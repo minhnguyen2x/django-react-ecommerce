@@ -1,0 +1,12 @@
+# Structurizr backup files
+*.dsl.backup
+
+# Exported diagrams (optional - you may want to commit these)
+*.png
+*.svg
+
+# Structurizr Lite auto-generated files
+.structurizr.*
+
+# macOS files
+.DS_Store
