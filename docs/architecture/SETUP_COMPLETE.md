@@ -67,14 +67,14 @@ Detailed React application structure showing:
 
 ### 4. Backend Components Diagram
 Detailed Django API structure showing:
-- **API Router**: Central routing
-- **User Authentication App**: JWT, profiles (3 components)
-- **Store App**: Core e-commerce (9 models + views/serializers)
-- **Vendor App**: Shop management (2 components)
-- **Customer App**: Customer features
-- **Addon App**: Configuration (2 components)
-- **Payment Processor**: Stripe/PayPal integration
-- **Notification System**: Event-driven alerts
+- **API Router**: Central routing for all API endpoints
+- **User Authentication App**: User, Profile models + Auth Views (JWT, register, password reset)
+- **Store App**: Core e-commerce with 20 models (Product with 40+ fields, Category, Tag, Brand, Gallery, Specification, Size, Color, Cart, CartOrder, CartOrderItem, Review, Wishlist, Address, Coupon, CouponUsers, Notification, CancelledOrder, DeliveryCouriers) + Store Views (40+ endpoints) + Serializers
+- **Vendor App**: Vendor model + Vendor Views (30+ endpoints for dashboard, analytics, products, orders, reviews, coupons, notifications)
+- **Customer App**: Customer Views (orders, wishlist, notifications, settings)
+- **Addon App**: ConfigSettings, Tax models for platform configuration
+- **Payment Processor**: Stripe and PayPal integration
+- **Notification System**: Django signals for event-driven notifications
 
 All components include their relationships showing data flow and dependencies.
 
@@ -117,15 +117,15 @@ docker run -it --rm -p 8080:8080 \
 Based on the code analysis, your platform features:
 
 **Backend (Django):**
-- 7 apps: userauths, store, vendor, customer, addon, category, brand
-- 20+ models in store app alone
-- 30+ vendor-specific API endpoints
-- JWT authentication with 5-min access tokens
-- Session-based cart with user association
-- Comprehensive order tracking with delivery stages
-- Review system with ratings
-- Coupon system with usage tracking
-- Automatic notifications via Django signals
+- 6 Django apps: userauths, store, vendor, customer, addon, api
+- 20 models in store app (Category, Tag, Brand, Product, Gallery, Specification, Size, Color, Cart, CartOrder, CartOrderItem, Review, Wishlist, Address, Coupon, CouponUsers, Notification, CancelledOrder, DeliveryCouriers, + ProductFaq)
+- 90+ total API endpoints (8 auth, 20+ store, 6 customer, 30+ vendor, 1 addon)
+- JWT authentication with 5-min access tokens, 50-day refresh tokens
+- Session-based cart (cart_id) with optional user association
+- Comprehensive order tracking with 7 delivery stages (On Hold, Shipping Processing, Shipped, Arrived, Delivered, Returning, Returned)
+- Review system with 1-5 star ratings and helpful/not helpful voting
+- Percentage-based coupon system (0-100%) with usage tracking per user
+- Automatic notifications via Django signals on order events
 
 **Frontend (React):**
 - 40+ view components across auth, shop, customer, vendor modules

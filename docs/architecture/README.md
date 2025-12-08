@@ -96,15 +96,16 @@ Detailed view of the React application structure:
 
 ### 4. Backend Components Diagram (`BackendComponents`)
 Detailed view of the Django API structure:
-- User Authentication App
-- Store App (products, cart, orders, reviews)
-- Vendor App (shop management, analytics)
-- Customer App (customer features)
-- Addon App (configuration)
-- Payment Processor
-- Notification System
+- **API Router**: Central routing component
+- **User Authentication App**: User, Profile models + Auth Views (JWT, register, password reset)
+- **Store App**: 20 models including Product, Category, Tag, Brand, Gallery, Specification, Size, Color, Cart, CartOrder, CartOrderItem, Review, Wishlist, Address, Coupon, CouponUsers, Notification, CancelledOrder, DeliveryCouriers + Store Views (40+ endpoints) + Serializers
+- **Vendor App**: Vendor model + Vendor Views (30+ endpoints for dashboard, products, orders, analytics, coupons, notifications)
+- **Customer App**: Customer Views (orders, wishlist, notifications, settings)
+- **Addon App**: ConfigSettings and Tax models for platform configuration
+- **Payment Processor**: Stripe and PayPal integration
+- **Notification System**: Django signals for automatic notifications
 
-**Use for**: Understanding backend code organization
+**Use for**: Understanding backend code organization and data models
 
 ### 5. Order Flow Diagram (`OrderFlow`)
 Dynamic diagram showing the complete order process:
@@ -118,31 +119,84 @@ Dynamic diagram showing the complete order process:
 
 ## Django Apps Overview
 
-### Core Apps
+### Core Apps (6 Django Apps)
 
-- **`userauths`**: User authentication, JWT tokens, profiles
-- **`store`**: Products, categories, brands, cart, orders, reviews, wishlist, coupons
-- **`vendor`**: Vendor shops, analytics, notifications, 30+ endpoints
+- **`userauths`**: User authentication, JWT tokens, user profiles
+- **`store`**: Complete e-commerce logic with 20 models (products, categories, brands, cart, orders, reviews, wishlist, coupons, delivery tracking)
+- **`vendor`**: Vendor shops, analytics, notifications, 30+ API endpoints
 - **`customer`**: Customer-specific features and account management
-- **`addon`**: Platform configuration (currency, fees, tax rates)
+- **`addon`**: Platform configuration (currency, service fees, tax rates, 2FA settings)
+- **`api`**: Central API routing for all apps under `/api/v1/`
 
-### Key Models
+### Key Models (20 Models in Store App)
 
-- **User/Profile**: Email-based authentication with OTP and password reset
-- **Product**: 40+ fields including pricing, stock, variants, ratings
-- **Cart/CartOrder/CartOrderItem**: Shopping cart and order management
-- **Vendor**: Shop details, verification status
-- **Review**: Product reviews with ratings (1-5 stars)
-- **Coupon**: Discount codes with usage tracking
+- **Category**: Product categories with images and slugs
+- **Tag**: Tags linked to categories
+- **Brand**: Product brands with images
+- **Product**: Main product model with 40+ fields (price, old_price, shipping_amount, stock_qty, in_stock, status, type, featured, hot_deal, special_offer, digital, views, orders, saved, rating)
+- **Gallery**: Product images (many-to-many relationship with products)
+- **Specification**: Product specifications (key-value pairs)
+- **Size**: Product size variations with pricing
+- **Color**: Product color variations with images and color codes
+- **Cart**: Shopping cart items with session-based cart_id
+- **CartOrder**: Order header with payment_status (paid/pending/processing/cancelled/initiated/failed/refunded) and order_status (Pending/Fulfilled/Partially Fulfilled/Cancelled)
+- **CartOrderItem**: Order line items with delivery tracking (order_placed, processing, quality_check, shipped, arrived, delivered)
+- **Review**: Product reviews with 1-5 star ratings and helpful/not helpful voting
+- **Wishlist**: User wishlists
+- **Address**: User shipping addresses
+- **Coupon**: Percentage-based discount coupons (0-100%)
+- **CouponUsers**: Tracks coupon usage per user
 - **Notification**: User and vendor notifications
+- **CancelledOrder**: Order cancellation tracking
+- **DeliveryCouriers**: Delivery service providers
+- **User/Profile** (userauths app): Email-based authentication with OTP and password reset
+- **Vendor** (vendor app): Shop details with verification status
 
-### API Structure
+### API Structure (90+ Endpoints)
 
 All APIs are RESTful and prefixed with `/api/v1/`:
-- Authentication: `/api/v1/user/`
-- Store: `/api/v1/products/`, `/api/v1/cart-view/`, `/api/v1/checkout/`
-- Vendor: `/api/v1/vendor/`
-- Customer: `/api/v1/customer/`
+
+**Authentication (8 endpoints):**
+- `/api/v1/user/token/` - JWT token obtain
+- `/api/v1/user/token/refresh/` - Token refresh
+- `/api/v1/user/register/` - User registration
+- `/api/v1/user/profile/<user_id>/` - User profile
+- `/api/v1/user/password-reset/<email>/` - Password reset email
+- `/api/v1/user/password-change/` - Password change
+
+**Store (20+ endpoints):**
+- `/api/v1/category/`, `/api/v1/brand/` - List categories and brands
+- `/api/v1/products/`, `/api/v1/featured-products/` - Product listings
+- `/api/v1/products/<slug>/` - Product detail
+- `/api/v1/cart-view/`, `/api/v1/cart-list/<cart_id>/` - Cart operations
+- `/api/v1/create-order/`, `/api/v1/checkout/<order_oid>/` - Order creation
+- `/api/v1/stripe-checkout/<order_oid>/` - Stripe payment
+- `/api/v1/payment-success/` - Payment confirmation
+- `/api/v1/coupon/` - Apply coupon
+- `/api/v1/create-review/`, `/api/v1/reviews/<product_id>/` - Reviews
+- `/api/v1/search/` - Product search
+
+**Customer (6 endpoints):**
+- `/api/v1/customer/orders/<user_id>/` - Order history
+- `/api/v1/customer/order/detail/<user_id>/<order_oid>/` - Order detail
+- `/api/v1/customer/wishlist/create/`, `/api/v1/customer/wishlist/<user_id>/` - Wishlist
+- `/api/v1/customer/notification/<user_id>/` - Notifications
+- `/api/v1/customer/setting/<pk>/` - Account settings
+
+**Vendor (30+ endpoints):**
+- `/api/v1/vendor/stats/<vendor_id>/` - Dashboard statistics
+- `/api/v1/vendor/products/<vendor_id>/` - Product management
+- `/api/v1/vendor/orders/<vendor_id>/` - Order management
+- `/api/v1/vendor/yearly-report/<vendor_id>/` - Analytics
+- `/api/v1/vendor/earning/<vendor_id>/` - Revenue tracking
+- `/api/v1/vendor/reviews/<vendor_id>/` - Review management
+- `/api/v1/vendor/coupon-list/<vendor_id>/` - Coupon management
+- `/api/v1/vendor/notifications-unseen/<vendor_id>/` - Notifications
+- `/api/v1/vendor/settings/<pk>/`, `/api/v1/vendor/shop-settings/<pk>/` - Settings
+- `/api/v1/shop/<vendor_slug>/` - Public shop view
+- `/api/v1/vendor/register/` - Vendor registration
+- `/api/v1/vendor/couriers/` - Delivery couriers
+- `/api/v1/vendor/order-item-detail/<pk>/` - Item tracking
 
 ## React App Structure
 
