@@ -55,7 +55,7 @@ function Register() {
                             <div className="col-xl-5 col-md-8">
                                 <div className="card rounded-5">
                                     <div className="card-body p-4">
-                                        <h3 className="text-center">Register Account</h3>
+                                        <h3 className="text-center">Đăng Ký Tài Khoản</h3>
                                         <br />
 
                                         <div className="tab-content">
@@ -69,13 +69,13 @@ function Register() {
                                                     {/* Email input */}
                                                     <div className="form-outline mb-4">
                                                         <label className="form-label" htmlFor="Full Name">
-                                                            Full Name
+                                                            Họ và Tên
                                                         </label>
                                                         <input
                                                             type="text"
                                                             id="username"
                                                             onChange={(e) => setFullname(e.target.value)}
-                                                            placeholder="Full Name"
+                                                            placeholder="Họ và Tên"
                                                             required
                                                             className="form-control"
 
@@ -89,7 +89,7 @@ function Register() {
                                                             type="email"
                                                             id="email"
                                                             onChange={(e) => setEmail(e.target.value)}
-                                                            placeholder="Email Address"
+                                                            placeholder="Địa chỉ Email"
                                                             required
                                                             className="form-control"
                                                         />
@@ -97,56 +97,56 @@ function Register() {
 
                                                     <div className="form-outline mb-4">
                                                         <label className="form-label" htmlFor="loginName">
-                                                            Mobile Number
+                                                            Số Điện Thoại
                                                         </label>
                                                         <input
                                                             type="text"
                                                             id="phone"
                                                             onChange={(e) => setPhone(e.target.value)}
-                                                            placeholder="Mobile Number"
+                                                            placeholder="Số điện thoại"
                                                             required
                                                             className="form-control"
                                                         />
                                                     </div>
                                                     <div className="form-outline mb-4">
                                                         <label className="form-label" htmlFor="loginPassword">
-                                                            Password
+                                                            Mật Khẩu
                                                         </label>
                                                         <input
                                                             type="password"
                                                             id="password"
                                                             onChange={(e) => setPassword(e.target.value)}
-                                                            placeholder="Password"
+                                                            placeholder="Mật khẩu"
                                                             className="form-control"
                                                         />
                                                     </div>
                                                     {/* Password input */}
                                                     <div className="form-outline mb-4">
                                                         <label className="form-label" htmlFor="loginPassword">
-                                                            Confirm Password
+                                                            Xác Nhận Mật Khẩu
                                                         </label>
                                                         <input
                                                             type="password"
                                                             id="confirm-password"
                                                             onChange={(e) => setPassword2(e.target.value)}
-                                                            placeholder="Confirm Password"
+                                                            placeholder="Xác nhận mật khẩu"
                                                             required
                                                             className="form-control"
                                                         />
                                                     </div>
                                                     <p className='fw-bold text-danger'>
-                                                        {password2 !== password ? 'Passwords do not match' : ''}
+                                                        {password2 !== password ? 'Mật khẩu không khớp' : ''}
                                                     </p>
 
                                                     <button className='btn btn-primary w-100' type="submit" disabled={isLoading}>
                                                         {isLoading ? (
                                                             <>
-                                                                <span className="mr-2 ">Processing...</span>
+                                                                <span className="mr-2 ">Đang Xử Lý...</span>
                                                                 <i className="fas fa-spinner fa-spin" />
                                                             </>
                                                         ) : (
                                                             <>
-                                                                <span className="mr-2">Sign Up</span>
+                                                                <span className="mr-2">Đăng Ký</span>
                                                                 <i className="fas fa-user-plus" />
                                                             </>
                                                         )}
@@ -154,7 +154,7 @@ function Register() {
 
                                                     <div className="text-center">
                                                         <p className='mt-4'>
-                                                            Already have an account? <Link to="/login">Login</Link>
+                                                            Đã có tài khoản? <Link to="/login">Đăng nhập ngay</Link>
                                                         </p>
                                                     </div>
                                                 </form>

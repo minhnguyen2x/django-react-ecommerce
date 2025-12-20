@@ -151,7 +151,7 @@ function Products() {
     const handleAddToCart = async (product_id, price, shipping_amount) => {
         setLoadingStates((prevStates) => ({
             ...prevStates,
-            [product_id]: 'Adding...',
+            [product_id]: 'Đang Thêm...',
         }));
 
 
@@ -161,7 +161,7 @@ function Products() {
             // After a successful operation, set the loading state to false
             setLoadingStates((prevStates) => ({
                 ...prevStates,
-                [product_id]: 'Added to Cart',
+                [product_id]: 'Đã Thêm Giỏ Hàng',
             }));
 
 
@@ -183,7 +183,7 @@ function Products() {
             // In case of an error, set the loading state for the specific product back to "Add to Cart"
             setLoadingStates((prevStates) => ({
                 ...prevStates,
-                [product_id]: 'Add to Cart',
+                [product_id]: 'Thêm Giỏ Hàng',
             }));
         }
 
@@ -209,9 +209,9 @@ function Products() {
                             <section className="text-center container">
                                 <div className="row mt-4 mb-3">
                                     <div className="col-lg-6 col-md-8 mx-auto">
-                                        <h1 className="fw-light">Hot Category🔥</h1>
+                                        <h1 className="fw-light">Danh Mục Nổi Bật🔥</h1>
                                         <p className="lead text-muted">
-                                            Our Latest Categories
+                                            Danh Mục Mới Nhất Của Chúng Tôi
                                         </p>
                                     </div>
                                 </div>
@@ -232,9 +232,9 @@ function Products() {
                             <section className="text-center container">
                                 <div className="row mt-4 mb-3">
                                     <div className="col-lg-6 col-md-8 mx-auto">
-                                        <h1 className="fw-light">Featured Products 📍</h1>
+                                        <h1 className="fw-light">Sản Phẩm Nổi Bật 📍</h1>
                                         <p className="lead text-muted">
-                                            Our Featured Products
+                                            Sản Phẩm Nổi Bật Của Chúng Tôi
                                         </p>
                                     </div>
                                 </div>
@@ -266,7 +266,7 @@ function Products() {
                                                     {((product.color && product.color.length > 0) || (product.size && product.size.length > 0)) ? (
                                                         <div className="btn-group">
                                                             <button className="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuClickable" data-bs-toggle="dropdown" data-bs-auto-close="false" aria-expanded="false">
-                                                                Variation
+                                                                Biến Thể
                                                             </button>
                                                             <ul className="dropdown-menu" style={{ maxWidth: "400px" }} aria-labelledby="dropdownMenuClickable">
                                                                 {/* Quantity */}
@@ -277,7 +277,7 @@ function Products() {
                                                                                 <input
                                                                                     type="number"
                                                                                     className='form-control'
-                                                                                    placeholder='Quantity'
+                                                                                    placeholder='Số lượng'
                                                                                     onChange={(e) => handleQtyChange(e, product.id)}
                                                                                     min={1}
                                                                                     defaultValue={1}
@@ -290,7 +290,7 @@ function Products() {
                                                                 {/* Size */}
                                                                 {product?.size && product?.size.length > 0 && (
                                                                     <div className="d-flex flex-column">
-                                                                        <li className="p-1"><b>Size</b>: {selectedSize[product.id] || 'Select a size'}</li>
+                                                                        <li className="p-1"><b>Kích Cỡ</b>: {selectedSize[product.id] || 'Chọn kích cỡ'}</li>
                                                                         <div className="p-1 mt-0 pt-0 d-flex flex-wrap">
                                                                             {product?.size?.map((size, index) => (
                                                                                 <>
@@ -312,7 +312,7 @@ function Products() {
                                                                 {/* Color */}
                                                                 {product.color && product.color.length > 0 && (
                                                                     <div className="d-flex flex-column mt-3">
-                                                                        <li className="p-1 color_name_div"><b>Color</b>: {selectedColors[product.id] || 'Select a color'}</li>
+                                                                        <li className="p-1 color_name_div"><b>Màu Sắc</b>: {selectedColors[product.id] || 'Chọn màu sắc'}</li>
                                                                         <div className="p-1 mt-0 pt-0 d-flex flex-wrap">
                                                                             {product?.color?.map((color, index) => (
                                                                                 <>
@@ -336,21 +336,21 @@ function Products() {
                                                                 <div className="d-flex mt-3 p-1 w-100">
                                                                     <button
                                                                         onClick={() => handleAddToCart(product.id, product.price, product.shipping_amount)}
-                                                                        disabled={loadingStates[product.id] === 'Adding...'}
+                                                                        disabled={loadingStates[product.id] === 'Đang Thêm...'}
                                                                         type="button"
                                                                         className="btn btn-primary me-1 mb-1"
                                                                     >
-                                                                        {loadingStates[product.id] === 'Added to Cart' ? (
+                                                                        {loadingStates[product.id] === 'Đã Thêm Giỏ Hàng' ? (
                                                                             <>
-                                                                                Added to Cart <FaCheckCircle />
+                                                                                Đã Thêm Giỏ Hàng <FaCheckCircle />
                                                                             </>
-                                                                        ) : loadingStates[product.id] === 'Adding...' ? (
+                                                                        ) : loadingStates[product.id] === 'Đang Thêm...' ? (
                                                                             <>
-                                                                                Adding to Cart <FaSpinner className='fas fa-spin' />
+                                                                                Đang Thêm Giỏ Hàng <FaSpinner className='fas fa-spin' />
                                                                             </>
                                                                         ) : (
                                                                             <>
-                                                                                {loadingStates[product.id] || 'Add to Cart'} <FaShoppingCart />
+                                                                                {loadingStates[product.id] || 'Thêm Giỏ Hàng'} <FaShoppingCart />
                                                                             </>
                                                                         )}
                                                                     </button>
@@ -360,21 +360,21 @@ function Products() {
                                                     ) : (
                                                         <button
                                                             onClick={() => handleAddToCart(product.id, product.price, product.shipping_amount)}
-                                                            disabled={loadingStates[product.id] === 'Adding...'}
+                                                            disabled={loadingStates[product.id] === 'Đang Thêm...'}
                                                             type="button"
                                                             className="btn btn-primary me-1 mb-1"
                                                         >
-                                                            {loadingStates[product.id] === 'Added to Cart' ? (
+                                                            {loadingStates[product.id] === 'Đã Thêm Giỏ Hàng' ? (
                                                                 <>
-                                                                    Added to Cart <FaCheckCircle />
+                                                                    Đã Thêm Giỏ Hàng <FaCheckCircle />
                                                                 </>
-                                                            ) : loadingStates[product.id] === 'Adding...' ? (
+                                                            ) : loadingStates[product.id] === 'Đang Thêm...' ? (
                                                                 <>
-                                                                    Adding to Cart <FaSpinner className='fas fa-spin' />
+                                                                    Đang Thêm Giỏ Hàng <FaSpinner className='fas fa-spin' />
                                                                 </>
                                                             ) : (
                                                                 <>
-                                                                    {loadingStates[product.id] || 'Add to Cart'} <FaShoppingCart />
+                                                                    {loadingStates[product.id] || 'Thêm Giỏ Hàng'} <FaShoppingCart />
                                                                 </>
                                                             )}
                                                         </button>
@@ -401,7 +401,7 @@ function Products() {
                                     <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
                                         <button className="page-link" onClick={() => setCurrentPage(currentPage - 1)}>
                                             <i className="ci-arrow-left me-2" />
-                                            Previous
+                                            Trước
                                         </button>
                                     </li>
                                 </ul>
@@ -418,7 +418,7 @@ function Products() {
                                 <ul className="pagination">
                                     <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
                                         <button className="page-link" onClick={() => setCurrentPage(currentPage + 1)}>
-                                            Next
+                                            Tiếp
                                             <i className="ci-arrow-right ms-3" />
 
                                         </button>
@@ -428,11 +428,11 @@ function Products() {
                             </nav>
                             <div>
                                 <div className="d-blfock mt-5" aria-label="Page navigation" >
-                                    <span className="fs-sm text-muted me-md-3">Page <b>{currentPage} </b> of <b>{totalPages}</b></span>
+                                    <span className="fs-sm text-muted me-md-3">Trang <b>{currentPage} </b> / <b>{totalPages}</b></span>
                                 </div>
                                 {totalPages !== 1 &&
                                     <div className="d-block mt-2" aria-label="Page navigation" >
-                                        <span className="fs-sm text-muted me-md-3">Showing <b>{itemsPerPage}</b> of <b>{products?.length}</b> records</span>
+                                        <span className="fs-sm text-muted me-md-3">Hiển thị <b>{itemsPerPage}</b> / <b>{products?.length}</b> sản phẩm</span>
                                     </div>
                                 }
                             </div>
