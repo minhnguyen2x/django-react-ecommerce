@@ -110,7 +110,7 @@ function ProductDetail() {
             console.log(response.data.length);
             Swal.fire({
                 icon: "success",
-                title: "Added To Cart"
+                title: "Đã Thêm Vào Giỏ Hàng"
             })
 
         } catch (error) {
@@ -157,7 +157,7 @@ function ProductDetail() {
             fetchReviewData()
             Swal.fire({
                 icon: "success",
-                title: "Review created successfully"
+                title: "Đánh giá đã được tạo thành công"
             })
         })
     }

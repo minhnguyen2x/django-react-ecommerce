@@ -46,7 +46,7 @@ const Login = () => {
                             <div className="col-xl-5 col-md-8">
                                 <div className="card rounded-5">
                                     <div className="card-body p-4">
-                                        <h3 className="text-center">Login</h3>
+                                        <h3 className="text-center">Đăng Nhập</h3>
                                         <br />
 
                                         <div className="tab-content">
@@ -60,7 +60,7 @@ const Login = () => {
                                                     {/* Email input */}
                                                     <div className="form-outline mb-4">
                                                         <label className="form-label" htmlFor="Full Name">
-                                                            Email Address
+                                                            Địa Chỉ Email
                                                         </label>
                                                         <input
                                                             type="text"
@@ -75,7 +75,7 @@ const Login = () => {
 
                                                     <div className="form-outline mb-4">
                                                         <label className="form-label" htmlFor="loginPassword">
-                                                            Password
+                                                            Mật Khẩu
                                                         </label>
                                                         <input
                                                             type="password"
@@ -90,12 +90,12 @@ const Login = () => {
                                                     <button className='btn btn-primary w-100' type="submit" disabled={isLoading}>
                                                         {isLoading ? (
                                                             <>
-                                                                <span className="mr-2 ">Processing...</span>
+                                                                <span className="mr-2 ">Đang Xử Lý...</span>
                                                                 <i className="fas fa-spinner fa-spin" />
                                                             </>
                                                         ) : (
                                                             <>
-                                                                <span className="mr-2">Sign In </span>
+                                                                <span className="mr-2">Đăng Nhập </span>
                                                                 <i className="fas fa-sign-in-alt" />
                                                             </>
                                                         )}
@@ -103,10 +103,10 @@ const Login = () => {
 
                                                     <div className="text-center">
                                                         <p className='mt-4'>
-                                                            Don't have an account? <Link to="/register">Register</Link>
+                                                            Chưa có tài khoản? <Link to="/register">Đăng ký ngay</Link>
                                                         </p>
                                                         <p className='mt-0'>
-                                                             <Link to="/forgot-password" className='text-danger'>Forgot Password?</Link>
+                                                             <Link to="/forgot-password" className='text-danger'>Quên mật khẩu?</Link>
                                                         </p>
                                                     </div>
                                                 </form>

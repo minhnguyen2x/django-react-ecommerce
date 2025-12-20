@@ -179,8 +179,8 @@ function Cart() {
             console.log("Please fill in all required fields");
             Swal.fire({
                 icon: 'warning',
-                title: 'Missing Fields!',
-                text: "All fields are required before checkout",
+                title: 'Thiếu Thông Tin!',
+                text: "Vui lòng điền đầy đủ thông tin trước khi thanh toán",
             })
             return;
         }
@@ -257,31 +257,31 @@ function Cart() {
                                                         <Link to={`/detail/${c.product.slug}`} className="fw-bold text-dark mb-4">{c?.product?.title.slice(0, 20)}...</Link>
                                                         {c.size != "No Size" &&
                                                             <p className="mb-0">
-                                                                <span className="text-muted me-2">Size:</span>
+                                                                <span className="text-muted me-2">Kích Cỡ:</span>
                                                                 <span>{c.size}</span>
                                                             </p>
                                                         }
                                                         {c.color != "No Color" &&
                                                             <p className='mb-0'>
-                                                                <span className="text-muted me-2">Color:</span>
+                                                                <span className="text-muted me-2">Màu Sắc:</span>
                                                                 <span>{c.color}</span>
                                                             </p>
                                                         }
                                                         <p className='mb-0'>
-                                                            <span className="text-muted me-2">Price:</span>
+                                                            <span className="text-muted me-2">Giá:</span>
                                                             <span>${c.product.price}</span>
                                                         </p>
                                                         <p className='mb-0'>
-                                                            <span className="text-muted me-2">Stock Qty:</span>
+                                                            <span className="text-muted me-2">Số Lượng Tồn:</span>
                                                             <span>{c.product.stock_qty}</span>
                                                         </p>
                                                         <p className='mb-0'>
-                                                            <span className="text-muted me-2">Vendor:</span>
+                                                            <span className="text-muted me-2">Người Bán:</span>
                                                             <span>{c.product.vendor.name}</span>
                                                         </p>
                                                         <p className="mt-3">
                                                             <button onClick={() => handleDeleteClick(cart_id, c.id)} className="btn btn-danger ">
-                                                                <small><i className="fas fa-trash me-2" />Remove</small>
+                                                                <small><i className="fas fa-trash me-2" />Xóa</small>
                                                             </button>
                                                         </p>
                                                     </div>
@@ -307,19 +307,19 @@ function Cart() {
 
                                             {cart.length < 1 &&
                                                 <>
-                                                    <h5>Your Cart Is Empty</h5>
-                                                    <Link to='/'> <i className='fas fa-shopping-cart'></i> Continue Shopping</Link>
+                                                    <h5>Giỏ Hàng Của Bạn Đang Trống</h5>
+                                                    <Link to='/'> <i className='fas fa-shopping-cart'></i> Tiếp Tục Mua Sắm</Link>
                                                 </>
                                             }
 
                                         </section>
                                         <div>
-                                            <h5 className="mb-4 mt-4">Personal Information</h5>
+                                            <h5 className="mb-4 mt-4">Thông Tin Cá Nhân</h5>
                                             {/* 2 column grid layout with text inputs for the first and last names */}
                                             <div className="row mb-4">
                                                 <div className="col">
                                                     <div className="form-outline">
-                                                        <label className="form-label" htmlFor="full_name"> <i className='fas fa-user'></i> Full Name</label>
+                                                        <label className="form-label" htmlFor="full_name"> <i className='fas fa-user'></i> Họ và Tên</label>
                                                         <input
                                                             type="text"
                                                             id=""
@@ -336,7 +336,7 @@ function Cart() {
                                             <div className="row mb-4">
                                                 <div className="col">
                                                     <div className="form-outline">
-                                                        <label className="form-label" htmlFor="form6Example1"><i className='fas fa-envelope'></i> Email</label>
+                                                        <label className="form-label" htmlFor="form6Example1"><i className='fas fa-phone'></i> Số Điện Thoại</label>
                                                         <input
                                                             type="text"
                                                             id="form6Example1"
@@ -350,7 +350,7 @@ function Cart() {
                                                 </div>
                                                 <div className="col">
                                                     <div className="form-outline">
-                                                        <label className="form-label" htmlFor="form6Example1"><i className='fas fa-phone'></i> Mobile</label>
+                                                        <label className="form-label" htmlFor="form6Example1"><i className='fas fa-phone'></i> Số Điện Thoại</label>
                                                         <input
                                                             type="text"
                                                             id="form6Example1"
@@ -363,12 +363,12 @@ function Cart() {
                                                 </div>
                                             </div>
 
-                                            <h5 className="mb-1 mt-4">Shipping address</h5>
+                                            <h5 className="mb-1 mt-4">Địa Chỉ Giao Hàng</h5>
 
                                             <div className="row mb-4">
                                                 <div className="col-lg-6 mt-3">
                                                     <div className="form-outline">
-                                                        <label className="form-label" htmlFor="form6Example1"> Address</label>
+                                                        <label className="form-label" htmlFor="form6Example1"> Thành Phố</label>
                                                         <input
                                                             type="text"
                                                             id="form6Example1"
@@ -381,7 +381,7 @@ function Cart() {
                                                 </div>
                                                 <div className="col-lg-6 mt-3">
                                                     <div className="form-outline">
-                                                        <label className="form-label" htmlFor="form6Example1"> City</label>
+                                                        <label className="form-label" htmlFor="form6Example1"> Thành Phố</label>
                                                         <input
                                                             type="text"
                                                             id="form6Example1"
@@ -395,7 +395,7 @@ function Cart() {
 
                                                 <div className="col-lg-6 mt-3">
                                                     <div className="form-outline">
-                                                        <label className="form-label" htmlFor="form6Example1"> State</label>
+                                                        <label className="form-label" htmlFor="form6Example1"> Tỉnh/Thành</label>
                                                         <input
                                                             type="text"
                                                             id="form6Example1"
@@ -408,7 +408,7 @@ function Cart() {
                                                 </div>
                                                 <div className="col-lg-6 mt-3">
                                                     <div className="form-outline">
-                                                        <label className="form-label" htmlFor="form6Example1"> Country</label>
+                                                        <label className="form-label" htmlFor="form6Example1"> Quốc Gia</label>
                                                         <input
                                                             type="text"
                                                             id="form6Example1"
@@ -425,26 +425,26 @@ function Cart() {
                                     <div className="col-lg-4 mb-4 mb-md-0">
                                         {/* Section: Summary */}
                                         <section className="shadow-4 p-4 rounded-5 mb-4">
-                                            <h5 className="mb-3">Cart Summary</h5>
+                                            <h5 className="mb-3">Tóm Tắt Giỏ Hàng</h5>
                                             <div className="d-flex justify-content-between mb-3">
-                                                <span>Subtotal </span>
+                                                <span>Tạm Tính </span>
                                                 <span>${cartTotal.sub_total?.toFixed(2)}</span>
                                             </div>
                                             <div className="d-flex justify-content-between">
-                                                <span>Shipping </span>
+                                                <span>Phí Vận Chuyển </span>
                                                 <span>${cartTotal.shipping?.toFixed(2)}</span>
                                             </div>
                                             <div className="d-flex justify-content-between">
-                                                <span>Tax </span>
+                                                <span>Thuế </span>
                                                 <span>${cartTotal.tax?.toFixed(2)}</span>
                                             </div>
                                             <div className="d-flex justify-content-between">
-                                                <span>Servive Fee </span>
+                                                <span>Phí Dịch Vụ </span>
                                                 <span>${cartTotal.service_fee?.toFixed(2)}</span>
                                             </div>
                                             <hr className="my-4" />
                                             <div className="d-flex justify-content-between fw-bold mb-5">
-                                                <span>Total </span>
+                                                <span>Tổng Cộng </span>
                                                 <span>${cartTotal.total?.toFixed(2)}</span>
                                             </div>
                                             {cart.length > 0 &&
@@ -452,7 +452,7 @@ function Cart() {
                                                     onClick={createCartOrder}
                                                     className="btn btn-primary btn-rounded w-100"
                                                 >
-                                                    Got to checkout
+                                                    Tiến Hành Thanh Toán
                                                 </button>
                                             }
                                         </section>

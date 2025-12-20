@@ -91,9 +91,9 @@ function PaymentSuccess() {
                                                                                 />
                                                                             </div>
                                                                             <div className="text-center">
-                                                                                <h1>Pending...</h1>
+                                                                                <h1>Đang Xử Lý...</h1>
                                                                                 <p>
-                                                                                    We are verifying your payment, please hold on :)
+                                                                                    Chúng tôi đang xác minh thanh toán của bạn, vui lòng đợi :)
                                                                                 </p>
 
                                                                             </div>
@@ -113,26 +113,26 @@ function PaymentSuccess() {
                                                                                 />
                                                                             </div>
                                                                             <div className="text-center">
-                                                                                <h1>Already Paid!</h1>
+                                                                                <h1>Đã Thanh Toán!</h1>
                                                                                 <p>
-                                                                                    You have already paid for this order, thank you.
+                                                                                    Bạn đã thanh toán cho đơn hàng này, cảm ơn bạn.
                                                                                 </p>
                                                                                 <button
                                                                                     className="btn btn-success mt-3 me-2"
                                                                                     data-bs-toggle="modal"
                                                                                     data-bs-target="#exampleModal"
                                                                                 >
-                                                                                    View Order <i className="fas fa-eye" />{" "}
+                                                                                    Xem Đơn Hàng <i className="fas fa-eye" />{" "}
                                                                                 </button>
                                                                                 <Link to={`/invoice/${order.oid}/`} className="btn btn-success mt-3 me-2" >
-                                                                                    Download Invoice{" "}
+                                                                                    Tải Hóa Đơn{" "}
                                                                                     <i className="fas fa-file-invoice" />{" "}
                                                                                 </Link>
                                                                                 <Link
                                                                                     to="/"
                                                                                     className="btn btn-success mt-3 me-2"
                                                                                 >
-                                                                                    Go Home <i className="fas fa-fa-arrow-left" />{" "}
+                                                                                    Về Trang Chủ <i className="fas fa-fa-arrow-left" />{" "}
                                                                                 </Link>
                                                                             </div>
                                                                         </div>
@@ -151,27 +151,26 @@ function PaymentSuccess() {
                                                                                 />
                                                                             </div>
                                                                             <div className="text-center">
-                                                                                <h1>Thank You !</h1>
+                                                                                <h1>Cảm Ơn Bạn!</h1>
                                                                                 <p>
-                                                                                    Your checkout was successfull, we have sent the
-                                                                                    order detail to your email{" "}
+                                                                                    Thanh toán của bạn thành công, chúng tôi đã gửi chi tiết đơn hàng đến email của bạn{" "}
                                                                                 </p>
                                                                                 <button
                                                                                     className="btn btn-success mt-3 me-2"
                                                                                     data-bs-toggle="modal"
                                                                                     data-bs-target="#exampleModal"
                                                                                 >
-                                                                                    View Order <i className="fas fa-eye" />{" "}
+                                                                                    Xem Đơn Hàng <i className="fas fa-eye" />{" "}
                                                                                 </button>
                                                                                 <Link to={`/invoice/${order.oid}/`} className="btn btn-success mt-3 me-2" >
-                                                                                    Download Invoice{" "}
+                                                                                    Tải Hóa Đơn{" "}
                                                                                     <i className="fas fa-file-invoice" />{" "}
                                                                                 </Link>
                                                                                 <a
                                                                                     href="{% url 'dashboard:dashboard' %}"
                                                                                     className="btn btn-success mt-3 me-2"
                                                                                 >
-                                                                                    Go Home <i className="fas fa-fa-arrow-left" />{" "}
+                                                                                    Về Trang Chủ <i className="fas fa-fa-arrow-left" />{" "}
                                                                                 </a>
                                                                             </div>
                                                                         </div>

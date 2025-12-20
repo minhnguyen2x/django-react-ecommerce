@@ -68,7 +68,7 @@ function Checkout() {
         Swal.fire({
           icon: 'success',
           title: response.data.message,
-          text: "A new coupon has been applied to your order",
+          text: "Mã giảm giá đã được áp dụng cho đơn hàng của bạn",
         })
       }
 
@@ -78,7 +78,7 @@ function Checkout() {
         Swal.fire({
           icon: 'warning',
           title: response.data.message,
-          text: "This coupon has been already activated!",
+          text: "Mã giảm giá này đã được sử dụng!",
         })
       }
       setCouponCode("")
@@ -89,7 +89,7 @@ function Checkout() {
       Swal.fire({
         icon: 'error',
         title: error.response.data.message,
-        text: "This coupon does not exist!",
+        text: "Mã giảm giá không tồn tại!",
       })
       setCouponCode("")
 
@@ -115,16 +115,16 @@ function Checkout() {
                   {/* Section: Biling details */}
                   <section className="">
                     <div className="alert alert-warning">
-                      <strong>Review Your Shipping &amp; Order Details </strong>
+                      <strong>Kiểm Tra Thông Tin Giao Hàng &amp; Đơn Hàng </strong>
                     </div>
                     <form>
-                      <h5 className="mb-4 mt-4">Shipping address</h5>
+                      <h5 className="mb-4 mt-4">Địa chỉ giao hàng</h5>
                       {/* 2 column grid layout with text inputs for the first and last names */}
                       <div className="row mb-4">
 
                         <div className="col-lg-12">
                           <div className="form-outline">
-                            <label className="form-label" htmlFor="form6Example2">Full Name</label>
+                            <label className="form-label" htmlFor="form6Example2">Họ và Tên</label>
                             <input
                               type="text"
                               readOnly
@@ -148,7 +148,7 @@ function Checkout() {
 
                         <div className="col-lg-6 mt-4">
                           <div className="form-outline">
-                            <label className="form-label" htmlFor="form6Example2">Mobile</label>
+                            <label className="form-label" htmlFor="form6Example2">Số Điện Thoại</label>
                             <input
                               type="text"
                               readOnly
@@ -159,7 +159,7 @@ function Checkout() {
                         </div>
                         <div className="col-lg-6 mt-4">
                           <div className="form-outline">
-                            <label className="form-label" htmlFor="form6Example2">Address</label>
+                            <label className="form-label" htmlFor="form6Example2">Địa Chỉ</label>
                             <input
                               type="text"
                               readOnly
@@ -170,7 +170,7 @@ function Checkout() {
                         </div>
                         <div className="col-lg-6 mt-4">
                           <div className="form-outline">
-                            <label className="form-label" htmlFor="form6Example2">City</label>
+                            <label className="form-label" htmlFor="form6Example2">Thành Phố</label>
                             <input
                               type="text"
                               readOnly
@@ -181,7 +181,7 @@ function Checkout() {
                         </div>
                         <div className="col-lg-6 mt-4">
                           <div className="form-outline">
-                            <label className="form-label" htmlFor="form6Example2">State</label>
+                            <label className="form-label" htmlFor="form6Example2">Tỉnh/Thành</label>
                             <input
                               type="text"
                               readOnly
@@ -192,7 +192,7 @@ function Checkout() {
                         </div>
                         <div className="col-lg-6 mt-4">
                           <div className="form-outline">
-                            <label className="form-label" htmlFor="form6Example2">Country</label>
+                            <label className="form-label" htmlFor="form6Example2">Quốc Gia</label>
                             <input
                               type="text"
                               readOnly
@@ -204,11 +204,11 @@ function Checkout() {
                       </div>
 
 
-                      <h5 className="mb-4 mt-4">Billing address</h5>
+                      <h5 className="mb-4 mt-4">Địa chỉ thanh toán</h5>
                       <div className="form-check mb-2">
                         <input className="form-check-input me-2" type="checkbox" defaultValue="" id="form6Example8" defaultChecked="" />
                         <label className="form-check-label" htmlFor="form6Example8">
-                          Same as shipping address
+                          Giống với địa chỉ giao hàng
                         </label>
                       </div>
                     </form>
@@ -218,26 +218,26 @@ function Checkout() {
                 <div className="col-lg-4 mb-4 mb-md-0">
                   {/* Section: Summary */}
                   <section className="shadow-4 p-4 rounded-5 mb-4">
-                    <h5 className="mb-3">Cart Summary</h5>
+                    <h5 className="mb-3">Tóm Tắt Giỏ Hàng</h5>
                     <div className="d-flex justify-content-between mb-3">
-                      <span>Subtotal </span>
+                      <span>Tạm Tính </span>
                       <span>${order.sub_total}</span>
                     </div>
                     <div className="d-flex justify-content-between">
-                      <span>Shipping </span>
+                      <span>Phí Vận Chuyển </span>
                       <span>${order.shipping_amount}</span>
                     </div>
                     <div className="d-flex justify-content-between">
-                      <span>Tax </span>
+                      <span>Thuế </span>
                       <span>${order.tax_fee}</span>
                     </div>
                     <div className="d-flex justify-content-between">
-                      <span>Servive Fee </span>
+                      <span>Phí Dịch Vụ </span>
                       <span>${order.service_fee}</span>
                     </div>
                     <hr className="my-4" />
                     <div className="d-flex justify-content-between fw-bold mb-5">
-                      <span>Total </span>
+                      <span>Tổng Cộng </span>
                       <span>${order.total}</span>
                     </div>
 
@@ -251,7 +251,7 @@ function Checkout() {
 
                       {loading === false &&
                         <>
-                          <input onChange={handleChange} value={couponCode} name="couponCode" type="text" className='form-control' style={{ border: "dashed 1px gray" }} placeholder='Enter Coupon Code' id="" />
+                          <input onChange={handleChange} value={couponCode} name="couponCode" type="text" className='form-control' style={{ border: "dashed 1px gray" }} placeholder='Nhập Mã Giảm Giá' id="" />
                           <button onClick={appleCoupon} className='btn btn-success ms-1'><i className='fas fa-check-circle'></i></button>
                         </>
                       }
@@ -259,13 +259,13 @@ function Checkout() {
 
                     {paymentLoading === true &&
                       <form action={`${API_BASE_URL}stripe-checkout/${param?.order_oid}/`} method='POST'>
-                        <button onClick={payWithStripe} type="submit" className="btn btn-primary btn-rounded w-100 mt-2" style={{ backgroundColor: "#635BFF" }}>Processing... <i className='fas fa-spinner fa-spin'></i> </button>
+                        <button onClick={payWithStripe} type="submit" className="btn btn-primary btn-rounded w-100 mt-2" style={{ backgroundColor: "#635BFF" }}>Đang Xử Lý... <i className='fas fa-spinner fa-spin'></i> </button>
                       </form>
                     }
 
                     {paymentLoading === false &&
                       <form action={`${API_BASE_URL}stripe-checkout/${param?.order_oid}/`} method='POST'>
-                        <button onClick={payWithStripe} type="submit" className="btn btn-primary btn-rounded w-100 mt-2" style={{ backgroundColor: "#635BFF" }}>Pay Now (Stripe)</button>
+                        <button onClick={payWithStripe} type="submit" className="btn btn-primary btn-rounded w-100 mt-2" style={{ backgroundColor: "#635BFF" }}>Thanh Toán Ngay (Stripe)</button>
                       </form>
                     }
 
