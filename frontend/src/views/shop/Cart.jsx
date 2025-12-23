@@ -1,9 +1,16 @@
-import { React, useEffect, useState, useContext } from 'react';
+import { useEffect, useState, useContext } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2'
 
 // Icons
-import { FaCheckCircle } from 'react-icons/fa';
+import { FaCheckCircle, FaTrash, FaSync, FaShoppingCart, FaUser, FaEnvelope, FaPhone, FaMapMarkerAlt } from 'react-icons/fa';
+
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
+import { ScrollToTop } from '@/components/ui/scroll-to-top';
 
 import { addToCart } from '../plugin/AddToCart';
 import apiInstance from '../../utils/axios';
@@ -80,7 +87,7 @@ function Cart() {
             initialQuantities[c.product.id] = c.qty
         });
         setProductQuantities(initialQuantities);
-    }, productQuantities);
+    }, [cart]);
 
     const handleQtyChange = (event, product_id) => {
         const quantity = event.target.value;
@@ -88,6 +95,34 @@ function Cart() {
             ...prevQuantities,
             [product_id]: quantity,
         }));
+    };
+
+    // Tính sub_total động dựa trên số lượng hiện tại
+    const calculateSubTotal = (product_id, price) => {
+        const qty = productQuantities[product_id] !== undefined ? productQuantities[product_id] : 1;
+        return (price * qty).toFixed(2);
+    };
+
+    // Auto-update cart when quantity changes (debounced)
+    const handleQtyChangeWithUpdate = async (event, cart_id, item_id, product_id, price, shipping_amount, color, size) => {
+        const quantity = event.target.value;
+        
+        // Cập nhật state ngay lập tức
+        setProductQuantities((prevQuantities) => ({
+            ...prevQuantities,
+            [product_id]: quantity,
+        }));
+
+        // Gọi API để cập nhật giỏ hàng
+        if (quantity > 0) {
+            try {
+                await addToCart(product_id, userData?.user_id, quantity, price, shipping_amount, currentAddress.country, color, size, cart_id, isAddingToCart);
+                fetchCartData(cart_id, userData?.user_id);
+                fetchCartTotal(cart_id, userData?.user_id);
+            } catch (error) {
+                console.log(error);
+            }
+        }
     };
 
 
@@ -213,256 +248,264 @@ function Cart() {
 
 
     return (
-        <div>
-            <main className="mt-5">
-                <div className="container">
-                    {/*Main layout*/}
-                    <main className="mb-6">
-                        <div className="container">
-                            {/* Section: Cart */}
-                            <section className="">
-                                <div className="row gx-lg-5 mb-5">
-                                    <div className="col-lg-8 mb-4 mb-md-0">
-                                        {/* Section: Product list */}
-                                        <section className="mb-5">
+        <div className="min-h-screen bg-gray-50">
+            <main className="container mx-auto px-4 py-8">
+                {/* Page Title */}
+                <div className="text-center mb-8">
+                    <h1 className="text-4xl font-light mb-2">Giỏ Hàng Của Bạn</h1>
+                    <p className="text-muted-foreground">Xem lại đơn hàng và tiến hành thanh toán</p>
+                </div>
 
-                                            {cart.map((c, index) => (
-                                                <div className="row border-bottom mb-4">
-                                                    <div className="col-md-2 mb-4 mb-md-0">
-                                                        <div
-                                                            className="bg-image ripple rounded-5 mb-4 overflow-hidden d-block"
-                                                            data-ripple-color="light"
-                                                        >
-                                                            <Link to={`/detail/${c?.product?.slug}`}>
-                                                                <img
-                                                                    src={c?.product?.image}
-                                                                    className="w-100"
-                                                                    alt=""
-                                                                    style={{ height: "100px", objectFit: "cover", borderRadius: "10px" }}
-                                                                />
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    {/* Cart Items Section */}
+                    <div className="lg:col-span-2 space-y-4">
+                        <Card>
+                            <CardHeader>
+                                <CardTitle className="text-2xl">Sản Phẩm ({cart.length})</CardTitle>
+                            </CardHeader>
+                            <CardContent className="space-y-4">
+                                {cart.map((c, index) => (
+                                    <div key={c.id} className="flex gap-4 pb-4 border-b last:border-b-0">
+                                                        {/* Product Image */}
+                                                        <Link to={`/detail/${c?.product?.slug}`} className="flex-shrink-0">
+                                                            <img
+                                                                src={c?.product?.image}
+                                                                alt={c?.product?.title}
+                                                                className="w-24 h-24 object-cover rounded-lg hover:scale-105 transition-transform"
+                                                            />
+                                                        </Link>
+
+                                                        {/* Product Details */}
+                                                        <div className="flex-grow">
+                                                            <Link to={`/detail/${c.product.slug}`} className="font-semibold text-lg hover:text-primary transition-colors block mb-2">
+                                                                {c?.product?.title}
                                                             </Link>
-                                                            <a href="#!">
-                                                                <div className="hover-overlay">
-                                                                    <div
-                                                                        className="mask"
-                                                                        style={{
-                                                                            backgroundColor: "hsla(0, 0%, 98.4%, 0.2)"
-                                                                        }}
-                                                                    />
-                                                                </div>
-                                                            </a>
+                                                            <div className="space-y-1 text-sm text-muted-foreground">
+                                                                {c.size !== "No Size" && (
+                                                                    <p>
+                                                                        <span className="font-medium">Kích Cỡ:</span> {c.size}
+                                                                    </p>
+                                                                )}
+                                                                {c.color !== "No Color" && (
+                                                                    <p>
+                                                                        <span className="font-medium">Màu Sắc:</span> {c.color}
+                                                                    </p>
+                                                                )}
+                                                                <p>
+                                                                    <span className="font-medium">Giá:</span> ${c.product.price}
+                                                                </p>
+                                                                <p>
+                                                                    <span className="font-medium">Kho:</span> {c.product.stock_qty}
+                                                                </p>
+                                                                <p>
+                                                                    <Badge variant="outline">{c.product.vendor.name}</Badge>
+                                                                </p>
+                                                            </div>
+                                                            <Button
+                                                                onClick={() => handleDeleteClick(cart_id, c.id)}
+                                                                variant="destructive"
+                                                                size="sm"
+                                                                className="mt-3"
+                                                            >
+                                                                <FaTrash className="mr-2" />Xóa
+                                                            </Button>
                                                         </div>
-                                                    </div>
-                                                    <div className="col-md-8 mb-4 mb-md-0">
-                                                        <Link to={`/detail/${c.product.slug}`} className="fw-bold text-dark mb-4">{c?.product?.title.slice(0, 20)}...</Link>
-                                                        {c.size != "No Size" &&
-                                                            <p className="mb-0">
-                                                                <span className="text-muted me-2">Kích Cỡ:</span>
-                                                                <span>{c.size}</span>
-                                                            </p>
-                                                        }
-                                                        {c.color != "No Color" &&
-                                                            <p className='mb-0'>
-                                                                <span className="text-muted me-2">Màu Sắc:</span>
-                                                                <span>{c.color}</span>
-                                                            </p>
-                                                        }
-                                                        <p className='mb-0'>
-                                                            <span className="text-muted me-2">Giá:</span>
-                                                            <span>${c.product.price}</span>
-                                                        </p>
-                                                        <p className='mb-0'>
-                                                            <span className="text-muted me-2">Số Lượng Tồn:</span>
-                                                            <span>{c.product.stock_qty}</span>
-                                                        </p>
-                                                        <p className='mb-0'>
-                                                            <span className="text-muted me-2">Người Bán:</span>
-                                                            <span>{c.product.vendor.name}</span>
-                                                        </p>
-                                                        <p className="mt-3">
-                                                            <button onClick={() => handleDeleteClick(cart_id, c.id)} className="btn btn-danger ">
-                                                                <small><i className="fas fa-trash me-2" />Xóa</small>
-                                                            </button>
-                                                        </p>
-                                                    </div>
-                                                    <div className="col-md-2 mb-4 mb-md-0">
-                                                        <div className="d-flex justify-content-center align-items-center">
-                                                            <div className="form-outline">
-                                                                <input
+
+                                                        {/* Quantity and Price */}
+                                                        <div className="flex flex-col items-end gap-3">
+                                                            <div className="flex items-center gap-2">
+                                                                <Input
                                                                     type="number"
                                                                     id={`qtyInput-${c.product.id}`}
-                                                                    className="form-control"
-                                                                    onChange={(e) => handleQtyChange(e, c.product.id)}
-                                                                    value={productQuantities[c.product.id] || c.qty}
+                                                                    className="w-20"
+                                                                    onChange={(e) => handleQtyChangeWithUpdate(e, cart_id, c.id, c.product.id, c.product.price, c.product.shipping_amount, c.color, c.size)}
+                                                                    value={productQuantities[c.product.id] !== undefined ? productQuantities[c.product.id] : c.qty}
                                                                     min={1}
-
                                                                 />
                                                             </div>
-                                                            <button onClick={() => UpdateCart(cart_id, c.id, c.product.id, c.product.price, c.product.shipping_amount, c.color, c.size)} className='ms-2 btn btn-primary'><i className='fas fa-rotate-right'></i></button>
+                                                            <div className="text-right">
+                                                                <p className="text-2xl font-bold text-primary">${calculateSubTotal(c.product.id, c.product.price)}</p>
+                                                            </div>
                                                         </div>
-                                                        <h5 className="mb-2 mt-3 text-center"><span className="align-middle">${c.sub_total}</span></h5>
                                                     </div>
-                                                </div>
                                             ))}
 
-                                            {cart.length < 1 &&
-                                                <>
-                                                    <h5>Giỏ Hàng Của Bạn Đang Trống</h5>
-                                                    <Link to='/'> <i className='fas fa-shopping-cart'></i> Tiếp Tục Mua Sắm</Link>
-                                                </>
-                                            }
-
-                                        </section>
-                                        <div>
-                                            <h5 className="mb-4 mt-4">Thông Tin Cá Nhân</h5>
-                                            {/* 2 column grid layout with text inputs for the first and last names */}
-                                            <div className="row mb-4">
-                                                <div className="col">
-                                                    <div className="form-outline">
-                                                        <label className="form-label" htmlFor="full_name"> <i className='fas fa-user'></i> Họ và Tên</label>
-                                                        <input
-                                                            type="text"
-                                                            id=""
-                                                            name='fullName'
-                                                            className="form-control"
-                                                            onChange={handleChange}
-                                                            value={fullName}
-                                                        />
+                                                {cart.length < 1 && (
+                                                    <div className="text-center py-12">
+                                                        <FaShoppingCart className="mx-auto text-6xl text-gray-300 mb-4" />
+                                                        <h3 className="text-2xl font-semibold mb-2">Giỏ Hàng Của Bạn Đang Trống</h3>
+                                                        <p className="text-muted-foreground mb-4">Hãy thêm sản phẩm vào giỏ hàng để tiếp tục mua sắm</p>
+                                                        <Link to='/'>
+                                                            <Button>
+                                                                <FaShoppingCart className="mr-2" /> Tiếp Tục Mua Sắm
+                                                            </Button>
+                                                        </Link>
                                                     </div>
-                                                </div>
+                                                )}
+                                            </CardContent>
+                                        </Card>
 
-                                            </div>
+                                        {/* Shipping Information */}
+                                        {cart.length > 0 && (
+                                            <Card>
+                                                <CardHeader>
+                                                    <CardTitle className="text-2xl">Thông Tin Giao Hàng</CardTitle>
+                                                </CardHeader>
+                                                <CardContent className="space-y-4">
+                                                    {/* Personal Info */}
+                                                    <div>
+                                                        <h3 className="text-lg font-semibold mb-3 flex items-center">
+                                                            <FaUser className="mr-2" /> Thông Tin Cá Nhân
+                                                        </h3>
+                                                        <div className="space-y-3">
+                                                            <div>
+                                                                <label className="text-sm font-medium mb-1 block">Họ và Tên</label>
+                                                                <Input
+                                                                    type="text"
+                                                                    name='fullName'
+                                                                    onChange={handleChange}
+                                                                    value={fullName}
+                                                                    placeholder="Nhập họ và tên"
+                                                                />
+                                                            </div>
+                                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                                                <div>
+                                                                    <label className="text-sm font-medium mb-1 block">Email</label>
+                                                                    <Input
+                                                                        type="email"
+                                                                        name='email'
+                                                                        onChange={handleChange}
+                                                                        value={email}
+                                                                        placeholder="email@example.com"
+                                                                    />
+                                                                </div>
+                                                                <div>
+                                                                    <label className="text-sm font-medium mb-1 block">Số Điện Thoại</label>
+                                                                    <Input
+                                                                        type="text"
+                                                                        name='mobile'
+                                                                        onChange={handleChange}
+                                                                        value={mobile}
+                                                                        placeholder="0123456789"
+                                                                    />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
 
-                                            <div className="row mb-4">
-                                                <div className="col">
-                                                    <div className="form-outline">
-                                                        <label className="form-label" htmlFor="form6Example1"><i className='fas fa-phone'></i> Số Điện Thoại</label>
-                                                        <input
-                                                            type="text"
-                                                            id="form6Example1"
-                                                            className="form-control"
-                                                            name='email'
-                                                            onChange={handleChange}
-                                                            value={email}
+                                                    <Separator />
 
-                                                        />
-                                                    </div>
-                                                </div>
-                                                <div className="col">
-                                                    <div className="form-outline">
-                                                        <label className="form-label" htmlFor="form6Example1"><i className='fas fa-phone'></i> Số Điện Thoại</label>
-                                                        <input
-                                                            type="text"
-                                                            id="form6Example1"
-                                                            className="form-control"
-                                                            name='mobile'
-                                                            onChange={handleChange}
-                                                            value={mobile}
-                                                        />
-                                                    </div>
-                                                </div>
-                                            </div>
+                                                    {/* Shipping Address */}
+                                                    <div>
+                                                        <h3 className="text-lg font-semibold mb-3 flex items-center">
+                                                            <FaMapMarkerAlt className="mr-2" /> Địa Chỉ Giao Hàng
+                                                        </h3>
 
-                                            <h5 className="mb-1 mt-4">Địa Chỉ Giao Hàng</h5>
-
-                                            <div className="row mb-4">
-                                                <div className="col-lg-6 mt-3">
-                                                    <div className="form-outline">
-                                                        <label className="form-label" htmlFor="form6Example1"> Thành Phố</label>
-                                                        <input
-                                                            type="text"
-                                                            id="form6Example1"
-                                                            className="form-control"
-                                                            name='address'
-                                                            onChange={handleChange}
-                                                            value={address}
-                                                        />
+                                                        <div className="space-y-3">
+                                                            <div>
+                                                                <label className="text-sm font-medium mb-1 block">Địa Chỉ</label>
+                                                                <Input
+                                                                    type="text"
+                                                                    name='address'
+                                                                    onChange={handleChange}
+                                                                    value={address}
+                                                                    placeholder="Số nhà, tên đường"
+                                                                />
+                                                            </div>
+                                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                                                <div>
+                                                                    <label className="text-sm font-medium mb-1 block">Thành Phố</label>
+                                                                    <Input
+                                                                        type="text"
+                                                                        name='city'
+                                                                        onChange={handleChange}
+                                                                        value={city}
+                                                                        placeholder="Thành phố"
+                                                                    />
+                                                                </div>
+                                                                <div>
+                                                                    <label className="text-sm font-medium mb-1 block">Tỉnh/Thành</label>
+                                                                    <Input
+                                                                        type="text"
+                                                                        name='state'
+                                                                        onChange={handleChange}
+                                                                        value={state}
+                                                                        placeholder="Tỉnh/Thành phố"
+                                                                    />
+                                                                </div>
+                                                            </div>
+                                                            <div>
+                                                                <label className="text-sm font-medium mb-1 block">Quốc Gia</label>
+                                                                <Input
+                                                                    type="text"
+                                                                    name='country'
+                                                                    onChange={handleChange}
+                                                                    value={country}
+                                                                    placeholder="Việt Nam"
+                                                                />
+                                                            </div>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                                <div className="col-lg-6 mt-3">
-                                                    <div className="form-outline">
-                                                        <label className="form-label" htmlFor="form6Example1"> Thành Phố</label>
-                                                        <input
-                                                            type="text"
-                                                            id="form6Example1"
-                                                            className="form-control"
-                                                            name='city'
-                                                            onChange={handleChange}
-                                                            value={city}
-                                                        />
-                                                    </div>
-                                                </div>
-
-                                                <div className="col-lg-6 mt-3">
-                                                    <div className="form-outline">
-                                                        <label className="form-label" htmlFor="form6Example1"> Tỉnh/Thành</label>
-                                                        <input
-                                                            type="text"
-                                                            id="form6Example1"
-                                                            className="form-control"
-                                                            name='state'
-                                                            onChange={handleChange}
-                                                            value={state}
-                                                        />
-                                                    </div>
-                                                </div>
-                                                <div className="col-lg-6 mt-3">
-                                                    <div className="form-outline">
-                                                        <label className="form-label" htmlFor="form6Example1"> Quốc Gia</label>
-                                                        <input
-                                                            type="text"
-                                                            id="form6Example1"
-                                                            className="form-control"
-                                                            name='country'
-                                                            onChange={handleChange}
-                                                            value={country}
-                                                        />
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
+                                                </CardContent>
+                                            </Card>
+                                        )}
                                     </div>
-                                    <div className="col-lg-4 mb-4 mb-md-0">
-                                        {/* Section: Summary */}
-                                        <section className="shadow-4 p-4 rounded-5 mb-4">
-                                            <h5 className="mb-3">Tóm Tắt Giỏ Hàng</h5>
-                                            <div className="d-flex justify-content-between mb-3">
-                                                <span>Tạm Tính </span>
-                                                <span>${cartTotal.sub_total?.toFixed(2)}</span>
-                                            </div>
-                                            <div className="d-flex justify-content-between">
-                                                <span>Phí Vận Chuyển </span>
-                                                <span>${cartTotal.shipping?.toFixed(2)}</span>
-                                            </div>
-                                            <div className="d-flex justify-content-between">
-                                                <span>Thuế </span>
-                                                <span>${cartTotal.tax?.toFixed(2)}</span>
-                                            </div>
-                                            <div className="d-flex justify-content-between">
-                                                <span>Phí Dịch Vụ </span>
-                                                <span>${cartTotal.service_fee?.toFixed(2)}</span>
-                                            </div>
-                                            <hr className="my-4" />
-                                            <div className="d-flex justify-content-between fw-bold mb-5">
-                                                <span>Tổng Cộng </span>
-                                                <span>${cartTotal.total?.toFixed(2)}</span>
-                                            </div>
-                                            {cart.length > 0 &&
-                                                <button
-                                                    onClick={createCartOrder}
-                                                    className="btn btn-primary btn-rounded w-100"
-                                                >
-                                                    Tiến Hành Thanh Toán
-                                                </button>
-                                            }
-                                        </section>
+                    {/* Cart Summary Sidebar */}
+                    <div className="lg:col-span-1">
+                        <Card className="sticky top-4">
+                            <CardHeader>
+                                <CardTitle className="text-2xl">Tóm Tắt Đơn Hàng</CardTitle>
+                            </CardHeader>
+                            <CardContent className="space-y-4">
+                                <div className="space-y-3">
+                                    <div className="flex justify-between text-muted-foreground">
+                                        <span>Tạm Tính</span>
+                                        <span className="font-medium">${cartTotal.sub_total?.toFixed(2)}</span>
+                                    </div>
+                                    <div className="flex justify-between text-muted-foreground">
+                                        <span>Phí Vận Chuyển</span>
+                                        <span className="font-medium">${cartTotal.shipping?.toFixed(2)}</span>
+                                    </div>
+                                    <div className="flex justify-between text-muted-foreground">
+                                        <span>Thuế</span>
+                                        <span className="font-medium">${cartTotal.tax?.toFixed(2)}</span>
+                                    </div>
+                                    <div className="flex justify-between text-muted-foreground">
+                                        <span>Phí Dịch Vụ</span>
+                                        <span className="font-medium">${cartTotal.service_fee?.toFixed(2)}</span>
                                     </div>
                                 </div>
-                            </section>
-                        </div>
-                    </main>
+                                
+                                <Separator />
+                                
+                                <div className="flex justify-between text-xl font-bold">
+                                    <span>Tổng Cộng</span>
+                                    <span className="text-primary">${cartTotal.total?.toFixed(2)}</span>
+                                </div>
+                                
+                                {cart.length > 0 && (
+                                    <Button
+                                        onClick={createCartOrder}
+                                        className="w-full py-6 text-lg"
+                                        size="lg"
+                                    >
+                                        <FaCheckCircle className="mr-2" />
+                                        Tiến Hành Thanh Toán
+                                    </Button>
+                                )}
+                                
+                                <Link to="/">
+                                    <Button variant="outline" className="w-full">
+                                        <FaShoppingCart className="mr-2" />
+                                        Tiếp Tục Mua Sắm
+                                    </Button>
+                                </Link>
+                            </CardContent>
+                        </Card>
+                    </div>
                 </div>
             </main>
+            <ScrollToTop />
         </div>
     )
 }

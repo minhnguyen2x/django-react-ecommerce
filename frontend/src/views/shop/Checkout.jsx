@@ -1,9 +1,17 @@
-import { React, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
 import Swal from 'sweetalert2'
 import { API_BASE_URL, PAYPAL_CLIENT_ID, SERVER_URL } from '../../utils/constants';
+import { FaUser, FaMapMarkerAlt, FaCheckCircle, FaSpinner, FaCreditCard, FaLock } from 'react-icons/fa';
 
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { ScrollToTop } from '@/components/ui/scroll-to-top';
 
 import apiInstance from '../../utils/axios';
 import GetCurrentAddress from '../plugin/UserCountry';
@@ -104,173 +112,231 @@ function Checkout() {
 
 
   return (
-    <div>
-      <main>
-        <main className="mb-4 mt-4">
-          <div className="container">
-            {/* Section: Checkout form */}
-            <section className="">
-              <div className="row gx-lg-5">
-                <div className="col-lg-8 mb-4 mb-md-0">
-                  {/* Section: Biling details */}
-                  <section className="">
-                    <div className="alert alert-warning">
-                      <strong>Kiểm Tra Thông Tin Giao Hàng &amp; Đơn Hàng </strong>
+    <div className="min-h-screen bg-gray-50">
+      <main className="container mx-auto px-4 py-8">
+        {/* Page Title */}
+        <div className="text-center mb-8">
+          <h1 className="text-4xl font-light mb-2">Thanh Toán</h1>
+          <p className="text-muted-foreground">Kiểm tra thông tin và hoàn tất đơn hàng</p>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Order Information Section */}
+          <div className="lg:col-span-2 space-y-4">
+            {/* Shipping Information Card */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-2xl flex items-center">
+                  <FaMapMarkerAlt className="mr-2" />
+                  Địa Chỉ Giao Hàng
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Alert className="mb-6">
+                  <AlertDescription>
+                    <strong>Kiểm tra thông tin giao hàng trước khi thanh toán</strong>
+                  </AlertDescription>
+                </Alert>
+
+                <div className="space-y-4">
+
+                  <div>
+                    <label className="text-sm font-medium mb-1 block">Họ và Tên</label>
+                    <Input
+                      type="text"
+                      readOnly
+                      value={order.full_name}
+                      className="bg-gray-100"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-sm font-medium mb-1 block">Email</label>
+                      <Input
+                        type="text"
+                        readOnly
+                        value={order.email}
+                        className="bg-gray-100"
+                      />
                     </div>
-                    <form>
-                      <h5 className="mb-4 mt-4">Địa chỉ giao hàng</h5>
-                      {/* 2 column grid layout with text inputs for the first and last names */}
-                      <div className="row mb-4">
 
-                        <div className="col-lg-12">
-                          <div className="form-outline">
-                            <label className="form-label" htmlFor="form6Example2">Họ và Tên</label>
-                            <input
-                              type="text"
-                              readOnly
-                              className="form-control"
-                              value={order.full_name}
-                            />
-                          </div>
-                        </div>
+                    <div>
+                      <label className="text-sm font-medium mb-1 block">Số Điện Thoại</label>
+                      <Input
+                        type="text"
+                        readOnly
+                        value={order.mobile}
+                        className="bg-gray-100"
+                      />
+                    </div>
+                  </div>
 
-                        <div className="col-lg-6 mt-4">
-                          <div className="form-outline">
-                            <label className="form-label" htmlFor="form6Example2">Email</label>
-                            <input
-                              type="text"
-                              readOnly
-                              className="form-control"
-                              value={order.email}
-                            />
-                          </div>
-                        </div>
+                  <div>
+                    <label className="text-sm font-medium mb-1 block">Địa Chỉ</label>
+                    <Input
+                      type="text"
+                      readOnly
+                      value={order.address}
+                      className="bg-gray-100"
+                    />
+                  </div>
 
-                        <div className="col-lg-6 mt-4">
-                          <div className="form-outline">
-                            <label className="form-label" htmlFor="form6Example2">Số Điện Thoại</label>
-                            <input
-                              type="text"
-                              readOnly
-                              className="form-control"
-                              value={order.mobile}
-                            />
-                          </div>
-                        </div>
-                        <div className="col-lg-6 mt-4">
-                          <div className="form-outline">
-                            <label className="form-label" htmlFor="form6Example2">Địa Chỉ</label>
-                            <input
-                              type="text"
-                              readOnly
-                              className="form-control"
-                              value={order.address}
-                            />
-                          </div>
-                        </div>
-                        <div className="col-lg-6 mt-4">
-                          <div className="form-outline">
-                            <label className="form-label" htmlFor="form6Example2">Thành Phố</label>
-                            <input
-                              type="text"
-                              readOnly
-                              className="form-control"
-                              value={order.city}
-                            />
-                          </div>
-                        </div>
-                        <div className="col-lg-6 mt-4">
-                          <div className="form-outline">
-                            <label className="form-label" htmlFor="form6Example2">Tỉnh/Thành</label>
-                            <input
-                              type="text"
-                              readOnly
-                              className="form-control"
-                              value={order.state}
-                            />
-                          </div>
-                        </div>
-                        <div className="col-lg-6 mt-4">
-                          <div className="form-outline">
-                            <label className="form-label" htmlFor="form6Example2">Quốc Gia</label>
-                            <input
-                              type="text"
-                              readOnly
-                              className="form-control"
-                              value={order.country}
-                            />
-                          </div>
-                        </div>
-                      </div>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                      <label className="text-sm font-medium mb-1 block">Thành Phố</label>
+                      <Input
+                        type="text"
+                        readOnly
+                        value={order.city}
+                        className="bg-gray-100"
+                      />
+                    </div>
 
+                    <div>
+                      <label className="text-sm font-medium mb-1 block">Tỉnh/Thành</label>
+                      <Input
+                        type="text"
+                        readOnly
+                        value={order.state}
+                        className="bg-gray-100"
+                      />
+                    </div>
 
-                      <h5 className="mb-4 mt-4">Địa chỉ thanh toán</h5>
-                      <div className="form-check mb-2">
-                        <input className="form-check-input me-2" type="checkbox" defaultValue="" id="form6Example8" defaultChecked="" />
-                        <label className="form-check-label" htmlFor="form6Example8">
-                          Giống với địa chỉ giao hàng
-                        </label>
-                      </div>
-                    </form>
-                  </section>
-                  {/* Section: Biling details */}
+                    <div>
+                      <label className="text-sm font-medium mb-1 block">Quốc Gia</label>
+                      <Input
+                        type="text"
+                        readOnly
+                        value={order.country}
+                        className="bg-gray-100"
+                      />
+                    </div>
+                  </div>
+
+                  <Separator className="my-6" />
+
+                  <div className="flex items-center space-x-2">
+                    <input type="checkbox" defaultChecked id="billingAddress" className="rounded" />
+                    <label htmlFor="billingAddress" className="text-sm font-medium">
+                      Địa chỉ thanh toán giống với địa chỉ giao hàng
+                    </label>
+                  </div>
                 </div>
-                <div className="col-lg-4 mb-4 mb-md-0">
-                  {/* Section: Summary */}
-                  <section className="shadow-4 p-4 rounded-5 mb-4">
-                    <h5 className="mb-3">Tóm Tắt Giỏ Hàng</h5>
-                    <div className="d-flex justify-content-between mb-3">
-                      <span>Tạm Tính </span>
-                      <span>${order.sub_total}</span>
-                    </div>
-                    <div className="d-flex justify-content-between">
-                      <span>Phí Vận Chuyển </span>
-                      <span>${order.shipping_amount}</span>
-                    </div>
-                    <div className="d-flex justify-content-between">
-                      <span>Thuế </span>
-                      <span>${order.tax_fee}</span>
-                    </div>
-                    <div className="d-flex justify-content-between">
-                      <span>Phí Dịch Vụ </span>
-                      <span>${order.service_fee}</span>
-                    </div>
-                    <hr className="my-4" />
-                    <div className="d-flex justify-content-between fw-bold mb-5">
-                      <span>Tổng Cộng </span>
-                      <span>${order.total}</span>
-                    </div>
+              </CardContent>
+            </Card>
+          </div>
+          {/* Order Summary Sidebar */}
+          <div className="lg:col-span-1">
+            <Card className="sticky top-4">
+              <CardHeader>
+                <CardTitle className="text-2xl">Tóm Tắt Đơn Hàng</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-3">
+                  <div className="flex justify-between text-muted-foreground">
+                    <span>Tạm Tính</span>
+                    <span className="font-medium">${order.sub_total}</span>
+                  </div>
+                  <div className="flex justify-between text-muted-foreground">
+                    <span>Phí Vận Chuyển</span>
+                    <span className="font-medium">${order.shipping_amount}</span>
+                  </div>
+                  <div className="flex justify-between text-muted-foreground">
+                    <span>Thuế</span>
+                    <span className="font-medium">${order.tax_fee}</span>
+                  </div>
+                  <div className="flex justify-between text-muted-foreground">
+                    <span>Phí Dịch Vụ</span>
+                    <span className="font-medium">${order.service_fee}</span>
+                  </div>
+                </div>
+                
+                <Separator />
+                
+                <div className="flex justify-between text-xl font-bold">
+                  <span>Tổng Cộng</span>
+                  <span className="text-primary">${order.total}</span>
+                </div>
 
-                    <div className="shadow p-3 d-flex mt-4 mb-4">
-                      {loading === true &&
-                        <>
-                          <input readOnly value={couponCode} name="couponCode" type="text" className='form-control' style={{ border: "dashed 1px gray" }} placeholder='Enter Coupon Code' id="" />
-                          <button disabled className='btn btn-success ms-1'><i className='fas fa-spinner fa-spin'></i></button>
-                        </>
-                      }
+                <Separator />
+                
+                {/* Coupon Section */}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Mã Giảm Giá</label>
+                  <div className="flex gap-2">
+                    {loading === true ? (
+                      <>
+                        <Input
+                          readOnly
+                          value={couponCode}
+                          name="couponCode"
+                          type="text"
+                          placeholder='Nhập mã giảm giá'
+                          className="border-dashed"
+                        />
+                        <Button disabled size="icon">
+                          <FaSpinner className="animate-spin" />
+                        </Button>
+                      </>
+                    ) : (
+                      <>
+                        <Input
+                          onChange={handleChange}
+                          value={couponCode}
+                          name="couponCode"
+                          type="text"
+                          placeholder='Nhập mã giảm giá'
+                          className="border-dashed"
+                        />
+                        <Button onClick={appleCoupon} size="icon" variant="default">
+                          <FaCheckCircle />
+                        </Button>
+                      </>
+                    )}
+                  </div>
+                </div>
+                
+                <Separator />
 
-                      {loading === false &&
-                        <>
-                          <input onChange={handleChange} value={couponCode} name="couponCode" type="text" className='form-control' style={{ border: "dashed 1px gray" }} placeholder='Nhập Mã Giảm Giá' id="" />
-                          <button onClick={appleCoupon} className='btn btn-success ms-1'><i className='fas fa-check-circle'></i></button>
-                        </>
-                      }
-                    </div>
+                {/* Payment Buttons */}
+                <div className="space-y-3">
+                  <h3 className="text-lg font-semibold flex items-center">
+                    <FaLock className="mr-2" />
+                    Phương Thức Thanh Toán
+                  </h3>
+                  
+                  {/* Stripe Payment */}
+                  {paymentLoading === true ? (
+                    <form action={`${API_BASE_URL}stripe-checkout/${param?.order_oid}/`} method='POST'>
+                      <Button
+                        onClick={payWithStripe}
+                        type="submit"
+                        className="w-full py-6 text-lg"
+                        style={{ backgroundColor: "#635BFF" }}
+                        disabled
+                      >
+                        <FaSpinner className="mr-2 animate-spin" />
+                        Đang Xử Lý...
+                      </Button>
+                    </form>
+                  ) : (
+                    <form action={`${API_BASE_URL}stripe-checkout/${param?.order_oid}/`} method='POST'>
+                      <Button
+                        onClick={payWithStripe}
+                        type="submit"
+                        className="w-full py-6 text-lg"
+                        style={{ backgroundColor: "#635BFF" }}
+                      >
+                        <FaCreditCard className="mr-2" />
+                        Thanh Toán Qua Stripe
+                      </Button>
+                    </form>
+                  )}
 
-                    {paymentLoading === true &&
-                      <form action={`${API_BASE_URL}stripe-checkout/${param?.order_oid}/`} method='POST'>
-                        <button onClick={payWithStripe} type="submit" className="btn btn-primary btn-rounded w-100 mt-2" style={{ backgroundColor: "#635BFF" }}>Đang Xử Lý... <i className='fas fa-spinner fa-spin'></i> </button>
-                      </form>
-                    }
-
-                    {paymentLoading === false &&
-                      <form action={`${API_BASE_URL}stripe-checkout/${param?.order_oid}/`} method='POST'>
-                        <button onClick={payWithStripe} type="submit" className="btn btn-primary btn-rounded w-100 mt-2" style={{ backgroundColor: "#635BFF" }}>Thanh Toán Ngay (Stripe)</button>
-                      </form>
-                    }
-
-                    <PayPalScriptProvider options={initialOptions}>
-                      <PayPalButtons className='mt-3'
+                  {/* PayPal Payment */}
+                  <PayPalScriptProvider options={initialOptions}>
+                    <PayPalButtons
                         createOrder={(data, actions) => {
                           return actions.order.create({
                             purchase_units: [
@@ -296,19 +362,15 @@ function Checkout() {
                             }
                           })
                         }}
-                      />
-                    </PayPalScriptProvider>
-
-                    {/* <button type="button" className="btn btn-primary btn-rounded w-100 mt-2">Pay Now (Flutterwave)</button>
-                    <button type="button" className="btn btn-primary btn-rounded w-100 mt-2">Pay Now (Paystack)</button>
-                    <button type="button" className="btn btn-primary btn-rounded w-100 mt-2">Pay Now (Paypal)</button> */}
-                  </section>
+                    />
+                  </PayPalScriptProvider>
                 </div>
-              </div>
-            </section>
+              </CardContent>
+            </Card>
           </div>
-        </main>
+        </div>
       </main>
+      <ScrollToTop />
     </div>
   )
 }

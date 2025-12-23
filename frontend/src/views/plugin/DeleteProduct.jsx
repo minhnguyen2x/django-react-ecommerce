@@ -9,9 +9,9 @@ export const deleteProduct = async (vendorId, productPid) => {
             // Display a warning confirmation dialog using SweetAlert
             const result = await Swal.fire({
                 icon: 'warning',
-                title: 'Delete Product?',
-                text: 'Are you sure you want to permanently delete this product?',
-                confirmButtonText: 'Yes, delete it!',
+                title: 'Xóa sản phẩm?',
+                text: 'Bạn có chắc chắn muốn xóa sản phẩm này vĩnh viễn không?',
+                confirmButtonText: 'Có, xóa nó!',
                 showCancelButton: true,
             });
 
@@ -22,8 +22,8 @@ export const deleteProduct = async (vendorId, productPid) => {
                 // Display a success notification using SweetAlert
                 Swal.fire({
                     icon: 'success',
-                    title: 'Product Deleted!',
-                    text: 'This product has now been deleted forever.',
+                    title: 'Đã Xóa Sản Phẩm!',
+                    text: 'Sản phẩm này đã được xóa vĩnh viễn.',
                 });
                 // Resolve the promise if deletion is successful
                 // In the context of a Promise, resolving means that the asynchronous operation or task has completed successfully.
@@ -32,8 +32,8 @@ export const deleteProduct = async (vendorId, productPid) => {
                 // Display an error notification using SweetAlert if the user denies the deletion
                 Swal.fire({
                     icon: 'error',
-                    title: 'An Error Occurred',
-                    text: 'An error occurred while deleting the product. Please try again later.',
+                    title: 'Đã Xảy Ra Lỗi',
+                    text: 'Đã xảy ra lỗi khi xóa sản phẩm. Vui lòng thử lại sau.',
                 });
                 // Reject the promise with an error if deletion is canceled or fails
                 reject(new Error('Deletion canceled or failed.'));

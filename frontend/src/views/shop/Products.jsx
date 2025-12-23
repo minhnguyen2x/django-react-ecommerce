@@ -1,6 +1,6 @@
-import { React, useEffect, useState, useContext } from 'react';
+import { useEffect, useState, useContext } from 'react';
 import { Link } from 'react-router-dom';
-import { FaCheckCircle, FaShoppingCart, FaSpinner } from 'react-icons/fa';
+import { FaCheckCircle, FaShoppingCart, FaSpinner, FaHeart } from 'react-icons/fa';
 
 import apiInstance from '../../utils/axios';
 import Addon from '../plugin/Addon';
@@ -10,6 +10,21 @@ import CartID from '../plugin/cartID';
 import { addToCart } from '../plugin/AddToCart';
 import { addToWishlist } from '../plugin/addToWishlist';
 import { CartContext } from '../plugin/Context';
+
+import { Card, CardContent, CardFooter } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { ProductCardSkeleton, CategorySkeleton } from '@/components/ui/product-skeleton';
+import { 
+  Pagination, 
+  PaginationContent, 
+  PaginationItem, 
+  PaginationLink, 
+  PaginationNext, 
+  PaginationPrevious 
+} from '@/components/ui/pagination';
+import { ScrollToTop } from '@/components/ui/scroll-to-top';
 
 function Products() {
 
@@ -209,100 +224,97 @@ function Products() {
                             <section className="text-center container">
                                 <div className="row mt-4 mb-3">
                                     <div className="col-lg-6 col-md-8 mx-auto">
-                                        <h1 className="fw-light">Danh Mục Nổi Bật🔥</h1>
-                                        <p className="lead text-muted">
-                                            Danh Mục Mới Nhất Của Chúng Tôi
-                                        </p>
-                                    </div>
-                                </div>
-                            </section>
-                            <div className="d-flex justify-content-center">
-                                {category.map((c, index) => (
-                                    <div className="align-items-center d-flex flex-column" style={{ background: "#e8e8e8", marginLeft: "10px", borderRadius: "10px", padding: "30px" }}>
-                                        <img src={c.image}
-                                            alt=""
-                                            style={{ width: "80px", height: "80px", objectFit: "cover" }}
-                                        />
-                                        <p><a href="" className='text-dark'>{c.title}</a></p>
-                                    </div>
-                                ))}
-
-                            </div>
-
-                            <section className="text-center container">
-                                <div className="row mt-4 mb-3">
-                                    <div className="col-lg-6 col-md-8 mx-auto">
                                         <h1 className="fw-light">Sản Phẩm Nổi Bật 📍</h1>
-                                        <p className="lead text-muted">
+                                        <p className="fw-light">
                                             Sản Phẩm Nổi Bật Của Chúng Tôi
                                         </p>
                                     </div>
                                 </div>
                             </section>
                             <section className="text-center">
-                                <div className="row">
+                                <div className={`grid gap-4 justify-items-center ${
+                                    currentItems.length === 1 ? 'grid-cols-1 md:grid-cols-1 lg:grid-cols-1' :
+                                    currentItems.length === 2 ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-2' :
+                                    currentItems.length === 3 ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' :
+                                    currentItems.length === 4 ? 'grid-cols-2 md:grid-cols-3 lg:grid-cols-4' :
+                                    currentItems.length === 5 ? 'grid-cols-2 md:grid-cols-3 lg:grid-cols-5' :
+                                    'grid-cols-1 md:grid-cols-3 lg:grid-cols-6'
+                                }`}>
                                     {currentItems.map((product, index) => (
-                                        <div className="col-lg-4 col-md-12 mb-4" key={index.id}>
-                                            <div className="card">
-                                                <div
-                                                    className="bg-image hover-zoom ripple"
-                                                    data-mdb-ripple-color="light"
-                                                >
-                                                    <Link to={`/detail/${product.slug}`}>
-                                                        <img
-                                                            src={(selectedProduct === product.id && colorImage) ? colorImage : product.image}
-                                                            className="w-100"
-                                                            style={{ width: "100px", height: "300px", objectFit: "cover" }}
-                                                        />
+                                        <Card key={product.id} className="overflow-hidden hover:shadow-lg transition-shadow relative w-full max-w-[200px]">
+                                            {/* Wishlist Button */}
+                                            <Button
+                                                onClick={() => handleAddToWishlist(product.id)}
+                                                variant="destructive"
+                                                size="icon"
+                                                className="absolute top-2 left-2 z-10"
+                                            >
+                                                <FaHeart />
+                                            </Button>
+                                            
+                                            <Link to={`/detail/${product.slug}`} className="block relative group">
+                                                <img
+                                                    src={(selectedProduct === product.id && colorImage) ? colorImage : product.image}
+                                                    alt={product.title}
+                                                    className="w-full aspect-square object-cover group-hover:scale-105 transition-transform duration-300"
+                                                />
+                                                {product.featured && (
+                                                    <Badge className="absolute top-2 right-2" variant="destructive">
+                                                        Nổi bật
+                                                    </Badge>
+                                                )}
+                                            </Link>
+                                            <CardContent className="p-4">
+                                                <div className="space-y-2">
+                                                    <p className="text-sm text-muted-foreground">
+                                                        By: <Link to={`/vendor/${product?.vendor?.slug}`} className="hover:underline">{product.vendor.name}</Link>
+                                                    </p>
+                                                    <Link to={`/detail/${product.slug}`} className="block">
+                                                        <h5 className="font-semibold text-lg hover:text-primary transition-colors">
+                                                            {product.title.slice(0, 30)}...
+                                                        </h5>
                                                     </Link>
+                                                    <Badge variant="secondary">{product?.brand.title}</Badge>
+                                                    <p className="text-xl font-bold text-primary">${product.price}</p>
                                                 </div>
-                                                <div className="card-body">
 
-                                                    <h6 className="">By: <Link to={`/vendor/${product?.vendor?.slug}`}>{product.vendor.name}</Link></h6>
-                                                    <Link to={`/detail/${product.slug}`} className="text-reset"><h5 className="card-title mb-3 ">{product.title.slice(0, 30)}...</h5></Link>
-                                                    <Link to="/" className="text-reset"><p>{product?.brand.title}</p></Link>
-                                                    <h6 className="mb-1">${product.price}</h6>
-
-                                                    {((product.color && product.color.length > 0) || (product.size && product.size.length > 0)) ? (
-                                                        <div className="btn-group">
-                                                            <button className="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuClickable" data-bs-toggle="dropdown" data-bs-auto-close="false" aria-expanded="false">
-                                                                Biến Thể
-                                                            </button>
-                                                            <ul className="dropdown-menu" style={{ maxWidth: "400px" }} aria-labelledby="dropdownMenuClickable">
+                                                {((product.color && product.color.length > 0) || (product.size && product.size.length > 0)) ? (
+                                                    <div className="mt-4">
+                                                        <details className="group">
+                                                            <summary className="cursor-pointer list-none">
+                                                                <Button variant="outline" className="w-full">
+                                                                    Biến Thể
+                                                                </Button>
+                                                            </summary>
+                                                            <div className="mt-2 p-4 border rounded-lg space-y-4">
                                                                 {/* Quantity */}
-                                                                <div className="d-flex flex-column mb-2 mt-2 p-1">
-                                                                    <div className="p-1 mt-0 pt-0 d-flex flex-wrap">
-                                                                        <>
-                                                                            <li>
-                                                                                <input
-                                                                                    type="number"
-                                                                                    className='form-control'
-                                                                                    placeholder='Số lượng'
-                                                                                    onChange={(e) => handleQtyChange(e, product.id)}
-                                                                                    min={1}
-                                                                                    defaultValue={1}
-                                                                                />
-                                                                            </li>
-                                                                        </>
-                                                                    </div>
+                                                                <div className="space-y-2">
+                                                                    <label className="text-sm font-medium">Số lượng</label>
+                                                                    <Input
+                                                                        type="number"
+                                                                        placeholder='Số lượng'
+                                                                        onChange={(e) => handleQtyChange(e, product.id)}
+                                                                        min={1}
+                                                                        defaultValue={1}
+                                                                    />
                                                                 </div>
 
                                                                 {/* Size */}
                                                                 {product?.size && product?.size.length > 0 && (
-                                                                    <div className="d-flex flex-column">
-                                                                        <li className="p-1"><b>Kích Cỡ</b>: {selectedSize[product.id] || 'Chọn kích cỡ'}</li>
-                                                                        <div className="p-1 mt-0 pt-0 d-flex flex-wrap">
+                                                                    <div className="space-y-2">
+                                                                        <p className="text-sm font-medium">
+                                                                            <span className="font-semibold">Kích Cỡ:</span> {selectedSize[product.id] || 'Chọn kích cỡ'}
+                                                                        </p>
+                                                                        <div className="flex flex-wrap gap-2">
                                                                             {product?.size?.map((size, index) => (
-                                                                                <>
-                                                                                    <li key={index}>
-                                                                                        <button
-                                                                                            className="btn btn-secondary btn-sm me-2 mb-1"
-                                                                                            onClick={(e) => handleSizeButtonClick(e, product.id, size.name)}
-                                                                                        >
-                                                                                            {size.name}
-                                                                                        </button>
-                                                                                    </li>
-                                                                                </>
+                                                                                <Button
+                                                                                    key={index}
+                                                                                    variant={selectedSize[product.id] === size.name ? "default" : "outline"}
+                                                                                    size="sm"
+                                                                                    onClick={(e) => handleSizeButtonClick(e, product.id, size.name)}
+                                                                                >
+                                                                                    {size.name}
+                                                                                </Button>
                                                                             ))}
                                                                         </div>
                                                                     </div>
@@ -311,219 +323,162 @@ function Products() {
 
                                                                 {/* Color */}
                                                                 {product.color && product.color.length > 0 && (
-                                                                    <div className="d-flex flex-column mt-3">
-                                                                        <li className="p-1 color_name_div"><b>Màu Sắc</b>: {selectedColors[product.id] || 'Chọn màu sắc'}</li>
-                                                                        <div className="p-1 mt-0 pt-0 d-flex flex-wrap">
+                                                                    <div className="space-y-2">
+                                                                        <p className="text-sm font-medium">
+                                                                            <span className="font-semibold">Màu Sắc:</span> {selectedColors[product.id] || 'Chọn màu sắc'}
+                                                                        </p>
+                                                                        <div className="flex flex-wrap gap-2">
                                                                             {product?.color?.map((color, index) => (
-                                                                                <>
-                                                                                    <input type="hidden" className={`color_name${color.id}`} name="" id="" />
-                                                                                    <li key={index}>
-                                                                                        <button
-                                                                                            key={color.id}
-                                                                                            className="color-button btn p-3 me-2"
-                                                                                            style={{ backgroundColor: color.color_code }}
-                                                                                            onClick={(e) => handleColorButtonClick(e, product.id, color.name, color.image)}
-                                                                                        >
-                                                                                        </button>
-                                                                                    </li>
-                                                                                </>
+                                                                                <button
+                                                                                    key={index}
+                                                                                    className={`w-10 h-10 rounded-full border-2 transition-all ${
+                                                                                        selectedColors[product.id] === color.name 
+                                                                                        ? 'ring-2 ring-primary ring-offset-2' 
+                                                                                        : 'hover:scale-110'
+                                                                                    }`}
+                                                                                    style={{ backgroundColor: color.color_code }}
+                                                                                    onClick={(e) => handleColorButtonClick(e, product.id, color.name, color.image)}
+                                                                                    title={color.name}
+                                                                                />
                                                                             ))}
                                                                         </div>
                                                                     </div>
                                                                 )}
 
                                                                 {/* Add To Cart */}
-                                                                <div className="d-flex mt-3 p-1 w-100">
-                                                                    <button
-                                                                        onClick={() => handleAddToCart(product.id, product.price, product.shipping_amount)}
-                                                                        disabled={loadingStates[product.id] === 'Đang Thêm...'}
-                                                                        type="button"
-                                                                        className="btn btn-primary me-1 mb-1"
-                                                                    >
-                                                                        {loadingStates[product.id] === 'Đã Thêm Giỏ Hàng' ? (
-                                                                            <>
-                                                                                Đã Thêm Giỏ Hàng <FaCheckCircle />
-                                                                            </>
-                                                                        ) : loadingStates[product.id] === 'Đang Thêm...' ? (
-                                                                            <>
-                                                                                Đang Thêm Giỏ Hàng <FaSpinner className='fas fa-spin' />
-                                                                            </>
-                                                                        ) : (
-                                                                            <>
-                                                                                {loadingStates[product.id] || 'Thêm Giỏ Hàng'} <FaShoppingCart />
-                                                                            </>
-                                                                        )}
-                                                                    </button>
-                                                                </div>
-                                                            </ul>
-                                                        </div>
-                                                    ) : (
-                                                        <button
+                                                                <Button
+                                                                    onClick={() => handleAddToCart(product.id, product.price, product.shipping_amount)}
+                                                                    disabled={loadingStates[product.id] === 'Đang Thêm...'}
+                                                                    className="w-full"
+                                                                >
+                                                                    {loadingStates[product.id] === 'Đã Thêm Giỏ Hàng' ? (
+                                                                        <>
+                                                                            Đã Thêm <FaCheckCircle className="ml-2" />
+                                                                        </>
+                                                                    ) : loadingStates[product.id] === 'Đang Thêm...' ? (
+                                                                        <>
+                                                                            Đang Thêm <FaSpinner className='ml-2 animate-spin' />
+                                                                        </>
+                                                                    ) : (
+                                                                        <>
+                                                                            {loadingStates[product.id] || 'Thêm Giỏ Hàng'} <FaShoppingCart className="ml-2" />
+                                                                        </>
+                                                                    )}
+                                                                </Button>
+                                                            </div>
+                                                        </details>
+                                                    </div>
+                                                ) : (
+                                                    <div className="mt-4">
+                                                        <Button
                                                             onClick={() => handleAddToCart(product.id, product.price, product.shipping_amount)}
                                                             disabled={loadingStates[product.id] === 'Đang Thêm...'}
-                                                            type="button"
-                                                            className="btn btn-primary me-1 mb-1"
+                                                            className="w-full"
                                                         >
                                                             {loadingStates[product.id] === 'Đã Thêm Giỏ Hàng' ? (
                                                                 <>
-                                                                    Đã Thêm Giỏ Hàng <FaCheckCircle />
+                                                                    Đã Thêm <FaCheckCircle className="ml-2" />
                                                                 </>
                                                             ) : loadingStates[product.id] === 'Đang Thêm...' ? (
                                                                 <>
-                                                                    Đang Thêm Giỏ Hàng <FaSpinner className='fas fa-spin' />
+                                                                    Đang Thêm <FaSpinner className='ml-2 animate-spin' />
                                                                 </>
                                                             ) : (
                                                                 <>
-                                                                    {loadingStates[product.id] || 'Thêm Giỏ Hàng'} <FaShoppingCart />
+                                                                    {loadingStates[product.id] || 'Thêm Giỏ Hàng'} <FaShoppingCart className="ml-2" />
                                                                 </>
                                                             )}
-                                                        </button>
-
-                                                    )}
-
-                                                    {/* Wishlist Button */}
-                                                    <button
-                                                        onClick={() => handleAddToWishlist(product.id)}
-                                                        type="button"
-                                                        className="btn btn-danger px-3 ms-2 "
-                                                    >
-                                                        <i className="fas fa-heart" />
-                                                    </button>
-
-                                                </div>
-                                            </div>
-                                        </div>
+                                                        </Button>
+                                                    </div>
+                                                )}
+                                            </CardContent>
+                                        </Card>
                                     ))}
                                 </div>
                             </section>
-                            <nav className='d-flex  gap-1 pt-2'>
-                                <ul className='pagination'>
-                                    <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
-                                        <button className="page-link" onClick={() => setCurrentPage(currentPage - 1)}>
-                                            <i className="ci-arrow-left me-2" />
-                                            Trước
-                                        </button>
-                                    </li>
-                                </ul>
-                                <ul className="pagination">
+                            
+                            {/* Pagination with shadcn */}
+                            <Pagination className="mt-8">
+                                <PaginationContent>
+                                    <PaginationItem>
+                                        <PaginationPrevious 
+                                            onClick={() => currentPage > 1 && setCurrentPage(currentPage - 1)}
+                                            className={currentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                                        />
+                                    </PaginationItem>
+                                    
                                     {pageNumbers.map((number) => (
-                                        <li key={number} className={`page-item ${currentPage === number ? 'active' : ''}`}>
-                                            <button className="page-link" onClick={() => setCurrentPage(number)}>
+                                        <PaginationItem key={number}>
+                                            <PaginationLink
+                                                onClick={() => setCurrentPage(number)}
+                                                isActive={currentPage === number}
+                                                className="cursor-pointer"
+                                            >
                                                 {number}
-                                            </button>
-                                        </li>
+                                            </PaginationLink>
+                                        </PaginationItem>
                                     ))}
-                                </ul>
-
-                                <ul className="pagination">
-                                    <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
-                                        <button className="page-link" onClick={() => setCurrentPage(currentPage + 1)}>
-                                            Tiếp
-                                            <i className="ci-arrow-right ms-3" />
-
-                                        </button>
-                                    </li>
-                                </ul>
-
-                            </nav>
-                            <div>
-                                <div className="d-blfock mt-5" aria-label="Page navigation" >
-                                    <span className="fs-sm text-muted me-md-3">Trang <b>{currentPage} </b> / <b>{totalPages}</b></span>
-                                </div>
-                                {totalPages !== 1 &&
-                                    <div className="d-block mt-2" aria-label="Page navigation" >
-                                        <span className="fs-sm text-muted me-md-3">Hiển thị <b>{itemsPerPage}</b> / <b>{products?.length}</b> sản phẩm</span>
-                                    </div>
-                                }
+                                    
+                                    <PaginationItem>
+                                        <PaginationNext 
+                                            onClick={() => currentPage < totalPages && setCurrentPage(currentPage + 1)}
+                                            className={currentPage === totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                                        />
+                                    </PaginationItem>
+                                </PaginationContent>
+                            </Pagination>
+                            <div className="text-center mt-6 space-y-2">
+                                <p className="text-sm text-muted-foreground">
+                                    Trang <span className="font-semibold">{currentPage}</span> / <span className="font-semibold">{totalPages}</span>
+                                </p>
+                                {totalPages !== 1 && (
+                                    <p className="text-sm text-muted-foreground">
+                                        Hiển thị <span className="font-semibold">{itemsPerPage}</span> / <span className="font-semibold">{products?.length}</span> sản phẩm
+                                    </p>
+                                )}
                             </div>
                             {/*Section: Wishlist*/}
                         </div>
                     </main>
 
-                    <main>
+                    <main className="mt-12">
                         <section className="text-center container">
-                            <div className="row mt-4 mb-3">
-                                <div className="col-lg-6 col-md-8 mx-auto">
-                                    <h1 className="fw-light">Category</h1>
-                                    <p className="lead text-muted">
-                                        Our Latest Categories
-                                    </p>
-                                </div>
+                            <div className="max-w-2xl mx-auto mb-8">
+                                <h1 className="text-3xl font-light mb-3">Danh mục</h1>
                             </div>
                         </section>
-                        <div className="d-flex justify-content-center">
+                        <div className="flex justify-center gap-4 flex-wrap">
                             {category.map((c, index) => (
-                                <div className="align-items-center d-flex flex-column" style={{ background: "#e8e8e8", marginLeft: "10px", borderRadius: "10px", padding: "30px" }}>
-                                    <img src={c.image}
-                                        alt=""
-                                        style={{ width: "80px", height: "80px", objectFit: "cover" }}
+                                <Link 
+                                    key={index}
+                                    to={`/category/${c.slug}`}
+                                    className="flex flex-col items-center bg-gray-100 hover:bg-gray-200 transition-colors rounded-xl p-8 min-w-[120px]"
+                                >
+                                    <img 
+                                        src={c.image}
+                                        alt={c.title}
+                                        className="w-20 h-20 object-cover rounded-full"
                                     />
-                                    <p><a href="" className='text-dark'>{c.title}</a></p>
-                                </div>
+                                    <p className="text-gray-800 mt-2 font-medium">{c.title}</p>
+                                </Link>
                             ))}
-
-                        </div>
-                        <section className="text-center container mt-5">
-                            <div className="row py-lg-5">
-                                <div className="col-lg-6 col-md-8 mx-auto">
-                                    <h1 className="fw-light">Trending Products</h1>
-                                    <p className="lead text-muted">
-                                        Something short and leading about the collection below—its contents
-                                    </p>
-                                </div>
-                            </div>
-                        </section>
-                        <div className="album py-5 bg-light">
-                            <div className="container">
-                                <div className="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
-                                    {featuredProducts.map((product, index) => (
-                                        <div className="col-lg-4 col-md-12 mb-4" key={index.id}>
-                                            <div className="card">
-                                                <div
-                                                    className="bg-image hover-zoom ripple"
-                                                    data-mdb-ripple-color="light"
-                                                >
-                                                    <img
-                                                        src={product.image}
-                                                        className="w-100"
-                                                        style={{ width: "100px", height: "300px", objectFit: "cover" }}
-                                                    />
-                                                </div>
-                                                <div className="card-body">
-                                                    <a href="" className="text-reset">
-                                                        <h5 className="card-title mb-3 ">{product.title.slice(0, 30)}...</h5>
-                                                    </a>
-                                                    <a href="" className="text-reset">
-                                                        <p>{product?.brand.title}</p>
-                                                    </a>
-                                                    <h6 className="mb-3">{addon.currency_sign}{product.price}</h6>
-                                                    <button type="button" className="btn btn-primary me-1 mb-1">
-                                                        Add to cart
-                                                    </button>
-                                                    <button type="button" className="btn btn-danger px-3 me-1 mb-1">
-                                                        <i className="fas fa-heart" />
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
                         </div>
                     </main>
                 </div>
             }
 
-            {loading === true &&
-                <div className="container text-center">
-                    <img className='' src="https://cdn.dribbble.com/users/2046015/screenshots/5973727/06-loader_telega.gif" alt="" />
+            {loading === true && (
+                <div className="container mx-auto px-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+                        {[...Array(6)].map((_, i) => (
+                            <ProductCardSkeleton key={i} />
+                        ))}
+                    </div>
                 </div>
-            }
+            )}
+
+            <ScrollToTop />
         </>
-
-
-
-
     )
 }
 

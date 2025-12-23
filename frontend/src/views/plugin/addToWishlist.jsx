@@ -1,6 +1,4 @@
-import React from 'react'
 import apiInstance from '../../utils/axios';
-import { useState } from 'react';
 import Swal from 'sweetalert2'
 
 export const addToWishlist = async (productId, userId) => {

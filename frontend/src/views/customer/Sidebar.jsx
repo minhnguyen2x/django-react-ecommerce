@@ -1,6 +1,9 @@
-import { React, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom'
 import UseProfileData from '../plugin/UseProfileData'
+import { Card, CardContent } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { FaUser, FaShoppingCart, FaHeart, FaBell, FaCog, FaSignOutAlt, FaEdit } from 'react-icons/fa'
 
 
 function Sidebar() {
@@ -16,62 +19,99 @@ function Sidebar() {
     })
 
     return (
-        <div className="col-lg-3">
+        <div className="space-y-4">
             {loading === false &&
                 <>
-                    <div className="d-flex justify-content-center align-items-center flex-column mb-4 shadow rounded-3">
-                        <img
-                            src={userProfile?.image}
-                            style={{ width: 120, height: 120, borderRadius: "50%", objectFit: "cover" }}
-                            alt=""
-                        />
-                        <div className="text-center">
-                            <h3 className="mb-0">{userProfile?.full_name}</h3>
-                            <p className="mt-0">
-                                <Link to="/customer/settings/"><i className='fas fa-edit me-2'></i> Edit Account</Link>
-                            </p>
-                        </div>
-                    </div>
-                    <ol className="list-group">
-                        <li className="list-group-item d-flex justify-content-between align-items-start">
-                            <div className="ms-2 me-auto">
-                                <Link to={'/customer/account/'} className="fw-bold text-dark"> <i className='fas fa-user me-2'></i> Account</Link>
+                    {/* Profile Card */}
+                    <Card className="shadow-lg">
+                        <CardContent className="p-6">
+                            <div className="flex flex-col items-center">
+                                <div className="relative mb-4">
+                                    <img
+                                        src={userProfile?.image}
+                                        className="w-32 h-32 rounded-full object-cover border-4 border-[rgb(37,99,235)] shadow-lg"
+                                        alt={userProfile?.full_name}
+                                    />
+                                </div>
+                                <h3 className="text-xl font-bold text-gray-800 mb-2">{userProfile?.full_name}</h3>
+                                <Link 
+                                    to="/customer/settings/" 
+                                    className="text-[rgb(37,99,235)] hover:text-[rgb(29,78,216)] flex items-center gap-2 text-sm font-medium transition-colors"
+                                >
+                                    <FaEdit /> Chỉnh Sửa Tài Khoản
+                                </Link>
                             </div>
-                        </li>
-                        <li className="list-group-item d-flex justify-content-between align-items-start">
-                            <div className="ms-2 me-auto">
-                                <Link to={'/customer/orders/'} className="fw-bold text-dark"><i className='fas fa-shopping-cart me-2'></i>Orders</Link>
-                            </div>
-                            <span className="badge bg-primary rounded-pill">14</span>
-                        </li>
-                        <li className="list-group-item d-flex justify-content-between align-items-start">
-                            <div className="ms-2 me-auto">
-                                <Link to={'/customer/wishlist/'} className="fw-bold text-dark"><i className='fas fa-heart fa-fade me-2'></i> Wishlist</Link>
-                            </div>
-                            <span className="badge bg-primary rounded-pill">14</span>
-                        </li>
-                        <li className="list-group-item d-flex justify-content-between align-items-start">
-                            <div className="ms-2 me-auto">
-                                <Link to={'/customer/notifications/'} className="fw-bold text-dark"><i className='fas fa-bell fa-shake me-2'></i> Notification</Link>
-                            </div>
-                            <span className="badge bg-primary rounded-pill">14</span>
-                        </li>
-                        <li className="list-group-item d-flex justify-content-between align-items-start">
-                            <div className="ms-2 me-auto">
-                                <Link to={'/customer/settings/'} className="fw-bold text-dark"><i className='fas fa-gear fa-spin me-2'></i> Setting</Link>
-                            </div>
-                        </li>
-                        {/* <li className="list-group-item d-flex justify-content-between align-items-start">
-                            <div className="ms-2 me-auto">
-                                <Link to={'/customer/notifications/'} className="fw-bold text-dark"><i className='fas fa-truck me-2'></i> Track Order</Link>
-                            </div>
-                        </li> */}
-                        <li className="list-group-item d-flex justify-content-between align-items-start">
-                            <div className="ms-2 me-auto">
-                                <Link to="/logout" className="fw-bold text-danger"><i className='fas fa-sign-out me-2'></i> Logout</Link>
-                            </div>
-                        </li>
-                    </ol>
+                        </CardContent>
+                    </Card>
+
+                    {/* Navigation Menu */}
+                    <Card className="shadow-lg">
+                        <CardContent className="p-2">
+                            <nav className="space-y-1">
+                                <Link 
+                                    to='/customer/account/' 
+                                    className="flex items-center justify-between px-4 py-3 rounded-lg hover:bg-blue-50 transition-colors group"
+                                >
+                                    <div className="flex items-center gap-3">
+                                        <FaUser className="text-[rgb(37,99,235)] group-hover:scale-110 transition-transform" />
+                                        <span className="font-medium text-gray-700 group-hover:text-[rgb(37,99,235)]">Tài Khoản</span>
+                                    </div>
+                                </Link>
+
+                                <Link 
+                                    to='/customer/orders/' 
+                                    className="flex items-center justify-between px-4 py-3 rounded-lg hover:bg-blue-50 transition-colors group"
+                                >
+                                    <div className="flex items-center gap-3">
+                                        <FaShoppingCart className="text-[rgb(37,99,235)] group-hover:scale-110 transition-transform" />
+                                        <span className="font-medium text-gray-700 group-hover:text-[rgb(37,99,235)]">Đơn Hàng</span>
+                                    </div>
+                                </Link>
+
+                                <Link 
+                                    to='/customer/wishlist/' 
+                                    className="flex items-center justify-between px-4 py-3 rounded-lg hover:bg-blue-50 transition-colors group"
+                                >
+                                    <div className="flex items-center gap-3">
+                                        <FaHeart className="text-red-500 group-hover:scale-110 transition-transform" />
+                                        <span className="font-medium text-gray-700 group-hover:text-[rgb(37,99,235)]">Yêu Thích</span>
+                                    </div>
+                                </Link>
+
+                                <Link 
+                                    to='/customer/notifications/' 
+                                    className="flex items-center justify-between px-4 py-3 rounded-lg hover:bg-blue-50 transition-colors group"
+                                >
+                                    <div className="flex items-center gap-3">
+                                        <FaBell className="text-yellow-500 group-hover:scale-110 transition-transform" />
+                                        <span className="font-medium text-gray-700 group-hover:text-[rgb(37,99,235)]">Thông Báo</span>
+                                    </div>
+                                </Link>
+
+                                <Link 
+                                    to='/customer/settings/' 
+                                    className="flex items-center justify-between px-4 py-3 rounded-lg hover:bg-blue-50 transition-colors group"
+                                >
+                                    <div className="flex items-center gap-3">
+                                        <FaCog className="text-gray-600 group-hover:scale-110 transition-transform" />
+                                        <span className="font-medium text-gray-700 group-hover:text-[rgb(37,99,235)]">Cài Đặt</span>
+                                    </div>
+                                </Link>
+
+                                <div className="border-t border-gray-200 my-2"></div>
+
+                                <Link 
+                                    to="/logout" 
+                                    className="flex items-center justify-between px-4 py-3 rounded-lg hover:bg-red-50 transition-colors group"
+                                >
+                                    <div className="flex items-center gap-3">
+                                        <FaSignOutAlt className="text-red-500 group-hover:scale-110 transition-transform" />
+                                        <span className="font-medium text-red-600 group-hover:text-red-700">Đăng Xuất</span>
+                                    </div>
+                                </Link>
+                            </nav>
+                        </CardContent>
+                    </Card>
                 </>
             }
         </div>

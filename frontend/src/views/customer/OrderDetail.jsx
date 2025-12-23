@@ -4,6 +4,11 @@ import apiInstance from '../../utils/axios';
 import UserData from '../plugin/UserData';
 import moment from 'moment';
 import { Link, useParams } from 'react-router-dom';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { FaShoppingCart, FaDollarSign, FaCreditCard, FaTruck, FaFileInvoice, FaTools, FaGift, FaMapMarkerAlt } from 'react-icons/fa'
+import { ScrollToTop } from '@/components/ui/scroll-to-top'
 
 function OrderDetail() {
   const [order, setOrder] = useState([])
@@ -28,249 +33,205 @@ function OrderDetail() {
   console.log(order);
 
   return (
-    <div>
+    <div className="min-h-screen bg-gray-50">
       {loading === false &&
-        <main className="mt-5">
-          <div className="container">
-            <section className="">
-              <div className="row">
-                <Sidebar />
-                <div className="col-lg-9 mt-1">
-                  <main className="mb-5">
-                    {/* Container for demo purpose */}
-                    <div className="container px-4">
-                      {/* Section: Summary */}
-                      <section className="mb-5">
-                        <h3 className="mb-3">
-                          {" "}
-                          <i className="fas fa-shopping-cart text-primary" /> #wuriuiwer{" "}
-                        </h3>
-                        <div className="row gx-xl-5">
-                          <div className="col-lg-3 mb-4 mb-lg-0">
-                            <div
-                              className="rounded shadow"
-                              style={{ backgroundColor: "#B2DFDB" }}
-                            >
-                              <div className="card-body">
-                                <div className="d-flex align-items-center">
-                                  <div className="">
-                                    <p className="mb-1">Total</p>
-                                    <h2 className="mb-0">
-                                      ${order.total}
-                                      <span
-                                        className=""
-                                        style={{ fontSize: "0.875rem" }}
-                                      ></span>
-                                    </h2>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                          <div className="col-lg-3 mb-4 mb-lg-0">
-                            <div
-                              className="rounded shadow"
-                              style={{ backgroundColor: "#D1C4E9" }}
-                            >
-                              <div className="card-body">
-                                <div className="d-flex align-items-center">
-                                  <div className="">
-                                    <p className="mb-1">Payment Status</p>
-                                    <h2 className="mb-0">
-                                      {order.payment_status?.toUpperCase()}
+        <main className="container mx-auto px-4 py-8">
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            {/* Sidebar */}
+            <div className="lg:col-span-1">
+              <Sidebar />
+            </div>
 
-                                      <span
-                                        className=""
-                                        style={{ fontSize: "0.875rem" }}
-                                      ></span>
-                                    </h2>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                          <div className="col-lg-3 mb-4 mb-lg-0">
-                            <div
-                              className="rounded shadow"
-                              style={{ backgroundColor: "#BBDEFB" }}
-                            >
-                              <div className="card-body">
-                                <div className="d-flex align-items-center">
-                                  <div className="">
-                                    <p className="mb-1">Order Status</p>
-                                    <h2 className="mb-0">
-                                      {order.order_status}
-                                      <span
-                                        className=""
-                                        style={{ fontSize: "0.875rem" }}
-                                      ></span>
-                                    </h2>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                          <div className="col-lg-3 mb-4 mb-lg-0">
-                            <div
-                              className="rounded shadow"
-                              style={{ backgroundColor: "#bbfbeb" }}
-                            >
-                              <div className="card-body">
-                                <div className="d-flex align-items-center">
-                                  <div className="">
-                                    <p className="mb-1">Shipping Amount</p>
-                                    <h2 className="mb-0">
-                                      ${order.shipping_amount}
-                                      <span
-                                        className=""
-                                        style={{ fontSize: "0.875rem" }}
-                                      ></span>
-                                    </h2>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                          <div className="col-lg-4 mb-4 mb-lg-0 mt-5">
-                            <div
-                              className="rounded shadow"
-                              style={{ backgroundColor: "#bbf7fb" }}
-                            >
-                              <div className="card-body">
-                                <div className="d-flex align-items-center">
-                                  <div className="">
-                                    <p className="mb-1">Tax Fee</p>
-                                    <h2 className="mb-0">
-                                      ${order.tax_fee}
-
-                                      <span
-                                        className=""
-                                        style={{ fontSize: "0.875rem" }}
-                                      ></span>
-                                    </h2>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                          <div className="col-lg-4 mb-4 mb-lg-0 mt-5">
-                            <div
-                              className="rounded shadow"
-                              style={{ backgroundColor: "#eebbfb" }}
-                            >
-                              <div className="card-body">
-                                <div className="d-flex align-items-center">
-                                  <div className="">
-                                    <p className="mb-1">Service Fee</p>
-                                    <h2 className="mb-0">
-                                      ${order.service_fee}
-                                      <span
-                                        className=""
-                                        style={{ fontSize: "0.875rem" }}
-                                      ></span>
-                                    </h2>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                          <div className="col-lg-4 mb-4 mb-lg-0 mt-5">
-                            <div
-                              className="rounded shadow"
-                              style={{ backgroundColor: "#bbc5fb" }}
-                            >
-                              <div className="card-body">
-                                <div className="d-flex align-items-center">
-                                  <div className="">
-                                    <p className="mb-1">Discount Fee</p>
-                                    <h2 className="mb-0">
-                                      -${order.saved}
-                                      <span
-                                        className=""
-                                        style={{ fontSize: "0.875rem" }}
-                                      ></span>
-                                    </h2>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
+            {/* Main Content */}
+            <div className="lg:col-span-3">
+              <Card className="shadow-lg">
+                <CardHeader className="border-b bg-gradient-to-r from-[rgb(37,99,235)] to-[rgb(29,78,216)] text-white">
+                  <CardTitle className="text-2xl">
+                    <FaShoppingCart className="inline-block mr-2" />
+                    Chi Tiết Đơn Hàng #{order.oid}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-6">
+                  {/* Summary Cards Grid */}
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-6">
+                    <Card className="border-l-4 border-teal-500 bg-teal-50">
+                      <CardContent className="p-4">
+                        <div className="flex items-center gap-3">
+                          <FaDollarSign className="text-teal-600 text-2xl" />
+                          <div>
+                            <p className="text-xs text-gray-600 mb-1">Tổng Tiền</p>
+                            <h3 className="text-2xl font-bold text-gray-800">${order.total}</h3>
                           </div>
                         </div>
-                      </section>
-                      {/* Section: Summary */}
-                      {/* Section: MSC */}
-                      <section className="">
-                        <div className="row rounded shadow p-3">
-                          <div className="col-lg-12 mb-4 mb-lg-0">
-                            <table className="table align-middle mb-0 bg-white">
-                              <thead className="bg-light">
-                                <tr>
-                                  <th>Product</th>
-                                  <th>Price</th>
-                                  <th>Qty</th>
-                                  <th>Total</th>
-                                  <th className='text-danger'>Discount</th>
-                                  <th>Action</th>
+                      </CardContent>
+                    </Card>
 
-                                </tr>
-                              </thead>
-                              <tbody>
-                                {orderItems?.map((order, index) => (
-                                  <tr key={index}>
-                                    <td>
-                                      <div className="d-flex align-items-center">
-                                        <img
-                                          src={order?.product?.image}
-                                          style={{ width: 80, height: 80, objectFit: "cover", borderRadius: 10 }}
-                                          alt=""
-                                        />
-                                        <Link to={`/detail/${order.product.slug}`} className="fw-bold text-dark ms-2 mb-0">
-                                          {order?.product?.title}
-                                        </Link>
-                                      </div>
-                                    </td>
-                                    <td>
-                                      <p className="fw-normal mb-1">${order.product.price}</p>
-                                    </td>
-                                    <td>
-                                      <p className="fw-normal mb-1">{order.qty}</p>
-                                    </td>
-                                    <td>
-                                      <span className="fw-normal mb-1">${order.sub_total}</span>
-                                    </td>
-                                    <td>
-                                      <span className="fw-normal mb-1 text-danger"> -${order.saved}</span>
-                                    </td>
-                                    <td>
-                                      {order.tracking_id == null || order.tracking_id == 'undefined'
-                                        ? <button class="btn btn-secondary btn-sm" disabled> No Tracking Yet<i className='fas fa-plus'></i></button>
-                                        : <a class="btn btn-success btn-sm" target='_blank' href={`${order.delivery_couriers?.tracking_website}?${order.delivery_couriers?.url_parameter}=${order.tracking_id}`}> Track Item <i className='fas fa-location-arrow'></i></a>
-                                      }
-                                    </td>
-                                  </tr>
-                                ))}
-
-                              </tbody>
-                            </table>
+                    <Card className="border-l-4 border-purple-500 bg-purple-50">
+                      <CardContent className="p-4">
+                        <div className="flex items-center gap-3">
+                          <FaCreditCard className="text-purple-600 text-2xl" />
+                          <div>
+                            <p className="text-xs text-gray-600 mb-1">Thanh Toán</p>
+                            <h3 className="text-lg font-bold text-gray-800">
+                              {order.payment_status?.toLowerCase() === 'paid' ? 'Đã TT' : 'Chưa TT'}
+                            </h3>
                           </div>
                         </div>
-                      </section>
-                    </div>
-                  </main>
-                </div>
-              </div>
-            </section>
-            {/*Section: Wishlist*/}
+                      </CardContent>
+                    </Card>
+
+                    <Card className="border-l-4 border-blue-500 bg-blue-50">
+                      <CardContent className="p-4">
+                        <div className="flex items-center gap-3">
+                          <FaTruck className="text-blue-600 text-2xl" />
+                          <div>
+                            <p className="text-xs text-gray-600 mb-1">Trạng Thái</p>
+                            <h3 className="text-lg font-bold text-gray-800">
+                              {order.order_status === 'Delivered' ? 'Đã Giao' :
+                               order.order_status === 'Shipping' ? 'Đang Giao' :
+                               order.order_status === 'Processing' ? 'Đang XL' : order.order_status}
+                            </h3>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    <Card className="border-l-4 border-cyan-500 bg-cyan-50">
+                      <CardContent className="p-4">
+                        <div className="flex items-center gap-3">
+                          <FaMapMarkerAlt className="text-cyan-600 text-2xl" />
+                          <div>
+                            <p className="text-xs text-gray-600 mb-1">Phí Ship</p>
+                            <h3 className="text-2xl font-bold text-gray-800">${order.shipping_amount}</h3>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    <Card className="border-l-4 border-sky-500 bg-sky-50">
+                      <CardContent className="p-4">
+                        <div className="flex items-center gap-3">
+                          <FaFileInvoice className="text-sky-600 text-2xl" />
+                          <div>
+                            <p className="text-xs text-gray-600 mb-1">Thuế</p>
+                            <h3 className="text-2xl font-bold text-gray-800">${order.tax_fee}</h3>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    <Card className="border-l-4 border-pink-500 bg-pink-50">
+                      <CardContent className="p-4">
+                        <div className="flex items-center gap-3">
+                          <FaTools className="text-pink-600 text-2xl" />
+                          <div>
+                            <p className="text-xs text-gray-600 mb-1">Phí Dịch Vụ</p>
+                            <h3 className="text-2xl font-bold text-gray-800">${order.service_fee}</h3>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    <Card className="border-l-4 border-indigo-500 bg-indigo-50">
+                      <CardContent className="p-4">
+                        <div className="flex items-center gap-3">
+                          <FaGift className="text-indigo-600 text-2xl" />
+                          <div>
+                            <p className="text-xs text-gray-600 mb-1">Giảm Giá</p>
+                            <h3 className="text-2xl font-bold text-green-600">-${order.saved}</h3>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+
+                  {/* Order Items Table */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-lg">Sản Phẩm Trong Đơn Hàng</CardTitle>
+                    </CardHeader>
+                    <CardContent className="p-0">
+                      <div className="overflow-x-auto">
+                        <table className="w-full">
+                          <thead className="bg-gray-100 border-b">
+                            <tr>
+                              <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Sản Phẩm</th>
+                              <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Giá</th>
+                              <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">SL</th>
+                              <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Tổng</th>
+                              <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Giảm</th>
+                              <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Thao Tác</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-gray-200">
+                            {orderItems?.map((order, index) => (
+                              <tr key={index} className="hover:bg-gray-50 transition-colors">
+                                <td className="px-6 py-4">
+                                  <div className="flex items-center gap-4">
+                                    <img
+                                      src={order?.product?.image}
+                                      className="w-20 h-20 object-cover rounded-lg border"
+                                      alt={order?.product?.title}
+                                    />
+                                    <Link 
+                                      to={`/detail/${order.product.slug}`} 
+                                      className="font-medium text-gray-800 hover:text-[rgb(37,99,235)] transition-colors"
+                                    >
+                                      {order?.product?.title}
+                                    </Link>
+                                  </div>
+                                </td>
+                                <td className="px-6 py-4">
+                                  <p className="font-semibold text-gray-800">${order.product.price}</p>
+                                </td>
+                                <td className="px-6 py-4">
+                                  <Badge variant="secondary">{order.qty}</Badge>
+                                </td>
+                                <td className="px-6 py-4">
+                                  <span className="font-semibold text-gray-800">${order.sub_total}</span>
+                                </td>
+                                <td className="px-6 py-4">
+                                  <span className="font-semibold text-green-600">-${order.saved}</span>
+                                </td>
+                                <td className="px-6 py-4">
+                                  {order.tracking_id == null || order.tracking_id == 'undefined'
+                                    ? <Button size="sm" disabled variant="secondary">
+                                        Chưa Có Tracking
+                                      </Button>
+                                    : <a 
+                                        href={`${order.delivery_couriers?.tracking_website}?${order.delivery_couriers?.url_parameter}=${order.tracking_id}`}
+                                        target='_blank'
+                                        rel="noopener noreferrer"
+                                      >
+                                        <Button size="sm" className="bg-green-600 hover:bg-green-700">
+                                          <FaTruck className="mr-2" /> Theo Dõi
+                                        </Button>
+                                      </a>
+                                  }
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </CardContent>
+              </Card>
+            </div>
           </div>
         </main>
       }
 
       {loading === true &&
-        <div className="container text-center">
-          <img className='' src="https://cdn.dribbble.com/users/2046015/screenshots/5973727/06-loader_telega.gif" alt="" />
+        <div className="flex justify-center items-center min-h-screen">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-[rgb(37,99,235)] mx-auto mb-4"></div>
+            <p className="text-gray-600 text-lg">Đang tải...</p>
+          </div>
         </div>
       }
-
+      <ScrollToTop />
     </div>
   )
 }

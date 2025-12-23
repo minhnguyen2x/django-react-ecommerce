@@ -1,4 +1,4 @@
-import { React, useEffect, useState, useContext } from 'react';
+import { useEffect, useState, useContext } from 'react';
 import { FaCheckCircle, FaShoppingCart, FaSpinner } from 'react-icons/fa';
 import { Link, useParams } from 'react-router-dom';
 import '../style/InvoiceStyle.css'

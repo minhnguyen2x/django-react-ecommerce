@@ -1,184 +1,140 @@
 import React from 'react'
+import { Link } from 'react-router-dom'
+import { Facebook, Twitter, Instagram, Youtube, Mail, Phone, MapPin, ShoppingBag } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 
 function StoreFooter() {
   return (
-    <div>
-      <footer className="bg-light text-center text-lg-start">
-        {/* Grid container */}
-        <div className="container-fluid p-4">
-          <div className="row">
-            <div className="col-md-6 mb-4 mb-md-0 d-flex justify-content-center justify-content-md-start align-items-center">
-              <strong>Get connected with us on social networks</strong>
+    <footer className="bg-slate-900 text-gray-300">
+      {/* Main Footer */}
+      <div className="container mx-auto px-4 py-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          
+          {/* Company Info */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-2">
+              <ShoppingBag className="h-8 w-8 text-blue-500" />
+              <span className="text-2xl font-bold text-white">Ecom</span>
             </div>
-            <div className="col-md-6 d-flex justify-content-center justify-content-md-end">
-              {/* Facebook */}
-              <a
-                className="btn btn-primary btn-sm btn-floating me-2"
-                style={{ backgroundColor: "#3b5998" }}
-                href="#!"
-                role="button"
-              >
-                <i className="fab fa-facebook-f" />
-              </a>
-              {/* Twitter */}
-              <a
-                className="btn text-white btn-sm btn-floating me-2"
-                style={{ backgroundColor: "#55acee" }}
-                href="#!"
-                role="button"
-              >
-                <i className="fab fa-twitter" />
-              </a>
-              {/* Pinterest */}
-              <a
-                className="btn text-white btn-sm btn-floating me-2"
-                style={{ backgroundColor: "#c61118" }}
-                href="#!"
-                role="button"
-              >
-                <i className="fab fa-pinterest" />
-              </a>
-              {/* Youtube */}
-              <a
-                className="btn text-white btn-sm btn-floating me-2"
-                style={{ backgroundColor: "#ed302f" }}
-                href="#!"
-                role="button"
-              >
-                <i className="fab fa-youtube" />
-              </a>
-              {/* Instagram */}
-              <a
-                className="btn text-white btn-sm btn-floating me-2"
-                style={{ backgroundColor: "#ac2bac" }}
-                href="#!"
-                role="button"
-              >
-                <i className="fab fa-instagram" />
-              </a>
+            <p className="text-sm leading-relaxed">
+              Nền tảng mua sắm trực tuyến hàng đầu Việt Nam. Mang đến trải nghiệm mua sắm tuyệt vời với hàng triệu sản phẩm chất lượng.
+            </p>
+            <div className="flex gap-2">
+              <Button size="icon" variant="ghost" className="hover:bg-blue-600 hover:text-white transition-colors" asChild>
+                <a href="https://facebook.com" target="_blank" rel="noopener noreferrer">
+                  <Facebook className="h-5 w-5" />
+                </a>
+              </Button>
+              <Button size="icon" variant="ghost" className="hover:bg-blue-400 hover:text-white transition-colors" asChild>
+                <a href="https://twitter.com" target="_blank" rel="noopener noreferrer">
+                  <Twitter className="h-5 w-5" />
+                </a>
+              </Button>
+              <Button size="icon" variant="ghost" className="hover:bg-pink-600 hover:text-white transition-colors" asChild>
+                <a href="https://instagram.com" target="_blank" rel="noopener noreferrer">
+                  <Instagram className="h-5 w-5" />
+                </a>
+              </Button>
+              <Button size="icon" variant="ghost" className="hover:bg-red-600 hover:text-white transition-colors" asChild>
+                <a href="https://youtube.com" target="_blank" rel="noopener noreferrer">
+                  <Youtube className="h-5 w-5" />
+                </a>
+              </Button>
             </div>
           </div>
-          <hr className="my-3" />
-          {/*Grid row*/}
-          <div className="row">
-            {/*Grid column*/}
-            <div className="col-lg-4 mb-4 mb-lg-0">
-              <p>
-                <strong>About us</strong>
-              </p>
-              <p>
-                Lorem ipsum dolor sit amet consectetur, adipisicing elit. Iste atque
-                ea quis molestias. Fugiat pariatur maxime quis culpa corporis vitae
-                repudiandae aliquam voluptatem veniam, est atque cumque eum delectus
-                sint!
-              </p>
-            </div>
-            {/*Grid column*/}
-            {/*Grid column*/}
-            <div className="col-lg-3 mb-4 mb-lg-0">
-              <p>
-                <strong>Useful links</strong>
-              </p>
-              <ul className="list-unstyled mb-0">
-                <li>
-                  <a href="#!" className="text-dark">
-                    Privacy policy
-                  </a>
-                </li>
-                <li>
-                  <a href="#!" className="text-dark">
-                    Media
-                  </a>
-                </li>
-                <li>
-                  <a href="#!" className="text-dark">
-                    Job offers
-                  </a>
-                </li>
-                <li>
-                  <a href="#!" className="text-dark">
-                    Cooperation
-                  </a>
-                </li>
-              </ul>
-            </div>
-            {/*Grid column*/}
-            {/*Grid column*/}
-            <div className="col-lg-3 mb-4 mb-lg-0">
-              <p>
-                <strong>Products</strong>
-              </p>
-              <ul className="list-unstyled">
-                <li>
-                  <a href="#!" className="text-dark">
-                    Electronics
-                  </a>
-                </li>
-                <li>
-                  <a href="#!" className="text-dark">
-                    Fashion
-                  </a>
-                </li>
-                <li>
-                  <a href="#!" className="text-dark">
-                    Beauty
-                  </a>
-                </li>
-                <li>
-                  <a href="#!" className="text-dark">
-                    Automotive
-                  </a>
-                </li>
-              </ul>
-            </div>
-            {/*Grid column*/}
-            {/*Grid column*/}
-            <div className="col-lg-2 mb-4 mb-lg-0">
-              <p>
-                <strong>Support</strong>
-              </p>
-              <ul className="list-unstyled">
-                <li>
-                  <a href="#!" className="text-dark">
-                    Complaints
-                  </a>
-                </li>
-                <li>
-                  <a href="#!" className="text-dark">
-                    Help center
-                  </a>
-                </li>
-                <li>
-                  <a href="#!" className="text-dark">
-                    Community
-                  </a>
-                </li>
-                <li>
-                  <a href="#!" className="text-dark">
-                    FAQ
-                  </a>
-                </li>
-              </ul>
-            </div>
-            {/*Grid column*/}
-          </div>
-          {/*Grid row*/}
-        </div>
-        {/* Grid container */}
-        {/* Copyright */}
-        <div
-          className="text-center p-3"
-          style={{ backgroundColor: "rgba(0, 0, 0, 0.2)" }}
-        >
-          © 2020 Copyright:
-          <a className="text-dark" href="https://mdbootstrap.com/">
-            MDBootstrap.com
-          </a>
-        </div>
-        {/* Copyright */}
-      </footer>
 
-    </div>
+          {/* Quick Links */}
+          <div>
+            <h3 className="text-white font-semibold mb-4 text-lg">Liên Kết</h3>
+            <ul className="space-y-2">
+              <li>
+                <Link to="/about" className="hover:text-white hover:translate-x-1 transition-all inline-block">
+                  Về Chúng Tôi
+                </Link>
+              </li>
+              <li>
+                <Link to="/contact" className="hover:text-white hover:translate-x-1 transition-all inline-block">
+                  Liên Hệ
+                </Link>
+              </li>
+              <li>
+                <Link to="/terms" className="hover:text-white hover:translate-x-1 transition-all inline-block">
+                  Điều Khoản Dịch Vụ
+                </Link>
+              </li>
+              <li>
+                <Link to="/privacy" className="hover:text-white hover:translate-x-1 transition-all inline-block">
+                  Chính Sách Bảo Mật
+                </Link>
+              </li>
+              <li>
+                <Link to="/shipping" className="hover:text-white hover:translate-x-1 transition-all inline-block">
+                  Chính Sách Vận Chuyển
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          
+
+          {/* Contact & Newsletter */}
+          <div>
+            <h3 className="text-white font-semibold mb-4 text-lg">Liên Hệ</h3>
+            <ul className="space-y-3 mb-6">
+              <li className="flex items-start gap-2">
+                <MapPin className="h-5 w-5 text-blue-500 flex-shrink-0 mt-0.5" />
+                <span className="text-sm">123 Nguyễn Văn Linh, Quận 7, TP.HCM</span>
+              </li>
+              <li className="flex items-center gap-2">
+                <Phone className="h-5 w-5 text-blue-500 flex-shrink-0" />
+                <span className="text-sm">1900 1234</span>
+              </li>
+              <li className="flex items-center gap-2">
+                <Mail className="h-5 w-5 text-blue-500 flex-shrink-0" />
+                <span className="text-sm">support@ecom.vn</span>
+              </li>
+            </ul>
+            
+            <div>
+              <h4 className="text-white font-medium mb-2">Đăng Ký Nhận Tin</h4>
+              <div className="flex gap-2">
+                <Input 
+                  type="email" 
+                  placeholder="Email của bạn" 
+                  className="bg-slate-800 border-slate-700 text-white placeholder:text-gray-500"
+                />
+                <Button className="bg-[rgb(37,99,235)] hover:bg-[rgb(29,78,216)] text-white">
+                  Gửi
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Bottom Bar */}
+      <div className="border-t border-slate-800">
+        <div className="container mx-auto px-4 py-6">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+            <p className="text-sm text-gray-400">
+              © 2024 Ecom. All rights reserved.
+            </p>
+            <div className="flex gap-6 text-sm">
+              <Link to="/help" className="hover:text-white transition-colors">
+                Trợ Giúp
+              </Link>
+              <Link to="/faq" className="hover:text-white transition-colors">
+                FAQ
+              </Link>
+              <Link to="/returns" className="hover:text-white transition-colors">
+                Đổi Trả Hàng
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
   )
 }
 

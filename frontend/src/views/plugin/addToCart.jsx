@@ -1,5 +1,4 @@
 import apiInstance from '../../utils/axios';
-import { useState } from 'react';
 import Swal from 'sweetalert2';
 
 const Toast = Swal.mixin({
@@ -41,7 +40,7 @@ export const addToCart = async (product_id, user_id, qty, price, shipping_amount
 
         Toast.fire({
             icon: 'success',
-            title: 'Added To Cart'
+            title: 'Đã Thêm Vào Giỏ Hàng'
         });
 
         // Set the loading state to "Added To Cart" upon a successful response
