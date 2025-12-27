@@ -15,7 +15,7 @@ function StoreFooter() {
           <div className="space-y-4">
             <div className="flex items-center gap-2">
               <ShoppingBag className="h-8 w-8 text-blue-500" />
-              <span className="text-2xl font-bold text-white">Ecom</span>
+              <span className="text-2xl font-bold text-white">Sộp Pi</span>
             </div>
             <p className="text-sm leading-relaxed">
               Nền tảng mua sắm trực tuyến hàng đầu Việt Nam. Mang đến trải nghiệm mua sắm tuyệt vời với hàng triệu sản phẩm chất lượng.
@@ -118,7 +118,7 @@ function StoreFooter() {
         <div className="container mx-auto px-4 py-6">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="text-sm text-gray-400">
-              © 2024 Ecom. All rights reserved.
+              © 12/2025 Sộp Pi. Bản quyền đã được bảo lưu.
             </p>
             <div className="flex gap-6 text-sm">
               <Link to="/help" className="hover:text-white transition-colors">

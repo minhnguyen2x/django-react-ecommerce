@@ -51,7 +51,7 @@ function StoreHeader() {
                     {/* Logo */}
                     <Link to="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
                         <ShoppingBag className="h-8 w-8" />
-                        <span className="text-xl font-bold hidden sm:block">E-Commerce</span>
+                        <span className="text-xl font-bold hidden sm:block">Sộp Pi</span>
                     </Link>
 
                     {/* Navigation - Desktop */}
