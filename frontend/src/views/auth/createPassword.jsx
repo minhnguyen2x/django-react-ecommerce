@@ -1,149 +1,117 @@
-import { useEffect, useState } from 'react';
-import { Link, useSearchParams, useNavigate } from 'react-router-dom';
-import apiInstance from '../../utils/axios';
+import { useState } from 'react'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import Swal from 'sweetalert2'
 
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { ScrollToTop } from '@/components/ui/scroll-to-top'
+
+import apiInstance from '../../utils/axios'
 
 function CreatePassword() {
-    const [password, setPassword] = useState("")
-    const [confirmPassword, setConfirmPassword] = useState("")
+    const [password, setPassword] = useState('')
+    const [confirmPassword, setConfirmPassword] = useState('')
     const [error, setError] = useState(null)
 
     const axios = apiInstance
     const navigate = useNavigate()
 
-    const [searchParams] = useSearchParams();
-    const otp = searchParams.get('otp');
-    const uidb64 = searchParams.get('uidb64');
-    const reset_token = searchParams.get('reset_token');
+    const [searchParams] = useSearchParams()
+    const otp = searchParams.get('otp')
+    const uidb64 = searchParams.get('uidb64')
+    const resetToken = searchParams.get('reset_token')
 
-
-
-
-    const handleNewPasswordChange = (event) => {
-        setPassword(event.target.value)
-    }
-
-    const handleNewPasswordConfirmChange = (event) => {
-        setConfirmPassword(event.target.value)
-    }
-
-    const handlePasswordSubmit = (e) => {
-        e.preventDefault()
+    const handlePasswordSubmit = async (event) => {
+        event.preventDefault()
 
         if (password !== confirmPassword) {
-            setError(true);
-            console.log("Password Does Not Match");
-        } else {
-            setError(false);
-
-            console.log("otp ======", otp);
-            console.log("uidb64 ======", uidb64);
-            console.log("reset_token ======", reset_token);
-            console.log("password ======", password);
-
-            const formdata = new FormData()
-
-            formdata.append("otp", otp)
-            formdata.append("uidb64", uidb64)
-            formdata.append("reset_token", reset_token)
-            formdata.append("password", password)
-
-            try {
-                axios.post(`user/password-change/`, formdata).then((res) => {
-                    console.log(res.data.code);
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Password Changed Successfully',
-                    })
-                    navigate("/login")
-                })
-            } catch (error) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'An Error Occured Try Again',
-                })
-                // console.log(error);
-            }
+            setError(true)
+            return
         }
 
+        setError(false)
 
+        const formdata = new FormData()
+        formdata.append('otp', otp)
+        formdata.append('uidb64', uidb64)
+        formdata.append('reset_token', resetToken)
+        formdata.append('password', password)
+
+        try {
+            const response = await axios.post('user/password-change/', formdata)
+            if (response.data?.code) {
+                Swal.fire({ icon: 'success', title: 'Đổi mật khẩu thành công' })
+                navigate('/login')
+            }
+        } catch (err) {
+            console.error('Password change failed:', err)
+            Swal.fire({ icon: 'error', title: 'Đã xảy ra lỗi. Vui lòng thử lại.' })
+        }
     }
+
     return (
-        <section>
-            <main className="" style={{ marginBottom: 100, marginTop: 50 }}>
-                <div className="container">
-                    {/* Section: Login form */}
-                    <section className="">
-                        <div className="row d-flex justify-content-center">
-                            <div className="col-xl-5 col-md-8">
-                                <div className="card rounded-5">
-                                    <div className="card-body p-4">
-                                        <h3 className="text-center">Create New Password</h3>
-                                        <br />
-
-                                        <div className="tab-content">
-                                            <div
-                                                className="tab-pane fade show active"
-                                                id="pills-login"
-                                                role="tabpanel"
-                                                aria-labelledby="tab-login"
-                                            >
-                                                <form onSubmit={handlePasswordSubmit}>
-                                                    {/* Email input */}
-                                                    <div className="form-outline mb-4">
-                                                        <label className="form-label" htmlFor="Full Name">
-                                                            Enter New Password
-                                                        </label>
-                                                        <input
-                                                            type="password"
-                                                            id="email"
-                                                            required
-                                                            name="password"
-                                                            className="form-control"
-                                                            onChange={handleNewPasswordChange}
-                                                        />
-                                                    </div>
-
-                                                    <div className="form-outline mb-4">
-                                                        <label className="form-label" htmlFor="Full Name">
-                                                            Confirm New Password
-                                                        </label>
-                                                        <input
-                                                            type="password"
-                                                            id="email"
-                                                            required
-                                                            name="confirmPassword"
-                                                            className="form-control"
-                                                            onChange={handleNewPasswordConfirmChange}
-                                                        />
-                                                        {error !== null &&
-                                                            <>
-                                                                {error === true
-
-                                                                    ? <p className='text-danger fw-bold mt-2'>Password Does Not Match</p>
-                                                                    : <p className='text-success fw-bold mt-2'>Password Matched</p>
-                                                                }
-                                                            </>
-                                                        }
-                                                    </div>
-
-
-                                                    <div className="text-center">
-                                                        <button type='submit' className='btn btn-primary w-100'>Reset Password</button>
-                                                    </div>
-
-                                                </form>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+        <div className="min-h-screen bg-slate-50">
+            <ScrollToTop />
+            <div className="mx-auto flex w-full max-w-md flex-col justify-center px-4 py-16">
+                <Card className="shadow-sm">
+                    <CardHeader className="space-y-2 text-center">
+                        <CardTitle className="text-2xl font-semibold">Tạo mật khẩu mới</CardTitle>
+                        <CardDescription>Nhập mật khẩu mới của bạn để hoàn tất quá trình đặt lại.</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <form onSubmit={handlePasswordSubmit} className="space-y-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="password">Mật khẩu mới</Label>
+                                <Input
+                                    id="password"
+                                    type="password"
+                                    name="password"
+                                    required
+                                    value={password}
+                                    onChange={(event) => setPassword(event.target.value)}
+                                    placeholder="Nhập mật khẩu mới"
+                                />
                             </div>
-                        </div>
-                    </section>
-                </div>
-            </main>
-        </section>
+
+                            <div className="space-y-2">
+                                <Label htmlFor="confirmPassword">Xác nhận mật khẩu</Label>
+                                <Input
+                                    id="confirmPassword"
+                                    type="password"
+                                    name="confirmPassword"
+                                    required
+                                    value={confirmPassword}
+                                    onChange={(event) => setConfirmPassword(event.target.value)}
+                                    placeholder="Nhập lại mật khẩu"
+                                />
+                                {error !== null && (
+                                    <Alert variant={error ? 'destructive' : 'default'} className="mt-2">
+                                        <AlertDescription>
+                                            {error ? 'Mật khẩu không khớp. Vui lòng kiểm tra lại.' : 'Mật khẩu đã khớp.'}
+                                        </AlertDescription>
+                                    </Alert>
+                                )}
+                            </div>
+
+                            <Button type="submit" className="w-full">
+                                Đặt lại mật khẩu
+                            </Button>
+                        </form>
+                    </CardContent>
+                    <CardFooter className="flex justify-center">
+                        <p className="text-sm text-muted-foreground">
+                            Nhớ mật khẩu rồi?{' '}
+                            <Link to="/login" className="font-medium text-primary hover:underline">
+                                Đăng nhập
+                            </Link>
+                        </p>
+                    </CardFooter>
+                </Card>
+            </div>
+        </div>
     )
 }
 

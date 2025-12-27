@@ -101,7 +101,7 @@ function StoreHeader() {
                         </DropdownMenu>
 
                         {/* Người Bán Dropdown */}
-                        <DropdownMenu>
+                        {/* <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                                 <Button variant="ghost" className="text-white hover:text-white hover:bg-[rgb(37,99,235)]">
                                     <ShoppingBag className="mr-2 h-4 w-4" />
@@ -166,7 +166,7 @@ function StoreHeader() {
                                     </Link>
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
-                        </DropdownMenu>
+                        </DropdownMenu> */}
                     </nav>
 
                     {/* Search Bar */}

@@ -1,38 +1,47 @@
-import { useEffect } from 'react';
-import { LoggedOutView } from '../shop/home';
-import { logout } from '../../utils/auth';
-import { Link } from 'react-router-dom';
+import { useEffect } from 'react'
+import { Link } from 'react-router-dom'
+import { LogIn, UserPlus } from 'lucide-react'
 
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { ScrollToTop } from '@/components/ui/scroll-to-top'
+
+import { logout } from '../../utils/auth'
 
 const Logout = () => {
     useEffect(() => {
-        logout();
-    }, []);
-    return (
-        <>
-            <section>
-                <main className="" style={{ marginBottom: 400, marginTop: 150 }}>
-                    <div className="container">
-                        <section className="">
-                            <div className="row d-flex justify-content-center">
-                                <div className="col-xl-5 col-md-8">
-                                    <div className="card rounded-5">
-                                        <div className="card-body p-4">
-                                            <h3 className="text-center">You have been logged out</h3>
-                                            <div className="d-flex justify-content-center" >
-                                                <Link to="/login" className='btn btn-primary me-2'>Login <i className='fas fa-sign-in-alt'></i> </Link>
-                                                <Link to="/login" className='btn btn-primary'>Register <i className='fas fa-user-plus'></i> </Link>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </section>
-                    </div>
-                </main>
-            </section>
-        </>
-    );
-};
+        logout()
+    }, [])
 
-export default Logout;
+    return (
+        <div className="min-h-screen bg-slate-50">
+            <ScrollToTop />
+            <div className="mx-auto flex w-full max-w-md flex-col justify-center px-4 py-24">
+                <Card className="shadow-sm">
+                    <CardHeader className="text-center">
+                        <CardTitle className="text-2xl font-semibold">Bạn đã đăng xuất</CardTitle>
+                    </CardHeader>
+                    <CardContent className="flex flex-col gap-3">
+                        <p className="text-center text-sm text-muted-foreground">
+                            Đăng nhập lại để tiếp tục mua sắm hoặc tạo tài khoản mới nếu bạn chưa có.
+                        </p>
+                        <div className="flex flex-wrap justify-center gap-3 pt-2">
+                            <Button asChild className="gap-2">
+                                <Link to="/login">
+                                    <LogIn className="h-4 w-4" /> Đăng nhập
+                                </Link>
+                            </Button>
+                            <Button asChild variant="outline" className="gap-2">
+                                <Link to="/register">
+                                    <UserPlus className="h-4 w-4" /> Đăng ký
+                                </Link>
+                            </Button>
+                        </div>
+                    </CardContent>
+                </Card>
+            </div>
+        </div>
+    )
+}
+
+export default Logout

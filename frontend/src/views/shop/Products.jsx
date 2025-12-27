@@ -220,15 +220,13 @@ function Products() {
             {loading === false &&
                 <div>
                     <main className="mt-5">
-                        <div className="container">
-                            <section className="text-center container">
-                                <div className="row mt-4 mb-3">
-                                    <div className="col-lg-6 col-md-8 mx-auto">
-                                        <h1 className="fw-light">Sản Phẩm Nổi Bật 📍</h1>
-                                        <p className="fw-light">
-                                            Sản Phẩm Nổi Bật Của Chúng Tôi
-                                        </p>
-                                    </div>
+                        <div className="mx-auto max-w-6xl px-4">
+                            <section className="text-center">
+                                <div className="mx-auto mb-6 mt-4 max-w-2xl space-y-2">
+                                    <h1 className="text-3xl font-semibold text-slate-900">Sản Phẩm Nổi Bật 📍</h1>
+                                    <p className="text-base text-muted-foreground">
+                                        Sản phẩm tiêu biểu mà người dùng yêu thích gần đây.
+                                    </p>
                                 </div>
                             </section>
                             <section className="text-center">
@@ -286,20 +284,18 @@ function Products() {
                                                                     Biến Thể
                                                                 </Button>
                                                             </summary>
-                                                            <div className="mt-2 p-4 border rounded-lg space-y-4">
-                                                                {/* Quantity */}
+                                                            <div className="mt-2 space-y-4 rounded-lg border p-4">
                                                                 <div className="space-y-2">
                                                                     <label className="text-sm font-medium">Số lượng</label>
                                                                     <Input
                                                                         type="number"
-                                                                        placeholder='Số lượng'
+                                                                        placeholder="Số lượng"
                                                                         onChange={(e) => handleQtyChange(e, product.id)}
                                                                         min={1}
                                                                         defaultValue={1}
                                                                     />
                                                                 </div>
 
-                                                                {/* Size */}
                                                                 {product?.size && product?.size.length > 0 && (
                                                                     <div className="space-y-2">
                                                                         <p className="text-sm font-medium">
@@ -309,7 +305,7 @@ function Products() {
                                                                             {product?.size?.map((size, index) => (
                                                                                 <Button
                                                                                     key={index}
-                                                                                    variant={selectedSize[product.id] === size.name ? "default" : "outline"}
+                                                                                    variant={selectedSize[product.id] === size.name ? 'default' : 'outline'}
                                                                                     size="sm"
                                                                                     onClick={(e) => handleSizeButtonClick(e, product.id, size.name)}
                                                                                 >
@@ -320,8 +316,6 @@ function Products() {
                                                                     </div>
                                                                 )}
 
-
-                                                                {/* Color */}
                                                                 {product.color && product.color.length > 0 && (
                                                                     <div className="space-y-2">
                                                                         <p className="text-sm font-medium">
@@ -331,10 +325,10 @@ function Products() {
                                                                             {product?.color?.map((color, index) => (
                                                                                 <button
                                                                                     key={index}
-                                                                                    className={`w-10 h-10 rounded-full border-2 transition-all ${
-                                                                                        selectedColors[product.id] === color.name 
-                                                                                        ? 'ring-2 ring-primary ring-offset-2' 
-                                                                                        : 'hover:scale-110'
+                                                                                    className={`h-10 w-10 rounded-full border-2 transition-all ${
+                                                                                        selectedColors[product.id] === color.name
+                                                                                            ? 'ring-2 ring-primary ring-offset-2'
+                                                                                            : 'hover:scale-110'
                                                                                     }`}
                                                                                     style={{ backgroundColor: color.color_code }}
                                                                                     onClick={(e) => handleColorButtonClick(e, product.id, color.name, color.image)}
@@ -345,7 +339,6 @@ function Products() {
                                                                     </div>
                                                                 )}
 
-                                                                {/* Add To Cart */}
                                                                 <Button
                                                                     onClick={() => handleAddToCart(product.id, product.price, product.shipping_amount)}
                                                                     disabled={loadingStates[product.id] === 'Đang Thêm...'}
@@ -357,7 +350,7 @@ function Products() {
                                                                         </>
                                                                     ) : loadingStates[product.id] === 'Đang Thêm...' ? (
                                                                         <>
-                                                                            Đang Thêm <FaSpinner className='ml-2 animate-spin' />
+                                                                            Đang Thêm <FaSpinner className="ml-2 animate-spin" />
                                                                         </>
                                                                     ) : (
                                                                         <>

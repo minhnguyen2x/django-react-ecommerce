@@ -1,152 +1,183 @@
-import React, { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom';
-import { Line } from "react-chartjs-2";
+import React, { useEffect, useMemo, useState } from 'react'
+import 'chart.js/auto'
+import { Line } from 'react-chartjs-2'
+import { DollarSign, TrendingUp } from 'lucide-react'
 
-import apiInstance from '../../utils/axios';
-import UserData from '../plugin/UserData';
-import Sidebar from './Sidebar';
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow
+} from '@/components/ui/table'
+import { cn } from '@/lib/utils'
+import apiInstance from '../../utils/axios'
+import UserData from '../plugin/UserData'
+import VendorLayout from './VendorLayout'
 
+const MONTH_LABELS = [
+  'January',
+  'February',
+  'March',
+  'April',
+  'May',
+  'June',
+  'July',
+  'August',
+  'September',
+  'October',
+  'November',
+  'December'
+]
 
 function Earning() {
-  const [earningStats, setEarningStats] = useState(null)
-  const [earningStatsTracker, setEarningTracker] = useState([])
-  const [earningChartData, setEarningChartData] = useState(null)
-
-  if (UserData()?.vendor_id === 0) {
-    window.location.href = '/vendor/register/'
-  }
-
+  const [earningStats, setEarningStats] = useState({ total_revenue: 0, monthly_revenue: 0 })
+  const [monthlyEarnings, setMonthlyEarnings] = useState([])
   const axios = apiInstance
   const userData = UserData()
+  const vendorId = userData?.vendor_id
 
   useEffect(() => {
-    const fetEarningStats = async () => {
-      axios.get(`vendor-earning/${userData?.vendor_id}/`).then((res) => {
-        setEarningStats(res.data[0])
-      })
-
-      axios.get(`vendor-monthly-earning/${userData?.vendor_id}/`).then((res) => {
-        setEarningTracker(res.data)
-        setEarningChartData(res.data)
-      })
+    if (UserData()?.vendor_id === 0) {
+      window.location.href = '/vendor/register/'
     }
-    fetEarningStats()
   }, [])
 
-  const months = earningChartData?.map(item => item.month);
-  const revenue = earningChartData?.map(item => item.total_earning);
-  const sales_count = earningChartData?.map(item => item.sales_count);
+  useEffect(() => {
+    if (!vendorId) {
+      return
+    }
 
+    const fetchEarnings = async () => {
+      try {
+        const [summaryResponse, monthlyResponse] = await Promise.all([
+          axios.get(`vendor-earning/${vendorId}/`),
+          axios.get(`vendor-monthly-earning/${vendorId}/`)
+        ])
 
-  const revenue_data = {
-    labels: months,
-    datasets: [
+        setEarningStats(summaryResponse.data?.[0] || { total_revenue: 0, monthly_revenue: 0 })
+        setMonthlyEarnings(monthlyResponse.data || [])
+      } catch (error) {
+        console.error('Error fetching earnings:', error)
+      }
+    }
+
+    fetchEarnings()
+  }, [axios, vendorId])
+
+  const revenueData = useMemo(() => {
+    const sorted = [...monthlyEarnings].sort((a, b) => a.month - b.month)
+    return {
+      labels: sorted.map((item) => MONTH_LABELS[(item.month || 1) - 1]),
+      datasets: [
+        {
+          label: 'Revenue Analytics',
+          data: sorted.map((item) => Number(item.total_earning || 0)),
+          fill: true,
+          backgroundColor: 'rgba(14, 116, 144, 0.15)',
+          borderColor: 'rgb(14, 116, 144)',
+          tension: 0.35,
+          pointRadius: 3
+        }
+      ]
+    }
+  }, [monthlyEarnings])
+
+  const revenueCards = useMemo(
+    () => [
       {
-        label: "Revenue Analytics",
-        data: revenue,
-        fill: true,
-        backgroundColor: "#cdb9ed",
-        borderColor: "#6203fc"
+        label: 'Total Revenue',
+        value: `$${Number(earningStats.total_revenue || 0).toFixed(2)}`,
+        accent: 'bg-emerald-500/10 text-emerald-600'
       },
-    ]
-  }
+      {
+        label: 'Monthly Revenue',
+        value: `$${Number(earningStats.monthly_revenue || 0).toFixed(2)}`,
+        accent: 'bg-sky-500/10 text-sky-600'
+      }
+    ],
+    [earningStats]
+  )
+
   return (
-    <div className="container-fluid" id="main" >
-      <div className="row row-offcanvas row-offcanvas-left h-100">
-        <Sidebar />
-        <div className="col-md-9 col-lg-10 main">
-          <div className="mb-3 mt-3" style={{ marginBottom: 300 }}>
-            <h4><i class="fas fa-dollar-sign"></i> Earning and Revenue  </h4>
+    <VendorLayout
+      title="Earning & Revenue"
+      description="Track your revenue performance across months."
+      actions={
+        <Button variant="outline" size="sm" className="gap-2" disabled>
+          <TrendingUp className="h-4 w-4" />
+          Reports coming soon
+        </Button>
+      }
+    >
+      <section className="grid gap-4 md:grid-cols-2">
+        {revenueCards.map(({ label, value, accent }) => (
+          <Card key={label}>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium text-slate-500">{label}</CardTitle>
+              <span className={cn('rounded-full bg-slate-200 p-2 text-slate-600', accent)}>
+                <DollarSign className="h-5 w-5" />
+              </span>
+            </CardHeader>
+            <CardContent>
+              <p className="text-3xl font-semibold text-slate-900">{value}</p>
+            </CardContent>
+          </Card>
+        ))}
+      </section>
 
-            <div className="col-xl-12 col-lg-12  mt-4">
-              <div className="row mb-3 text-white">
-                <div className="col-xl-6 col-lg-6 mb-2">
-                  <div className="card card-inverse card-success">
-                    <div className="card-block bg-success p-3">
-                      <div className="rotate">
-                        <i className="bi bi-currency-dollar fa-5x" />
-                      </div>
-                      <h6 className="text-uppercase">Total Sales</h6>
-                      <h1 className="display-1"><b>${earningStats?.total_revenue || "0.00"}</b></h1>
-                    </div>
-                  </div>
-                </div>
-                <div className="col-xl-6 col-lg-6 mb-2">
-                  <div className="card card-inverse card-danger">
-                    <div className="card-block bg-danger p-3">
-                      <div className="rotate">
-                        <i className="bi bi-currency-dollar fa-5x" />
-                      </div>
-                      <h6 className="text-uppercase">Monthly Earning</h6>
-                      <h1 className="display-1"><b>${earningStats?.monthly_revenue || "0.00"}</b></h1>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <hr />
-              <div className="row  container">
-                <div className="col-lg-12">
-                  <h4 className="mt-3 mb-4">Revenue Tracker</h4>
-                  <table className="table">
-                    <thead className="table-dark">
-                      <tr>
-                        <th scope="col">Month</th>
-                        <th scope="col">Sales</th>
-                        <th scope="col">Revenue</th>
-                        {/* <th scope="col">Action</th> */}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {earningStatsTracker?.map((earning, index) => (
-                        <tr>
-                          {earning.month == 1 && <th scope="row">January </th>}
-                          {earning.month == 2 && <th scope="row">February </th>}
-                          {earning.month == 3 && <th scope="row">March </th>}
-                          {earning.month == 4 && <th scope="row">April </th>}
-                          {earning.month == 5 && <th scope="row">May </th>}
-                          {earning.month == 6 && <th scope="row">June </th>}
-                          {earning.month == 7 && <th scope="row">July </th>}
-                          {earning.month == 8 && <th scope="row">August </th>}
-                          {earning.month == 9 && <th scope="row">September </th>}
-                          {earning.month == 10 && <th scope="row">October </th>}
-                          {earning.month == 11 && <th scope="row">November </th>}
-                          {earning.month == 12 && <th scope="row">December </th>}
-                          <td>{earning.sales_count}</td>
-                          <td>${earning.total_earning.toFixed(2)}</td>
-                          {/* <td>
-                            <a href="" className="btn btn-primary mb-1">
-                              <i className="fas fa-eye" />
-                            </a>
-                          </td> */}
-                        </tr>
-                      ))}
+      <section className="grid gap-4 lg:grid-cols-2">
+        <Card className="lg:col-span-1">
+          <CardHeader>
+            <CardTitle>Revenue Tracker</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Month</TableHead>
+                  <TableHead>Sales</TableHead>
+                  <TableHead>Revenue</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {monthlyEarnings?.length ? (
+                  monthlyEarnings
+                    .sort((a, b) => a.month - b.month)
+                    .map((earning) => (
+                      <TableRow key={earning.month}>
+                        <TableCell>{MONTH_LABELS[(earning.month || 1) - 1]}</TableCell>
+                        <TableCell>{earning.sales_count}</TableCell>
+                        <TableCell>${Number(earning.total_earning || 0).toFixed(2)}</TableCell>
+                      </TableRow>
+                    ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={3} className="py-6 text-center text-sm text-slate-500">
+                      No revenue data yet
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
 
-                    </tbody>
-                  </table>
-                </div>
-                <div className="container">
-                  <div className="row ">
-                    <div className="col">
-                      <h4 className="mt-4">Revenue Analytics</h4>
-                    </div>
-                  </div>
-                  <div className="row my-2">
-                    <div className="col-md-12 py-1">
-                      <div className="card">
-                        <div className="card-body">
-                          <Line data={revenue_data} style={{ height: 300, minWidth: "630px" }} />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+        <Card className="lg:col-span-1">
+          <CardHeader>
+            <CardTitle>Revenue Analytics</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="h-[320px]">
+              <Line data={revenueData} options={{ maintainAspectRatio: false }} />
             </div>
-
-          </div>
-        </div>
-      </div>
-    </div>
+          </CardContent>
+        </Card>
+      </section>
+    </VendorLayout>
   )
 }
 

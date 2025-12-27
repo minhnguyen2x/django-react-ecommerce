@@ -1,247 +1,307 @@
-import React, { useState, useEffect } from 'react'
-import { Link, useParams } from 'react-router-dom';
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import { Link } from 'react-router-dom'
+import { Plus, Tag, Percent, CheckCircle2, Trash2, Pencil, BadgeCheck } from 'lucide-react'
 
-import apiInstance from '../../utils/axios';
-import UserData from '../plugin/UserData';
-import Sidebar from './Sidebar';
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow
+} from '@/components/ui/table'
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger
+} from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Checkbox } from '@/components/ui/checkbox'
+import { cn } from '@/lib/utils'
+import apiInstance from '../../utils/axios'
+import UserData from '../plugin/UserData'
+import VendorLayout from './VendorLayout'
 
+const DEFAULT_STATS = { total_coupons: 0, active_coupons: 0 }
 
 function Coupon() {
-    const [stats, setStats] = useState([])
     const [coupons, setCoupons] = useState([])
-    const [createCoupons, setCreateCoupons] = useState({
-        code: "",
-        discount: "",
-        active: true
-    })
-
-    if (UserData()?.vendor_id === 0) {
-        window.location.href = '/vendor/register/'
-    }
+    const [stats, setStats] = useState(DEFAULT_STATS)
+    const [dialogOpen, setDialogOpen] = useState(false)
+    const [formState, setFormState] = useState({ code: '', discount: '', active: false })
+    const [isSubmitting, setIsSubmitting] = useState(false)
 
     const axios = apiInstance
     const userData = UserData()
-
-    const fetchData = async () => {
-        try {
-            await axios.get(`vendor-coupon-list/${userData?.vendor_id}/`).then((res) => {
-                setCoupons(res.data);
-            })
-
-            await axios.get(`vendor-coupon-list/${userData?.vendor_id}/`).then((res) => {
-                setCoupons(res.data);
-            })
-
-            await axios.get(`vendor-coupon-stats/${userData?.vendor_id}/`).then((res) => {
-                setStats(res.data[0]);
-            })
-        } catch (error) {
-            console.error('Error fetching data:', error);
-        }
-    };
+    const vendorId = userData?.vendor_id
 
     useEffect(() => {
-        fetchData();
-    }, []);
+        if (vendorId === 0) {
+            window.location.href = '/vendor/register/'
+        }
+    }, [vendorId])
 
-    const handleDeleteCoupon = async (couponId) => {
-        await axios.delete(`vendor-coupon-detail/${userData?.vendor_id}/${couponId}`).then((res) => {
-            console.log(res.data);
-        })
-        await fetchData();
+    const fetchCoupons = useCallback(async () => {
+        if (!vendorId) {
+            return
+        }
 
-    }
+        try {
+            const response = await axios.get(`vendor/coupons/${vendorId}/`)
+            setCoupons(response.data.coupons || [])
+            setStats(response.data.stats || DEFAULT_STATS)
+        } catch (error) {
+            console.error('Error fetching data:', error)
+        }
+    }, [axios, vendorId])
 
-    const handleCreateCouponChange = (event) => {
-        setCreateCoupons({
-            ...createCoupons,
-            [event.target.name]: event.target.type === 'checkbox' ? event.target.checked : event.target.value,
-        })
-        console.log(createCoupons);
-    }
+    useEffect(() => {
+        fetchCoupons()
+    }, [fetchCoupons])
 
-    const handleCreateCoupon = async (e) => {
-        e.preventDefault()
-        const formdata = new FormData()
+    const handleDeleteCoupon = useCallback(
+        async (couponId) => {
+            if (!vendorId) {
+                return
+            }
 
-        formdata.append("vendor_id", userData?.vendor_id)
-        formdata.append("code", createCoupons.code)
-        formdata.append("discount", createCoupons.discount)
-        formdata.append("active", createCoupons.active)
+            try {
+                await axios.delete(`vendor-coupon-delete/${vendorId}/${couponId}/`)
+                setCoupons((prev) => prev.filter((coupon) => coupon.id !== couponId))
+                setStats((prev) => {
+                    const removed = coupons.find((coupon) => coupon.id === couponId)
+                    return {
+                        total_coupons: Math.max(0, (prev.total_coupons || 0) - 1),
+                        active_coupons:
+                            Math.max(0, (prev.active_coupons || 0) - (removed?.active ? 1 : 0))
+                    }
+                })
+            } catch (error) {
+                console.error('Error deleting coupon:', error)
+            }
+        },
+        [axios, vendorId, coupons]
+    )
 
-        await axios.post(`vendor-coupon-create/${userData?.vendor_id}/`, formdata).then((res) => {
-            console.log(res.data);
-        })
-        await fetchData();
-    }
+    const handleCreateCoupon = useCallback(
+        async (event) => {
+            event.preventDefault()
+
+            if (!vendorId || !formState.code || !formState.discount) {
+                return
+            }
+
+            setIsSubmitting(true)
+
+            try {
+                const formData = new FormData()
+                formData.append('vendor_id', vendorId)
+                formData.append('code', formState.code)
+                formData.append('discount', formState.discount)
+                formData.append('active', formState.active)
+
+                const response = await axios.post(`vendor-coupon-create/${vendorId}/`, formData)
+                const newCoupon = response.data?.coupon
+
+                setFormState({ code: '', discount: '', active: false })
+                setDialogOpen(false)
+
+                if (newCoupon) {
+                    setCoupons((prev) => [newCoupon, ...prev])
+                    setStats((prev) => ({
+                        total_coupons: (prev.total_coupons || 0) + 1,
+                        active_coupons: (prev.active_coupons || 0) + (newCoupon.active ? 1 : 0)
+                    }))
+                } else {
+                    await fetchCoupons()
+                }
+            } catch (error) {
+                console.error('Error creating coupon:', error)
+            } finally {
+                setIsSubmitting(false)
+            }
+        },
+        [axios, vendorId, formState, fetchCoupons]
+    )
+
+    const statCards = useMemo(
+        () => [
+            {
+                label: 'Total Coupons',
+                value: stats.total_coupons || 0,
+                icon: Tag,
+                accent: 'bg-sky-500/10 text-sky-600'
+            },
+            {
+                label: 'Active Coupons',
+                value: stats.active_coupons || 0,
+                icon: CheckCircle2,
+                accent: 'bg-emerald-500/10 text-emerald-600'
+            }
+        ],
+        [stats]
+    )
 
     return (
-        <div className="container-fluid" id="main" >
-            <div className="row row-offcanvas row-offcanvas-left h-100">
-                <Sidebar />
-                <div className="col-md-9 col-lg-10 main mt-4">
-                    <h4 className="mt-3 mb-4"><i className="bi bi-tag" /> Coupons</h4>
-                    <button
-                        type="button"
-                        className="btn btn-primary mb-3"
-                        data-bs-toggle="modal"
-                        data-bs-target="#exampleModal"
-                    >
-                        <i className='fas fa-plus'></i> Create New Coupon
-                    </button>
-                    <div className="row mb-3">
-                        <div className="col-xl-6 col-lg-6 mb-2">
-                            <div className="card card-inverse card-success">
-                                <div className="card-block bg-success p-3">
-                                    <div className="rotate">
-                                        <i className="bi bi-tag fa-5x" />
-                                    </div>
-                                    <h6 className="text-uppercase">Total Coupons</h6>
-                                    <h1 className="display-1">{stats.total_coupons}</h1>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="col-xl-6 col-lg-6 mb-2">
-                            <div className="card card-inverse card-danger">
-                                <div className="card-block bg-danger p-3">
-                                    <div className="rotate">
-                                        <i className="bi bi-check-circle fa-5x" />
-                                    </div>
-                                    <h6 className="text-uppercase">Active Coupons</h6>
-                                    <h1 className="display-1">{stats.active_coupons}</h1>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <hr />
-                    <div className="row  container">
-                        <div className="col-lg-12">
-                            <table className="table">
-                                <thead className="table-dark">
-                                    <tr>
-                                        <th scope="col">Code</th>
-                                        <th scope="col">Type</th>
-                                        <th scope="col">Discount</th>
-                                        <th scope="col">Status</th>
-                                        <th scope="col">Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {coupons.map((coupon, index) => (
-                                        <tr>
-                                            <td>{coupon.code}</td>
-                                            <td>Percentage</td>
-                                            <td>{coupon.discount}%</td>
-                                            <td>
-                                                {coupon.active === true
-                                                    ? <p>Active</p>
-                                                    : <p>In-active</p>
-                                                }
-                                            </td>
-                                            <td>
-
-                                                <Link to={`/vendor/coupon/${coupon.id}/`} className="btn btn-primary mb-1">
-                                                    <i className="fas fa-edit" />
-                                                </Link>
-                                                <button onClick={() => handleDeleteCoupon(coupon.id)} className="btn btn-danger mb-1 ms-2">
-                                                    <i className="fas fa-trash" />
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    ))}
-
-                                    {coupons < 1 &&
-                                        <h5 className='mt-4 p-3'>No coupons yet</h5>
+        <VendorLayout
+            title="Coupons"
+            description="Create and manage discount codes for your customers."
+            actions={
+                <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+                    <DialogTrigger asChild>
+                        <Button size="sm" className="gap-2">
+                            <Plus className="h-4 w-4" />
+                            Create Coupon
+                        </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle>Create New Coupon</DialogTitle>
+                            <DialogDescription>Provide a code and discount percentage.</DialogDescription>
+                        </DialogHeader>
+                        <form onSubmit={handleCreateCoupon} className="space-y-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="coupon-code">Code</Label>
+                                <Input
+                                    id="coupon-code"
+                                    name="code"
+                                    placeholder="E.g DESTINY2025"
+                                    value={formState.code}
+                                    onChange={(event) =>
+                                        setFormState((prev) => ({ ...prev, code: event.target.value }))
                                     }
-
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-
-            </div>
-            <>
-                {/* Button trigger modal */}
-
-                {/* Modal */}
-                <div
-                    className="modal fade"
-                    id="exampleModal"
-                    tabIndex={-1}
-                    aria-labelledby="exampleModalLabel"
-                    aria-hidden="true"
-                >
-                    <div className="modal-dialog">
-                        <div className="modal-content">
-                            <div className="modal-header">
-                                <h5 className="modal-title" id="exampleModalLabel">
-                                    Create New Coupon
-                                </h5>
-                                <button
-                                    type="button"
-                                    className="btn-close"
-                                    data-bs-dismiss="modal"
-                                    aria-label="Close"
+                                    required
                                 />
+                                <p className="text-xs text-muted-foreground">Use unique, easy-to-remember codes.</p>
                             </div>
-                            <div className="modal-body">
-                                <form onSubmit={handleCreateCoupon}>
-                                    <div className="mb-3">
-                                        <label htmlFor="exampleInputEmail1" className="form-label">
-                                            Code
-                                        </label>
-                                        <input
-                                            type="text"
-                                            className="form-control"
-                                            id="exampleInputEmail1"
-                                            aria-describedby="emailHelp"
-                                            name='code'
-                                            placeholder='Enter Coupon Code'
-                                            onChange={handleCreateCouponChange}
-                                            value={createCoupons.code}
-                                        />
-                                        <div id="emailHelp" className="form-text">
-                                            E.g DESTINY2024
-                                        </div>
-                                    </div>
-                                    <div className="mb-3 mt-4">
-                                        <label htmlFor="exampleInputPassword1" className="form-label">
-                                            Discount
-                                        </label>
-                                        <input
-                                            type="number"
-                                            className="form-control"
-                                            id="exampleInputPassword1"
-                                            name='discount'
-                                            placeholder='Enter Discount'
-                                            onChange={handleCreateCouponChange}
-                                            value={createCoupons.discount}
-                                        />
-                                        <div id="emailHelp" className="form-text">
-                                            NOTE: Discount is in <b>percentage</b>
-                                        </div>
-                                    </div>
-                                    <div className="mb-3 form-check">
-                                        <input checked={createCoupons.active} onChange={handleCreateCouponChange} name='active' type="checkbox" className="form-check-input" id="exampleCheck1" />
-                                        <label className="form-check-label" htmlFor="exampleCheck1">
-                                            Activate Coupon
-                                        </label>
-                                    </div>
-                                    <button type="submit" className="btn btn-success">
-                                        Create Coupon <i className='fas fa-check-circle'></i>
-                                    </button>
-                                </form>
+                            <div className="space-y-2">
+                                <Label htmlFor="coupon-discount">Discount (%)</Label>
+                                <Input
+                                    id="coupon-discount"
+                                    name="discount"
+                                    type="number"
+                                    min="0"
+                                    max="100"
+                                    placeholder="Enter percentage"
+                                    value={formState.discount}
+                                    onChange={(event) =>
+                                        setFormState((prev) => ({ ...prev, discount: event.target.value }))
+                                    }
+                                    required
+                                />
+                                <p className="text-xs text-muted-foreground">Discount is applied as a percentage.</p>
                             </div>
-                        </div>
-                    </div>
-                </div>
-            </>
+                            <div className="flex items-center gap-2">
+                                <Checkbox
+                                    id="coupon-active"
+                                    name="active"
+                                    checked={formState.active}
+                                    onCheckedChange={(checked) =>
+                                        setFormState((prev) => ({ ...prev, active: Boolean(checked) }))
+                                    }
+                                />
+                                <Label htmlFor="coupon-active" className="text-sm font-medium">
+                                    Activate immediately
+                                </Label>
+                            </div>
+                            <DialogFooter>
+                                <Button type="submit" disabled={isSubmitting} className="gap-2">
+                                    {isSubmitting ? 'Creating…' : 'Create Coupon'}
+                                    <BadgeCheck className="h-4 w-4" />
+                                </Button>
+                            </DialogFooter>
+                        </form>
+                    </DialogContent>
+                </Dialog>
+            }
+        >
+            <section className="grid gap-4 md:grid-cols-2">
+                {statCards.map(({ label, value, icon: Icon, accent }) => (
+                    <Card key={label}>
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                            <CardTitle className="text-sm font-medium text-slate-500">{label}</CardTitle>
+                            <span className={cn('rounded-full p-2', accent)}>
+                                <Icon className="h-5 w-5" />
+                            </span>
+                        </CardHeader>
+                        <CardContent>
+                            <p className="text-3xl font-semibold text-slate-900">{value}</p>
+                        </CardContent>
+                    </Card>
+                ))}
+            </section>
 
-        </div >
-
-
+            <section className="space-y-4">
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Coupon List</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead className="w-[20%]">Code</TableHead>
+                                    <TableHead className="w-[15%]">Type</TableHead>
+                                    <TableHead className="w-[20%]">Discount</TableHead>
+                                    <TableHead className="w-[20%]">Status</TableHead>
+                                    <TableHead className="text-right">Actions</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {coupons?.length ? (
+                                    coupons.map((coupon) => (
+                                        <TableRow key={coupon.id}>
+                                            <TableCell className="font-medium">{coupon.code}</TableCell>
+                                            <TableCell className="flex items-center gap-2">
+                                                <Percent className="h-4 w-4 text-slate-400" />
+                                                Percentage
+                                            </TableCell>
+                                            <TableCell>{coupon.discount}%</TableCell>
+                                            <TableCell>
+                                                <span
+                                                    className={cn(
+                                                        'inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium',
+                                                        coupon.active
+                                                            ? 'bg-emerald-500/10 text-emerald-600'
+                                                            : 'bg-slate-200 text-slate-600'
+                                                    )}
+                                                >
+                                                    <CheckCircle2 className="h-3.5 w-3.5" />
+                                                    {coupon.active ? 'Active' : 'Inactive'}
+                                                </span>
+                                            </TableCell>
+                                            <TableCell className="flex justify-end gap-2">
+                                                <Button asChild size="sm" variant="outline">
+                                                    <Link to={`/vendor/coupon/${coupon.id}/`}>
+                                                        <Pencil className="h-4 w-4" />
+                                                    </Link>
+                                                </Button>
+                                                <Button size="sm" variant="destructive" onClick={() => handleDeleteCoupon(coupon.id)}>
+                                                    <Trash2 className="h-4 w-4" />
+                                                </Button>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))
+                                ) : (
+                                    <TableRow>
+                                        <TableCell colSpan={5} className="py-6 text-center text-sm text-slate-500">
+                                            No coupons yet
+                                        </TableCell>
+                                    </TableRow>
+                                )}
+                            </TableBody>
+                        </Table>
+                    </CardContent>
+                </Card>
+            </section>
+        </VendorLayout>
     )
 }
 

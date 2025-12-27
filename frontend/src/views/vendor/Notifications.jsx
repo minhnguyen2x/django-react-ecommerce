@@ -1,246 +1,262 @@
-import React, { useState, useEffect } from 'react'
-import { Link, useParams } from 'react-router-dom';
-import moment from 'moment';
+import React, { useEffect, useMemo, useState } from 'react'
+import moment from 'moment'
+import { BellRing, Eye, EyeOff, Inbox, CheckCircle2, ListChecks } from 'lucide-react'
 
-import apiInstance from '../../utils/axios';
-import UserData from '../plugin/UserData';
-import Sidebar from './Sidebar';
-
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger
+} from '@/components/ui/dialog'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow
+} from '@/components/ui/table'
+import { cn } from '@/lib/utils'
+import apiInstance from '../../utils/axios'
+import UserData from '../plugin/UserData'
+import VendorLayout from './VendorLayout'
 
 function Notifications() {
-  const [notifications, setNotifications] = useState([]);
-  const [notificationStats, setNotificationStats] = useState([]);
-  const [seenNotification, setSeenNotifications] = useState([]);
+  const [unreadNotifications, setUnreadNotifications] = useState([])
+  const [readNotifications, setReadNotifications] = useState([])
+  const [stats, setStats] = useState({ un_read_noti: 0, read_noti: 0, all_noti: 0 })
+  const [dialogOpen, setDialogOpen] = useState(false)
+  const axios = apiInstance
+  const userData = UserData()
+  const vendorId = userData?.vendor_id
 
-  const axios = apiInstance;
-  const userData = UserData();
+  useEffect(() => {
+    if (UserData()?.vendor_id === 0) {
+      window.location.href = '/vendor/register/'
+    }
+  }, [])
 
-  if (UserData()?.vendor_id === 0) {
-    window.location.href = '/vendor/register/'
+  useEffect(() => {
+    if (!vendorId) {
+      return
+    }
+
+    const fetchNotifications = async () => {
+      try {
+        const [unseenResponse, seenResponse, statsResponse] = await Promise.all([
+          axios.get(`vendor-notifications-unseen/${vendorId}/`),
+          axios.get(`vendor-notifications-seen/${vendorId}/`),
+          axios.get(`vendor-notifications-summary/${vendorId}/`)
+        ])
+
+        setUnreadNotifications(unseenResponse.data || [])
+        setReadNotifications(seenResponse.data || [])
+        setStats(statsResponse.data?.[0] || { un_read_noti: 0, read_noti: 0, all_noti: 0 })
+      } catch (error) {
+        console.error('Error fetching notifications:', error)
+      }
+    }
+
+    fetchNotifications()
+  }, [axios, vendorId])
+
+  const handleMarkAsSeen = async (notificationId) => {
+    try {
+      await axios.get(`vendor-notifications-mark-as-seen/${vendorId}/${notificationId}/`)
+
+      setUnreadNotifications((prev) => prev.filter((notification) => notification.id !== notificationId))
+      const movedNotification = unreadNotifications.find((notification) => notification.id === notificationId)
+
+      if (movedNotification) {
+        setReadNotifications((prev) => [movedNotification, ...prev])
+      }
+
+      setStats((prev) => ({
+        un_read_noti: Math.max(0, (prev.un_read_noti || 0) - 1),
+        read_noti: (prev.read_noti || 0) + 1,
+        all_noti: prev.all_noti || 0
+      }))
+    } catch (error) {
+      console.error('Error marking notification as seen:', error)
+    }
   }
 
-  const fetchUnseenData = async () => {
-    try {
-      const response = await axios.get(`vendor-notifications-unseen/${userData?.vendor_id}/`);
-      setNotifications(response.data);
-    } catch (error) {
-      console.error('Error fetching data:', error);
+  const statCards = useMemo(
+    () => [
+      {
+        label: 'Unread Notifications',
+        value: stats.un_read_noti || 0,
+        icon: EyeOff,
+        accent: 'bg-rose-500/10 text-rose-600'
+      },
+      {
+        label: 'Read Notifications',
+        value: stats.read_noti || 0,
+        icon: Eye,
+        accent: 'bg-emerald-500/10 text-emerald-600'
+      },
+      {
+        label: 'All Notifications',
+        value: stats.all_noti || 0,
+        icon: BellRing,
+        accent: 'bg-indigo-500/10 text-indigo-600'
+      }
+    ],
+    [stats]
+  )
+
+  const renderType = (notification) => {
+    if (notification.order) {
+      return `New Order #${notification.order.oid}`
     }
-  };
-
-  const fetchSeenData = async () => {
-    try {
-      const response = await axios.get(`vendor-notifications-seen/${userData?.vendor_id}/`);
-      setSeenNotifications(response.data);
-    } catch (error) {
-      console.error('Error fetching data:', error);
+    if (notification.order_item) {
+      return `Order Item: ${notification.order_item.product?.title}`
     }
-  };
+    return 'Notification'
+  }
 
-  const fetchStatsData = async () => {
-    try {
-      const response = await axios.get(`vendor-notifications-summary/${userData?.vendor_id}/`);
-      setNotificationStats(response.data[0]);
-    } catch (error) {
-      console.error('Error fetching stats data:', error);
+  const renderMessage = (notification) => {
+    if (notification.order_item) {
+      return `You've got a new order for ${notification.order_item.product?.title}`
     }
-  };
-
-  useEffect(() => {
-    fetchUnseenData();
-  }, [userData?.vendor_id]);
-
-  useEffect(() => {
-    fetchSeenData();
-  }, [userData?.vendor_id]);
-
-  useEffect(() => {
-    fetchStatsData();
-  }, [userData?.vendor_id]);
-
-  const handleNotificationSeenStatus = async (notiId) => {
-    try {
-      const response = await axios.get(`vendor-notifications-mark-as-seen/${userData?.vendor_id}/${notiId}/`);
-      console.log(response.data);
-      await fetchStatsData();
-      await fetchUnseenData();
-      await fetchSeenData();
-    } catch (error) {
-      console.error('Error marking notification as seen:', error);
+    if (notification.order) {
+      return 'New order placed'
     }
-  };
+    return notification?.message || '—'
+  }
 
+  const renderStatusBadge = (isSeen) => (
+    <span
+      className={cn(
+        'inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium',
+        isSeen ? 'bg-emerald-500/10 text-emerald-600' : 'bg-slate-200 text-slate-600'
+      )}
+    >
+      {isSeen ? <CheckCircle2 className="h-3.5 w-3.5" /> : <EyeOff className="h-3.5 w-3.5" />}
+      {isSeen ? 'Read' : 'Unread'}
+    </span>
+  )
 
   return (
-    <div className="container-fluid" id="main" >
-      <div className="row row-offcanvas row-offcanvas-left h-100">
-        <Sidebar />
-        <div className="col-md-9 col-lg-10 main mt-4">
-          <h4 className="mt-3 mb-1"><i className="bi bi-bell-fill" /> Notifications</h4>
-          <div className="dropdown">
-          </div>
-          <div className="col-md-12 col-lg-12 main mt-4">
-            <div className="row mb-3">
-              <div className="col-xl-4 col-lg-6 mb-2">
-                <div className="card card-inverse card-success">
-                  <div className="card-block bg-danger p-3">
-                    <div className="rotate">
-                      <i className="fas fa-eye-slash fa-3x" />
-                    </div>
-                    <h6 className="text-uppercase">Un-read Notification</h6>
-                    <h1 className="display-1">{notificationStats.un_read_noti}</h1>
-                  </div>
-                </div>
-              </div>
-              <div className="col-xl-4 col-lg-6 mb-2">
-                <div className="card card-inverse card-success">
-                  <div className="card-block bg-success p-3">
-                    <div className="rotate">
-                      <i className="fas fa-eye fa-3x" />
-                    </div>
-                    <h6 className="text-uppercase">Read Notification</h6>
-                    <h1 className="display-1">{notificationStats.read_noti}</h1>
-                  </div>
-                </div>
-              </div>
-              <div className="col-xl-4 col-lg-6 mb-2">
-                <div className="card card-inverse card-success">
-                  <div className="card-block bg-primary p-3">
-                    <div className="rotate">
-                      <i className="bi bi-bell-fill fa-3x" />
-                    </div>
-                    <h6 className="text-uppercase">All Notification</h6>
-                    <h1 className="display-1">{notificationStats.all_noti}</h1>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <hr />
-            <div className="row  container">
-              <div className="col-lg-12">
+    <VendorLayout
+      title="Notifications"
+      description="Stay informed about new orders and account updates."
+      actions={
+        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+          <DialogTrigger asChild>
+            <Button variant="outline" size="sm" className="gap-2">
+              <ListChecks className="h-4 w-4" />
+              View Read Notifications
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="max-w-3xl">
+            <DialogHeader>
+              <DialogTitle>Read Notifications</DialogTitle>
+              <DialogDescription>Every notification that has already been acknowledged.</DialogDescription>
+            </DialogHeader>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Type</TableHead>
+                  <TableHead>Message</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Date</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {readNotifications?.length ? (
+                  readNotifications.map((notification) => (
+                    <TableRow key={notification.id}>
+                      <TableCell>{renderType(notification)}</TableCell>
+                      <TableCell>{renderMessage(notification)}</TableCell>
+                      <TableCell>{renderStatusBadge(true)}</TableCell>
+                      <TableCell>{moment(notification.date).format('MMM/DD/YYYY')}</TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={4} className="py-6 text-center text-sm text-slate-500">
+                      No read notifications yet
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </DialogContent>
+        </Dialog>
+      }
+    >
+      <section className="grid gap-4 md:grid-cols-3">
+        {statCards.map(({ label, value, icon: Icon, accent }) => (
+          <Card key={label}>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium text-slate-500">{label}</CardTitle>
+              <span className={cn('rounded-full p-2', accent)}>
+                <Icon className="h-5 w-5" />
+              </span>
+            </CardHeader>
+            <CardContent>
+              <p className="text-3xl font-semibold text-slate-900">{value}</p>
+            </CardContent>
+          </Card>
+        ))}
+      </section>
 
-
-                <table className="table">
-                  <thead className="table-dark">
-                    <tr>
-                      <th scope="col">Type</th>
-                      <th scope="col">Message</th>
-                      <th scope="col">Status</th>
-                      <th scope="col">Date</th>
-                      <th scope="col">Action</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {notifications?.map((noti, index) => (
-                      <tr key={index}>
-                        <td>
-                          {noti.order !== null &&
-                            <p>New Order {noti?.order?.oid}</p>
-                          }
-                        </td>
-                        <td>
-                          {noti.order_item !== null &&
-                            <p>You've got a new order for <b>{noti?.order_item?.product?.title}</b></p>
-                          }
-
-                        </td>
-                        <td>
-                          {noti.seen === true
-                            ? <p>Read <i className="fas fa-eye" /></p>
-                            : <p>Unread <i className="fas fa-eye-slash" /></p>
-                          }
-                        </td>
-                        <td>{moment(noti.date).format("MMM/DD/YYYY")}</td>
-                        <td>
-                          {noti.seen === true
-                            ? <button disabled className="btn btn-success mb-1">
-                              <i className="fas fa-check-circle" />
-                            </button>
-
-                            : <button onClick={() => handleNotificationSeenStatus(noti.id)} className="btn btn-secondary mb-1">
-                              <i className="fas fa-eye" />
-                            </button>
-
-                          }
-
-                        </td>
-                      </tr>
-                    ))}
-
-                    {notifications.length < 1 &&
-                      <h4 className='mt-4 p-3'>No Notification Yet</h4>
-                    }
-
-                    <button type="button" className="btn btn-primary m-3" data-bs-toggle="modal" data-bs-target="#exampleModal">
-                      View All Read Notifications
-                    </button>
-
-                    <div className="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                      <div className="modal-dialog modal-lg">
-                        <div className="modal-content">
-                          <div className="modal-header">
-                            <h5 className="modal-title" id="exampleModalLabel">All Read Notifications</h5>
-                            <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                          </div>
-                          <div className="modal-body">
-                            <table className="table">
-                              <thead className="table-dark">
-                                <tr>
-                                  <th scope="col">Type</th>
-                                  <th scope="col">Message</th>
-                                  <th scope="col">Status</th>
-                                  <th scope="col">Date</th>
-                                </tr>
-                              </thead>
-                              <tbody>
-                                {seenNotification?.map((noti, index) => (
-                                  <tr key={index}>
-                                    <td>
-                                      {noti.order !== null &&
-                                        <p>New Order {noti?.order?.oid}</p>
-                                      }
-                                    </td>
-                                    <td>
-                                      {noti.order_item !== null &&
-                                        <p>You've got a new order for <b>{noti?.order_item?.product?.title}</b></p>
-                                      }
-
-                                    </td>
-                                    <td>
-                                      {noti.seen === true
-                                        ? <p>Read <i className="fas fa-eye" /></p>
-                                        : <p>Unread <i className="fas fa-eye-slash" /></p>
-                                      }
-                                    </td>
-                                    <td>{moment(noti.date).format("MMM/DD/YYYY")}</td>
-
-                                  </tr>
-                                ))}
-
-                                {seenNotification.length < 1 &&
-                                  <h4 className='mt-4 p-3'>No Read Notification Yet</h4>
-                                }
-                              </tbody>
-                            </table>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-
-        </div>
-
-
-      </div>
-
-
-    </div >
+      <section className="space-y-4">
+        <Card>
+          <CardHeader>
+            <CardTitle>Unread Notifications</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Type</TableHead>
+                  <TableHead>Message</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Date</TableHead>
+                  <TableHead className="text-right">Action</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {unreadNotifications?.length ? (
+                  unreadNotifications.map((notification) => (
+                    <TableRow key={notification.id}>
+                      <TableCell>{renderType(notification)}</TableCell>
+                      <TableCell>{renderMessage(notification)}</TableCell>
+                      <TableCell>{renderStatusBadge(notification.seen)}</TableCell>
+                      <TableCell>{moment(notification.date).format('MMM/DD/YYYY')}</TableCell>
+                      <TableCell className="flex justify-end">
+                        <Button
+                          variant={notification.seen ? 'outline' : 'default'}
+                          size="sm"
+                          className="gap-2"
+                          onClick={() => handleMarkAsSeen(notification.id)}
+                          disabled={notification.seen}
+                        >
+                          {notification.seen ? <Inbox className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                          {notification.seen ? 'Seen' : 'Mark as Seen'}
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={5} className="py-6 text-center text-sm text-slate-500">
+                      No notifications yet
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+      </section>
+    </VendorLayout>
   )
 }
 

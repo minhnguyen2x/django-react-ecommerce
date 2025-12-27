@@ -1,77 +1,90 @@
 import React, { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom';
-import moment from 'moment';
+import { Link } from 'react-router-dom'
+import moment from 'moment'
+import { Eye } from 'lucide-react'
 
-import apiInstance from '../../utils/axios';
-import UserData from '../plugin/UserData';
-import Sidebar from './Sidebar';
+import { Button } from '@/components/ui/button'
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow
+} from '@/components/ui/table'
+import apiInstance from '../../utils/axios'
+import UserData from '../plugin/UserData'
+import VendorLayout from './VendorLayout'
 
 function Orders() {
-    const [orders, setOrders] = useState(null)
+    const [orders, setOrders] = useState([])
 
     const axios = apiInstance
     const userData = UserData()
-
-    if (UserData()?.vendor_id === 0) {
-        window.location.href = '/vendor/register/'
-      }
+    const vendorId = userData?.vendor_id
 
     useEffect(() => {
+        if (UserData()?.vendor_id === 0) {
+            window.location.href = '/vendor/register/'
+        }
+    }, [])
+
+    useEffect(() => {
+        if (!vendorId) {
+            return
+        }
+
         const fetchData = async () => {
             try {
-                const response = await axios.get(`vendor/orders/${userData?.vendor_id}/`)
-                setOrders(response.data);
+                const response = await axios.get(`vendor/orders/${vendorId}/`)
+                setOrders(response.data)
             } catch (error) {
-                console.error('Error fetching data:', error);
+                console.error('Error fetching data:', error)
             }
-        };
+        }
 
-        fetchData();
-    }, []);
+        fetchData()
+    }, [axios, vendorId])
+
     return (
-        <div className="container-fluid" id="main" >
-            <div className="row row-offcanvas row-offcanvas-left h-100">
-                <Sidebar />
-                <div className="col-md-9 col-lg-10 main">
-                    <div className="mb-3 mt-3" style={{ marginBottom: 300 }}>
-                        <div>
-                            <h4><i class="bi bi-cart-check-fill"></i> All Orders  </h4>
-
-                            <table className="table">
-                                <thead className="table-dark">
-                                    <tr>
-                                        <th scope="col">#ID</th>
-                                        <th scope="col">Name</th>
-                                        <th scope="col">Date</th>
-                                        <th scope="col">Status</th>
-                                        <th scope="col">Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {orders?.map((o, index) => (
-                                        <tr key={index}>
-                                            <th scope="row">#{o.oid}</th>
-                                            <td>{o.full_name}</td>
-                                            <td>{moment(o.date).format("MM/DD/YYYY")}</td>
-                                            <td>{o.order_status}</td>
-                                            <td>
-                                                <Link to={`/vendor/orders/${o.oid}/`} className="btn btn-primary mb-1">
-                                                    <i className="fas fa-eye" />
-                                                </Link>
-                                            </td>
-                                        </tr>
-                                    ))}
-
-                                    {orders < 1 &&
-                                        <h5 className='mt-4 p-3'>No orders yet</h5>
-                                    }
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <VendorLayout title="All Orders" description="Review recent orders and drill into their details.">
+            <Table>
+                <TableHeader>
+                    <TableRow>
+                        <TableHead>#ID</TableHead>
+                        <TableHead>Name</TableHead>
+                        <TableHead>Date</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead className="text-right">Action</TableHead>
+                    </TableRow>
+                </TableHeader>
+                <TableBody>
+                    {orders?.length ? (
+                        orders.map((order) => (
+                            <TableRow key={order.oid}>
+                                <TableCell className="font-semibold">#{order.oid}</TableCell>
+                                <TableCell>{order.full_name}</TableCell>
+                                <TableCell>{moment(order.date).format('MM/DD/YYYY')}</TableCell>
+                                <TableCell>{order.order_status}</TableCell>
+                                <TableCell className="flex justify-end">
+                                    <Button asChild size="sm" variant="outline">
+                                        <Link to={`/vendor/orders/${order.oid}/`}>
+                                            <Eye className="h-4 w-4" />
+                                        </Link>
+                                    </Button>
+                                </TableCell>
+                            </TableRow>
+                        ))
+                    ) : (
+                        <TableRow>
+                            <TableCell colSpan={5} className="py-6 text-center text-sm text-slate-500">
+                                No orders yet
+                            </TableCell>
+                        </TableRow>
+                    )}
+                </TableBody>
+            </Table>
+        </VendorLayout>
     )
 }
 
