@@ -4,6 +4,11 @@ import apiInstance from '../../utils/axios';
 import UserData from '../plugin/UserData';
 import moment from 'moment';
 import { Link } from 'react-router-dom';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { FaShoppingCart, FaClock, FaCheckCircle, FaEye } from 'react-icons/fa'
+import { ScrollToTop } from '@/components/ui/scroll-to-top'
 
 function Orders() {
     const [orders, setOrders] = useState([])
@@ -21,165 +26,155 @@ function Orders() {
     console.log(orders);
 
     return (
-        <div className="container mt-5">
-            <section className="">
-                <div className="row">
-                    <Sidebar />
-                    <div className="col-lg-9 mt-1">
-                        <main className="mb-5" style={{}}>
-                            {/* Container for demo purpose */}
-                            <div className="container px-4">
-                                {/* Section: Summary */}
-                                <section className="mb-5">
-                                    <h3 className="mb-3">
-                                        {" "}
-                                        <i className="fas fa-shopping-cart text-primary" /> Orders{" "}
-                                    </h3>
-                                    <div className="row gx-xl-5">
-                                        <div className="col-lg-4 mb-4 mb-lg-0">
-                                            <div
-                                                className="rounded shadow"
-                                                style={{ backgroundColor: "#B2DFDB" }}
-                                            >
-                                                <div className="card-body">
-                                                    <div className="d-flex align-items-center">
-                                                        <div className="">
-                                                            <p className="mb-1">Orders</p>
-                                                            <h2 className="mb-0">
-                                                                {orders.length}
-                                                                <span
-                                                                    className=""
-                                                                    style={{ fontSize: "0.875rem" }}
-                                                                ></span>
-                                                            </h2>
-                                                        </div>
-                                                        <div className="flex-grow-1 ms-5">
-                                                            <div className="p-3 badge-primary rounded-4">
-                                                                <i
-                                                                    className="fas fa-shopping-cart fs-4"
-                                                                    style={{ color: "#004D40" }}
-                                                                />
-                                                            </div>
-                                                        </div>
-                                                    </div>
+        <div className="min-h-screen bg-gray-50">
+            <main className="container mx-auto px-4 py-8">
+                <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                    {/* Sidebar */}
+                    <div className="lg:col-span-1">
+                        <Sidebar />
+                    </div>
+
+                    {/* Main Content */}
+                    <div className="lg:col-span-3">
+                        <Card className="shadow-lg">
+                            <CardHeader className="border-b bg-gradient-to-r from-[rgb(37,99,235)] to-[rgb(29,78,216)] text-white">
+                                <CardTitle className="text-2xl">
+                                    <FaShoppingCart className="inline-block mr-2" />
+                                    Đơn Hàng Của Tôi
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent className="p-6">
+                                {/* Summary Cards */}
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                                    <Card className="border-l-4 border-teal-500 bg-teal-50">
+                                        <CardContent className="p-4">
+                                            <div className="flex items-center justify-between">
+                                                <div>
+                                                    <p className="text-sm text-gray-600 mb-1">Tổng Đơn Hàng</p>
+                                                    <h2 className="text-3xl font-bold text-gray-800">{orders.length}</h2>
+                                                </div>
+                                                <div className="w-14 h-14 bg-teal-600 rounded-full flex items-center justify-center">
+                                                    <FaShoppingCart className="text-white text-2xl" />
                                                 </div>
                                             </div>
-                                        </div>
-                                        <div className="col-lg-4 mb-4 mb-lg-0">
-                                            <div
-                                                className="rounded shadow"
-                                                style={{ backgroundColor: "#D1C4E9" }}
-                                            >
-                                                <div className="card-body">
-                                                    <div className="d-flex align-items-center">
-                                                        <div className="">
-                                                            <p className="mb-1">Pending Delivery</p>
-                                                            <h2 className="mb-0">
-                                                                6
-                                                                <span
-                                                                    className=""
-                                                                    style={{ fontSize: "0.875rem" }}
-                                                                ></span>
-                                                            </h2>
-                                                        </div>
-                                                        <div className="flex-grow-1 ms-5">
-                                                            <div className="p-3 badge-primary rounded-4">
-                                                                <i
-                                                                    className="fas fa-clock fs-4"
-                                                                    style={{ color: "#6200EA" }}
-                                                                />
-                                                            </div>
-                                                        </div>
-                                                    </div>
+                                        </CardContent>
+                                    </Card>
+
+                                    <Card className="border-l-4 border-purple-500 bg-purple-50">
+                                        <CardContent className="p-4">
+                                            <div className="flex items-center justify-between">
+                                                <div>
+                                                    <p className="text-sm text-gray-600 mb-1">Chờ Giao Hàng</p>
+                                                    <h2 className="text-3xl font-bold text-gray-800">
+                                                        {orders.filter(o => o.order_status !== 'Delivered').length}
+                                                    </h2>
+                                                </div>
+                                                <div className="w-14 h-14 bg-purple-600 rounded-full flex items-center justify-center">
+                                                    <FaClock className="text-white text-2xl" />
                                                 </div>
                                             </div>
-                                        </div>
-                                        <div className="col-lg-4 mb-4 mb-lg-0">
-                                            <div
-                                                className="rounded shadow"
-                                                style={{ backgroundColor: "#BBDEFB" }}
-                                            >
-                                                <div className="card-body">
-                                                    <div className="d-flex align-items-center">
-                                                        <div className="">
-                                                            <p className="mb-1">Fulfilled Orders</p>
-                                                            <h2 className="mb-0">
-                                                                2
-                                                                <span
-                                                                    className=""
-                                                                    style={{ fontSize: "0.875rem" }}
-                                                                ></span>
-                                                            </h2>
-                                                        </div>
-                                                        <div className="flex-grow-1 ms-5">
-                                                            <div className="p-3 badge-primary rounded-4">
-                                                                <i
-                                                                    className="fas fa-check-circle fs-4"
-                                                                    style={{ color: "#01579B" }}
-                                                                />
-                                                            </div>
-                                                        </div>
-                                                    </div>
+                                        </CardContent>
+                                    </Card>
+
+                                    <Card className="border-l-4 border-blue-500 bg-blue-50">
+                                        <CardContent className="p-4">
+                                            <div className="flex items-center justify-between">
+                                                <div>
+                                                    <p className="text-sm text-gray-600 mb-1">Đã Hoàn Thành</p>
+                                                    <h2 className="text-3xl font-bold text-gray-800">
+                                                        {orders.filter(o => o.order_status === 'Delivered').length}
+                                                    </h2>
+                                                </div>
+                                                <div className="w-14 h-14 bg-blue-600 rounded-full flex items-center justify-center">
+                                                    <FaCheckCircle className="text-white text-2xl" />
                                                 </div>
                                             </div>
-                                        </div>
-                                    </div>
-                                </section>
-                                {/* Section: Summary */}
-                                {/* Section: MSC */}
-                                <section className="">
-                                    <div className="row rounded shadow p-3">
-                                        <div className="col-lg-12 mb-4 mb-lg-0 h-100">
-                                            <table className="table align-middle mb-0 bg-white">
-                                                <thead className="bg-light">
+                                        </CardContent>
+                                    </Card>
+                                </div>
+
+                                {/* Orders Table */}
+                                <Card>
+                                    <CardContent className="p-0">
+                                        <div className="overflow-x-auto">
+                                            <table className="w-full">
+                                                <thead className="bg-gray-100 border-b">
                                                     <tr>
-                                                        <th>Order ID</th>
-                                                        <th>Payment Status</th>
-                                                        <th>Order Status</th>
-                                                        <th>Total</th>
-                                                        <th>Actions</th>
+                                                        <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Mã Đơn Hàng</th>
+                                                        <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Thanh Toán</th>
+                                                        <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Trạng Thái</th>
+                                                        <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Tổng Tiền</th>
+                                                        <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Thao Tác</th>
                                                     </tr>
                                                 </thead>
-                                                <tbody>
-                                                    {orders.map((o, index) => (
+                                                <tbody className="divide-y divide-gray-200">
+                                                    {orders.length > 0 ? (
+                                                        orders.map((o, index) => (
+                                                            <tr key={index} className="hover:bg-gray-50 transition-colors">
+                                                                <td className="px-6 py-4">
+                                                                    <p className="font-bold text-gray-800">#{o.oid}</p>
+                                                                    <p className="text-sm text-gray-500">{moment(o.date).format('DD/MM/YYYY')}</p>
+                                                                </td>
+                                                                <td className="px-6 py-4">
+                                                                    <Badge 
+                                                                        className={
+                                                                            o.payment_status?.toLowerCase() === 'paid' 
+                                                                                ? 'bg-green-100 text-green-700 hover:bg-green-100' 
+                                                                                : 'bg-yellow-100 text-yellow-700 hover:bg-yellow-100'
+                                                                        }
+                                                                    >
+                                                                        {o.payment_status?.toLowerCase() === 'paid' ? 'Đã Thanh Toán' : 'Chưa Thanh Toán'}
+                                                                    </Badge>
+                                                                </td>
+                                                                <td className="px-6 py-4">
+                                                                    <Badge 
+                                                                        className={
+                                                                            o.order_status === 'Delivered' 
+                                                                                ? 'bg-green-100 text-green-700 hover:bg-green-100'
+                                                                                : o.order_status === 'Shipping'
+                                                                                    ? 'bg-blue-100 text-blue-700 hover:bg-blue-100'
+                                                                                    : 'bg-gray-100 text-gray-700 hover:bg-gray-100'
+                                                                        }
+                                                                    >
+                                                                        {o.order_status === 'Delivered' ? 'Đã Giao' : 
+                                                                         o.order_status === 'Shipping' ? 'Đang Giao' :
+                                                                         o.order_status === 'Processing' ? 'Đang Xử Lý' : o.order_status}
+                                                                    </Badge>
+                                                                </td>
+                                                                <td className="px-6 py-4">
+                                                                    <span className="font-semibold text-gray-800">${o.total}</span>
+                                                                </td>
+                                                                <td className="px-6 py-4">
+                                                                    <Link to={`/customer/order/detail/${o.oid}/`}>
+                                                                        <Button size="sm" className="bg-[rgb(37,99,235)] hover:bg-[rgb(29,78,216)]">
+                                                                            <FaEye className="mr-2" /> Xem
+                                                                        </Button>
+                                                                    </Link>
+                                                                </td>
+                                                            </tr>
+                                                        ))
+                                                    ) : (
                                                         <tr>
-                                                            <td>
-                                                                <p className="fw-bold mb-1">#{o.oid}</p>
-                                                                <p className="text-muted mb-0">{moment(o.date).format('MM/DD/YYYY')}</p>
-                                                            </td>
-                                                            <td>
-                                                                <p className="fw-normal mb-1">{o.payment_status.toUpperCase()}</p>
-                                                            </td>
-                                                            <td>
-                                                                <p className="fw-normal mb-1">{o.order_status}</p>
-                                                            </td>
-                                                            <td>
-                                                                <span className="fw-normal mb-1">${o.total}</span>
-                                                            </td>
-                                                            <td>
-                                                                <Link className="btn btn-link btn-sm btn-rounded" to={`/customer/order/detail/${o.oid}/`}>
-                                                                    View <i className="fas fa-eye" />
-                                                                </Link>
+                                                            <td colSpan={5} className="px-6 py-12 text-center">
+                                                                <div className="flex flex-col items-center">
+                                                                    <FaShoppingCart className="text-gray-300 text-5xl mb-4" />
+                                                                    <p className="text-gray-500 text-lg">Chưa có đơn hàng nào</p>
+                                                                </div>
                                                             </td>
                                                         </tr>
-                                                    ))}
-
+                                                    )}
                                                 </tbody>
                                             </table>
                                         </div>
-                                        <canvas id="myChart" style={{ width: "100%" }} />
-                                    </div>
-                                </section>
-                                {/* Section: MSC */}
-                            </div>
-                            {/* Container for demo purpose */}
-                        </main>
+                                    </CardContent>
+                                </Card>
+                            </CardContent>
+                        </Card>
                     </div>
                 </div>
-            </section>
-            {/*Section: Wishlist*/}
+            </main>
+            <ScrollToTop />
         </div>
-
     )
 }
 

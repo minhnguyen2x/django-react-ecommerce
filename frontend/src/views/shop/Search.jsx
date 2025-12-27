@@ -1,4 +1,4 @@
-import { React, useEffect, useState, useContext } from 'react';
+import { useEffect, useState, useContext } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { FaCheckCircle, FaShoppingCart, FaSpinner } from 'react-icons/fa';
 
