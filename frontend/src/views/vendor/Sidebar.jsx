@@ -1,107 +1,65 @@
 import React from 'react'
-import { Link, useLocation } from 'react-router-dom';
-import UserData from '../plugin/UserData';
+import { Link, useLocation } from 'react-router-dom'
+import { LayoutDashboard, Package, ShoppingCart, DollarSign, Star, PlusCircle, Tag, Bell, Settings, LogOut } from 'lucide-react'
 
+import { cn } from '@/lib/utils'
+import UserData from '../plugin/UserData'
+
+const navItems = [
+  { href: '/vendor/dashboard/', label: 'Dashboard', icon: LayoutDashboard },
+  { href: '/vendor/products/', label: 'Products', icon: Package },
+  { href: '/vendor/orders/', label: 'Orders', icon: ShoppingCart },
+  { href: '/vendor/earning/', label: 'Earning', icon: DollarSign },
+  { href: '/vendor/reviews/', label: 'Reviews', icon: Star },
+  { href: '/vendor/product/new/', label: 'Add Product', icon: PlusCircle },
+  { href: '/vendor/coupon/', label: 'Coupon & Discount', icon: Tag },
+  { href: '/vendor/notifications/', label: 'Notifications', icon: Bell },
+  { href: '/vendor/settings/', label: 'Settings', icon: Settings },
+]
 
 function Sidebar() {
-    const currentPathname = window.location.pathname;
-    const location = useLocation();
-    const isActiveLink = (currentPath, linkPath) => {
-        return currentPath.includes(linkPath);
-    };
+  const location = useLocation()
 
+  if (UserData()?.vendor_id === 0) {
+    window.location.href = '/vendor/register/'
+  }
 
-    if (UserData()?.vendor_id === 0) {
-        window.location.href = '/vendor/register/'
-    }
+  const isActiveLink = (path) => location.pathname.startsWith(path)
 
-    return (
-        <div className="col-md-3 col-lg-2 sidebar-offcanvas bg-dark navbar-dark" id="sidebar" role="navigation" >
-            <ul className="nav nav-pills flex-column mb-auto nav flex-column pl-1 pt-2">
-                <li className="mb-3">
-                    <Link to="/vendor/dashboard/" className={isActiveLink(location.pathname, '/vendor/dashboard/') ? "nav-link text-white active" : "nav-link text-white"}>
-                        {" "}
-                        <i className="bi bi-speedometer" /> Dashboard{" "}
-                    </Link>
-                </li>
-                <li className="mb-3">
-                    <Link to="/vendor/products/" className={isActiveLink(location.pathname, '/vendor/products/') ? "nav-link text-white active" : "nav-link text-white"}>
-                        {" "}
-                        <i className="bi bi-grid" /> Products{" "}
-                    </Link>
-                </li>
-                <li className="mb-3">
-                    <Link to="/vendor/orders/" className={isActiveLink(location.pathname, '/vendor/orders/') ? "nav-link text-white active" : "nav-link text-white"}>
-                        {" "}
-                        <i className="bi bi-cart-check" /> Orders{" "}
-                    </Link>
-                </li>
-                <li className="mb-3">
-                    <Link to="/vendor/earning/" className={isActiveLink(location.pathname, '/vendor/earning/') ? "nav-link text-white active" : "nav-link text-white"}>
-                        {" "}
-                        <i className="bi bi-currency-dollar" /> Earning{" "}
-                    </Link>
-                </li>
-                <li className="mb-3">
-                    <Link to="/vendor/reviews/" className={isActiveLink(location.pathname, '/vendor/reviews/') ? "nav-link text-white active" : "nav-link text-white"}>
-                        {" "}
-                        <i className="bi bi-star" /> Reviews{" "}
-                    </Link>
-                </li>
-                <li className="mb-3">
-                    <Link to="/vendor/product/new/" className={isActiveLink(location.pathname, '/vendor/product/new/') ? "nav-link text-white active" : "nav-link text-white"}>
-                        {" "}
-                        <i className="bi bi-plus-circle" /> Add Product{" "}
-                    </Link>
-                </li>
-                {/* <li className="mb-3">
-                    <a href="faqs.html" className={isActiveLink(location.pathname, '/vendor/faqs/') ? "nav-link text-white active" : "nav-link text-white"}>
-                        {" "}
-                        <i className="bi bi-patch-question" /> FAQs{" "}
-                    </a>
-                </li> */}
-                <li className="mb-3">
-                    <Link to={`/vendor/coupon/`} className={isActiveLink(location.pathname, '/vendor/coupon/') ? "nav-link text-white active" : "nav-link text-white"}>
-                        {" "}
-                        <i className="bi bi-tag" /> Coupon &amp; Discount{" "}
-                    </Link>
-                </li>
-                {/* <li className="mb-3">
-                    <a href="customers.html" className={isActiveLink(location.pathname, '/vendor/customers/') ? "nav-link text-white active" : "nav-link text-white"}>
-                        {" "}
-                        <i className="bi bi-people" /> Customers{" "}
-                    </a>
-                </li> */}
-                <li className="mb-3">
-                    <Link to={`/vendor/notifications/`} className={isActiveLink(location.pathname, '/vendor/notifications/') ? "nav-link text-white active" : "nav-link text-white"}>
-                        {" "}
-                        <i className="bi bi-bell" /> Notifications{" "}
-                    </Link>
-                </li>
-                {/* <li className="mb-3">
-                    <a href="message.html" className={isActiveLink(location.pathname, '/vendor/message/') ? "nav-link text-white active" : "nav-link text-white"}>
-                        {" "}
-                        <i className="bi bi-envelope" /> Message{" "}
-                    </a>
-                </li> */}
-                <li className="mb-3">
-                    <Link to="/vendor/settings/" className={isActiveLink(location.pathname, '/vendor/settings/') ? "nav-link text-white active" : "nav-link text-white"}>
-                        {" "}
-                        <i className="bi bi-gear-fill" /> Settings{" "}
-                    </Link>
-                </li>
-
-                <li className="mb-3">
-                    <Link to="/logout" className={isActiveLink(location.pathname, '/logout') ? "nav-link text-white active" : "nav-link text-white"}>
-                        {" "}
-                        <i className="bi bi-box-arrow-left" /> Logout{" "}
-                    </Link>
-                </li>
-
-            </ul>
-            <hr />
-        </div >
-    )
+  return (
+    <aside className="w-full bg-slate-900 text-slate-100 lg:w-64" role="navigation">
+      <div className="flex h-full flex-col gap-6 px-4 py-8">
+        <div>
+          <h2 className="text-lg font-semibold uppercase tracking-wide text-slate-300">Vendor Portal</h2>
+          <p className="text-sm text-slate-500">Manage your store in one place</p>
+        </div>
+        <nav className="flex-1 space-y-1">
+          {navItems.map(({ href, label, icon: Icon }) => (
+            <Link
+              key={href}
+              to={href}
+              className={cn(
+                'flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-slate-800 hover:text-white',
+                isActiveLink(href) && 'bg-slate-800 text-white'
+              )}
+            >
+              <Icon className="h-4 w-4" />
+              <span>{label}</span>
+            </Link>
+          ))}
+        </nav>
+        <div className="border-t border-slate-800 pt-4">
+          <Link
+            to="/logout"
+            className="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-red-300 transition-colors hover:bg-red-500/10 hover:text-red-200"
+          >
+            <LogOut className="h-4 w-4" />
+            <span>Logout</span>
+          </Link>
+        </div>
+      </div>
+    </aside>
+  )
 }
 
 export default Sidebar

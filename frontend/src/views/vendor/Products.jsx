@@ -1,155 +1,240 @@
-import React, { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom';
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import { Link } from 'react-router-dom'
+import { Filter, Plus, Eye, Pencil, Trash2 } from 'lucide-react'
 
-import apiInstance from '../../utils/axios';
-import UserData from '../plugin/UserData';
-import Sidebar from './Sidebar';
-import { deleteProduct } from '../plugin/DeleteProduct';
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger
+} from '@/components/ui/dropdown-menu'
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow
+} from '@/components/ui/table'
+import { cn } from '@/lib/utils'
+import apiInstance from '../../utils/axios'
+import UserData from '../plugin/UserData'
+import VendorLayout from './VendorLayout'
+import { deleteProduct } from '../plugin/DeleteProduct'
+
+const FILTER_OPTIONS = [
+    { value: 'no-filter', label: 'No Filter' },
+    { value: 'published', label: 'Status: Published' },
+    { value: 'draft', label: 'Status: Draft' },
+    { value: 'in-review', label: 'Status: In Review' },
+    { value: 'disabled', label: 'Status: Disabled' },
+    { value: 'latest', label: 'Date: Latest' },
+    { value: 'oldest', label: 'Date: Oldest' }
+]
+
+const STATUS_STYLES = {
+    published: 'bg-emerald-500/10 text-emerald-600 border-transparent',
+    draft: 'bg-amber-500/10 text-amber-600 border-transparent',
+    'in-review': 'bg-sky-500/10 text-sky-600 border-transparent',
+    disabled: 'bg-rose-500/10 text-rose-600 border-transparent'
+}
+
+const currencyFormatter = new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD'
+})
 
 function Products() {
     const [products, setProducts] = useState([])
+    const [activeFilter, setActiveFilter] = useState('no-filter')
 
     const axios = apiInstance
     const userData = UserData()
-
-    if (UserData()?.vendor_id === 0) {
-        window.location.href = '/vendor/register/'
-    }
-    
-    const fetchData = async () => {
-        try {
-            const response = await axios.get(`vendor/products/${userData?.vendor_id}/`)
-            setProducts(response.data);
-        } catch (error) {
-            console.error('Error fetching data:', error);
-        }
-    };
+    const vendorId = userData?.vendor_id
 
     useEffect(() => {
-        fetchData();
-    }, []);
-
-    const handleDeleteProduct = async (productPid) => {
-        try {
-            await deleteProduct(userData?.vendor_id, productPid)
-            await fetchData();
-        } catch (error) {
-            console.log(error);
+        if (vendorId === 0) {
+            window.location.href = '/vendor/register/'
         }
-    }
+    }, [vendorId])
 
-
-    const handleFilterProduct = async (param) => {
-        try {
-            const response = await axios.get(`vendor-product-filter/${userData?.vendor_id}?filter=${param}`)
-            setProducts(response.data);
-
-        } catch (error) {
-            console.log(error);
+    const fetchProducts = useCallback(async () => {
+        if (!vendorId) {
+            return
         }
-    }
+
+        try {
+            const response = await axios.get(`vendor/products/${vendorId}/`)
+            setProducts(response.data || [])
+        } catch (error) {
+            console.error('Error fetching data:', error)
+        }
+    }, [axios, vendorId])
+
+    useEffect(() => {
+        fetchProducts()
+    }, [fetchProducts])
+
+    const handleFilterProduct = useCallback(
+        async (param) => {
+            if (!vendorId) {
+                return
+            }
+
+            setActiveFilter(param)
+
+            if (param === 'no-filter') {
+                await fetchProducts()
+                return
+            }
+
+            try {
+                const response = await axios.get(`vendor-product-filter/${vendorId}?filter=${param}`)
+                setProducts(response.data || [])
+            } catch (error) {
+                console.error('Error filtering products:', error)
+            }
+        },
+        [axios, vendorId, fetchProducts]
+    )
+
+    const handleDeleteProduct = useCallback(
+        async (productPid) => {
+            if (!vendorId) {
+                return
+            }
+
+            try {
+                await deleteProduct(vendorId, productPid)
+                if (activeFilter === 'no-filter') {
+                    await fetchProducts()
+                } else {
+                    await handleFilterProduct(activeFilter)
+                }
+            } catch (error) {
+                console.error('Error deleting product:', error)
+            }
+        },
+        [vendorId, activeFilter, fetchProducts, handleFilterProduct]
+    )
+
+    const activeFilterLabel = useMemo(() => {
+        return FILTER_OPTIONS.find((option) => option.value === activeFilter)?.label || 'No Filter'
+    }, [activeFilter])
 
     return (
-        <div className="container-fluid" id="main" >
-            <div className="row row-offcanvas row-offcanvas-left h-100">
-                <Sidebar />
-                <div className="col-md-9 col-lg-10 main mt-4">
-                    <>
-                        <h4>
-                            <i className="bi bi-grid" /> All Products
-                        </h4>
-                        <div className="dropdown">
-                            <button
-                                className="btn btn-secondary dropdown-toggle  mt-3 mb-3 me-2"
-                                type="button"
-                                id="dropdownMenuButton1"
-                                data-bs-toggle="dropdown"
-                                aria-expanded="false"
-                            >
-                                Filter <i className="fas fa-sliders" />
-                            </button>
-                            <ul className="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                                <li>
-                                    <button className="dropdown-item" onClick={() => handleFilterProduct('no-filter')}>
-                                        No Filter
-                                    </button>
-                                </li>
-                                <li>
-                                    <button className="dropdown-item" onClick={() => handleFilterProduct('published')}>
-                                        Status: Published
-                                    </button>
-                                </li>
-                                <li>
-                                    <button className="dropdown-item" onClick={() => handleFilterProduct('draft')}>
-                                        Status: In Draft
-                                    </button>
-                                </li>
-                                <li>
-                                    <button className="dropdown-item" onClick={() => handleFilterProduct('in-review')}>
-                                        Status: In-review
-                                    </button>
-                                </li>
-                                <li>
-                                    <button className="dropdown-item" onClick={() => handleFilterProduct('disabled')}>
-                                        Status: Disabled
-                                    </button>
-                                </li>
-
-                                <hr />
-                                <li>
-                                    <button className="dropdown-item" onClick={() => handleFilterProduct('latest')}>
-                                        Date: Latest
-                                    </button>
-                                </li>
-                                <li>
-                                    <button className="dropdown-item" onClick={() => handleFilterProduct('oldest')}>
-                                        Date: Oldest
-                                    </button>
-                                </li>
-                            </ul>
-                            <Link to={'/vendor/product/new/'} className='btn btn-primary'>Add Product</Link>
-                        </div>
-                    </>
-                    <div className="mb-3 mt-2">
-                        <table className="table">
-                            <thead className="table-dark">
-                                <tr>
-                                    <th scope="col">#ID</th>
-                                    <th scope="col">Name</th>
-                                    <th scope="col">Price</th>
-                                    <th scope="col">Quantity</th>
-                                    <th scope="col">Orders</th>
-                                    <th scope="col">Status</th>
-                                    <th scope="col">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {products?.map((p, index) => (
-                                    <tr key={index}>
-                                        <th scope="row">#{p.sku}</th>
-                                        <td>{p.title}</td>
-                                        <td>${p.price}</td>
-                                        <td>{p.stock_qty}</td>
-                                        <td>{p.order_count}</td>
-                                        <td>{p?.status?.toUpperCase()}</td>
-                                        <td>
-                                            <Link to={`/detail/${p.slug}`} className="btn btn-primary mb-1 me-2"><i className="fas fa-eye" /></Link>
-                                            <Link to={`/vendor/product/update/${p.pid}/`} className="btn btn-success mb-1 me-2"><i className="fas fa-edit" /></Link>
-                                            <button type='button' onClick={() => handleDeleteProduct(p.pid)} className="btn btn-danger mb-1 me-2"><i className="fas fa-trash" /></button>
-                                        </td>
-                                    </tr>
-                                ))}
-
-                                {products?.length < 1 &&
-                                    <h4 className='p-3 mt-4'>No Products Yet</h4>
-                                }
-
-                            </tbody>
-                        </table>
-                    </div>
+        <VendorLayout
+            title="Products"
+            description="Filter, inspect, and manage the products in your catalog."
+            actions={
+                <div className="flex flex-wrap items-center gap-2">
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button variant="outline" size="sm" className="gap-2">
+                                <Filter className="h-4 w-4" />
+                                {activeFilterLabel}
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-48">
+                            <DropdownMenuLabel>Filter Products</DropdownMenuLabel>
+                            <DropdownMenuSeparator />
+                            {FILTER_OPTIONS.map((option) => (
+                                <DropdownMenuItem
+                                    key={option.value}
+                                    onSelect={() => handleFilterProduct(option.value)}
+                                >
+                                    {option.label}
+                                </DropdownMenuItem>
+                            ))}
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                    <Button asChild size="sm" className="gap-2">
+                        <Link to="/vendor/product/new/">
+                            <Plus className="h-4 w-4" />
+                            Add Product
+                        </Link>
+                    </Button>
                 </div>
-            </div>
-        </div>
+            }
+        >
+            <Card>
+                <CardHeader>
+                    <CardTitle>Product Overview</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead className="w-[12%]">SKU</TableHead>
+                                <TableHead>Name</TableHead>
+                                <TableHead className="w-[12%]">Price</TableHead>
+                                <TableHead className="w-[12%]">Quantity</TableHead>
+                                <TableHead className="w-[12%]">Orders</TableHead>
+                                <TableHead className="w-[14%]">Status</TableHead>
+                                <TableHead className="text-right">Action</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {products?.length ? (
+                                products.map((product) => {
+                                    const status = product?.status?.toLowerCase()
+
+                                    return (
+                                        <TableRow key={product.pid}>
+                                            <TableCell className="font-semibold">#{product.sku}</TableCell>
+                                            <TableCell className="font-medium text-slate-700">{product.title}</TableCell>
+                                            <TableCell>{currencyFormatter.format(product.price || 0)}</TableCell>
+                                            <TableCell>{product.stock_qty}</TableCell>
+                                            <TableCell>{product.order_count}</TableCell>
+                                            <TableCell>
+                                                <Badge
+                                                    variant="outline"
+                                                    className={cn('capitalize', STATUS_STYLES[status] || 'border-transparent bg-slate-200 text-slate-600')}
+                                                >
+                                                    {product?.status || 'Unknown'}
+                                                </Badge>
+                                            </TableCell>
+                                            <TableCell>
+                                                <div className="flex justify-end gap-2">
+                                                    <Button asChild size="sm" variant="outline">
+                                                        <Link to={`/detail/${product.slug}`}>
+                                                            <Eye className="h-4 w-4" />
+                                                        </Link>
+                                                    </Button>
+                                                    <Button asChild size="sm" variant="outline">
+                                                        <Link to={`/vendor/product/update/${product.pid}/`}>
+                                                            <Pencil className="h-4 w-4" />
+                                                        </Link>
+                                                    </Button>
+                                                    <Button
+                                                        size="sm"
+                                                        variant="destructive"
+                                                        onClick={() => handleDeleteProduct(product.pid)}
+                                                    >
+                                                        <Trash2 className="h-4 w-4" />
+                                                    </Button>
+                                                </div>
+                                            </TableCell>
+                                        </TableRow>
+                                    )
+                                })
+                            ) : (
+                                <TableRow>
+                                    <TableCell colSpan={7} className="py-6 text-center text-sm text-slate-500">
+                                        No products yet
+                                    </TableCell>
+                                </TableRow>
+                            )}
+                        </TableBody>
+                    </Table>
+                </CardContent>
+            </Card>
+        </VendorLayout>
     )
 }
 

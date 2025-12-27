@@ -1,268 +1,220 @@
-import React, { useEffect, useState } from 'react'
-import { Link, useParams } from 'react-router-dom';
+import React, { useEffect, useMemo, useState } from 'react'
+import { Link, useParams } from 'react-router-dom'
+import { CheckCircle2, Clock, Download, Eye, Home } from 'lucide-react'
 
-import apiInstance from '../../utils/axios';
-
-
+import apiInstance from '../../utils/axios'
+import Addon from '../plugin/Addon'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+import { Separator } from '@/components/ui/separator'
+import { ScrollToTop } from '@/components/ui/scroll-to-top'
 
 function PaymentSuccess() {
-    const [loading, setIsLoading] = useState(true)
-    const [orderResponse, setOrderResponse] = useState([])
-    const [order, setOrder] = useState([])
+    const [isLoading, setIsLoading] = useState(true)
+    const [orderResponse, setOrderResponse] = useState(null)
+    const [order, setOrder] = useState(null)
 
+    const addon = Addon()
+    const currencySign = addon?.currency_sign || '$'
 
     const axios = apiInstance
-    const param = useParams()
+    const params = useParams()
 
-    const urlParams = new URLSearchParams(window.location.search);
-    const sessionId = urlParams.get('session_id');
-    const payaplOrderId = urlParams.get('payapl_order_id');
+    const urlParams = useMemo(() => new URLSearchParams(window.location.search), [])
+    const sessionId = urlParams.get('session_id')
+    const payaplOrderId = urlParams.get('payapl_order_id')
 
-    console.log(param);
-    console.log(sessionId);
-    console.log(payaplOrderId);
-
-    // Get order details
     useEffect(() => {
-        axios.get(`checkout/${param?.order_oid}/`).then((res) => {
-            setOrder(res.data);
-        })
-    }, [param])
+        if (!params?.order_oid) {
+            return
+        }
 
+        const fetchOrder = async () => {
+            try {
+                const response = await axios.get(`checkout/${params.order_oid}/`)
+                setOrder(response.data)
+            } catch (error) {
+                console.error('Error fetching order detail:', error)
+            }
+        }
 
-    // Payment Processing
+        fetchOrder()
+    }, [axios, params?.order_oid])
+
     useEffect(() => {
-        const formData = new FormData();
-        formData.append('order_oid', param?.order_oid);
-        formData.append('session_id', sessionId);
-        formData.append('payapl_order_id', payaplOrderId);
+        if (!params?.order_oid) {
+            return
+        }
 
-        setIsLoading(true)
+        const processPayment = async () => {
+            const formData = new FormData()
+            formData.append('order_oid', params.order_oid)
+            formData.append('session_id', sessionId)
+            formData.append('payapl_order_id', payaplOrderId)
 
-        axios.post(`payment-success/`, formData).then((res) => {
-            setOrderResponse(res.data)
-            if (res.data.message === "Payment Successfull") {
+            try {
+                setIsLoading(true)
+                const response = await axios.post('payment-success/', formData)
+                setOrderResponse(response.data)
+            } catch (error) {
+                console.error('Error processing payment:', error)
+                setOrderResponse({ message: 'Payment Error' })
+            } finally {
                 setIsLoading(false)
             }
+        }
 
-            if (res.data.message === "Already Paid") {
-                setIsLoading(false)
-            }
+        processPayment()
+    }, [axios, params?.order_oid, payaplOrderId, sessionId])
 
-        })
+    const formatCurrency = (value) => {
+        if (value === null || value === undefined || Number.isNaN(Number(value))) {
+            return `${currencySign}0`
+        }
 
-    }, [param?.order_oid])
+        return `${currencySign}${Number(value).toLocaleString()}`
+    }
 
+    const summaryRows = useMemo(
+        () => [
+            { label: 'Subtotal', value: formatCurrency(order?.sub_total) },
+            { label: 'Shipping Fee', value: formatCurrency(order?.shipping_amount) },
+            { label: 'Service Fee', value: formatCurrency(order?.service_fee) },
+            { label: 'Tax', value: formatCurrency(order?.tax_fee) },
+            { label: 'Discount', value: `-${formatCurrency(order?.saved)}` }
+        ],
+        [order, currencySign]
+    )
 
+    const totalValue = formatCurrency(order?.total)
+    const statusMessage = orderResponse?.message
 
-    console.log(orderResponse);
-    return (
-        <div>
-            <>
-                <main>
-                    <main className="mb-4 mt-4 h-100">
-                        <div className="container">
-                            {/* Section: Checkout form */}
-                            <section className="">
-                                <div className="gx-lg-5">
-                                    <div className="row pb50">
-                                        <div className="col-lg-12">
-                                            <div className="dashboard_title_area">
-                                                {/* <p class="para">Lorem ipsum dolor sit amet, consectetur.</p> */}
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="row">
-                                        <div className="col-xl-12">
-                                            <div className="application_statics">
-                                                <div className="account_user_deails dashboard_page">
-                                                    <div className="d-flex justify-content-center align-items-center">
-                                                        <div className="col-lg-12">
-                                                            <div className="" />
-                                                            {loading === true &&
-                                                                <>
-                                                                    <div className="border border-3 border-warning">
-
-                                                                        <div className="card bg-white shadow p-5">
-                                                                            <div className="mb-4 text-center">
-                                                                                <i
-                                                                                    className="fas fa-clock text-warning"
-                                                                                    style={{ fontSize: 100, color: "green" }}
-                                                                                />
-                                                                            </div>
-                                                                            <div className="text-center">
-                                                                                <h1>Đang Xử Lý...</h1>
-                                                                                <p>
-                                                                                    Chúng tôi đang xác minh thanh toán của bạn, vui lòng đợi :)
-                                                                                </p>
-
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                </>
-                                                            }
-
-                                                            {orderResponse.message === "Already Paid" && loading == false &&
-                                                                <>
-                                                                    <div className="border border-3 border-success">
-                                                                        <div className="card bg-white shadow p-5">
-                                                                            <div className="mb-4 text-center">
-                                                                                <i
-                                                                                    className="fas fa-check-circle text-success"
-                                                                                    style={{ fontSize: 100, color: "green" }}
-                                                                                />
-                                                                            </div>
-                                                                            <div className="text-center">
-                                                                                <h1>Đã Thanh Toán!</h1>
-                                                                                <p>
-                                                                                    Bạn đã thanh toán cho đơn hàng này, cảm ơn bạn.
-                                                                                </p>
-                                                                                <button
-                                                                                    className="btn btn-success mt-3 me-2"
-                                                                                    data-bs-toggle="modal"
-                                                                                    data-bs-target="#exampleModal"
-                                                                                >
-                                                                                    Xem Đơn Hàng <i className="fas fa-eye" />{" "}
-                                                                                </button>
-                                                                                <Link to={`/invoice/${order.oid}/`} className="btn btn-success mt-3 me-2" >
-                                                                                    Tải Hóa Đơn{" "}
-                                                                                    <i className="fas fa-file-invoice" />{" "}
-                                                                                </Link>
-                                                                                <Link
-                                                                                    to="/"
-                                                                                    className="btn btn-success mt-3 me-2"
-                                                                                >
-                                                                                    Về Trang Chủ <i className="fas fa-fa-arrow-left" />{" "}
-                                                                                </Link>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                </>
-                                                            }
-
-                                                            {orderResponse.message === "Payment Successfull" && loading == false &&
-                                                                <>
-                                                                    <div className="border border-3 border-success">
-                                                                        <div className="card bg-white shadow p-5">
-                                                                            <div className="mb-4 text-center">
-                                                                                <i
-                                                                                    className="fas fa-check-circle text-success"
-                                                                                    style={{ fontSize: 100, color: "green" }}
-                                                                                />
-                                                                            </div>
-                                                                            <div className="text-center">
-                                                                                <h1>Cảm Ơn Bạn!</h1>
-                                                                                <p>
-                                                                                    Thanh toán của bạn thành công, chúng tôi đã gửi chi tiết đơn hàng đến email của bạn{" "}
-                                                                                </p>
-                                                                                <button
-                                                                                    className="btn btn-success mt-3 me-2"
-                                                                                    data-bs-toggle="modal"
-                                                                                    data-bs-target="#exampleModal"
-                                                                                >
-                                                                                    Xem Đơn Hàng <i className="fas fa-eye" />{" "}
-                                                                                </button>
-                                                                                <Link to={`/invoice/${order.oid}/`} className="btn btn-success mt-3 me-2" >
-                                                                                    Tải Hóa Đơn{" "}
-                                                                                    <i className="fas fa-file-invoice" />{" "}
-                                                                                </Link>
-                                                                                <a
-                                                                                    href="{% url 'dashboard:dashboard' %}"
-                                                                                    className="btn btn-success mt-3 me-2"
-                                                                                >
-                                                                                    Về Trang Chủ <i className="fas fa-fa-arrow-left" />{" "}
-                                                                                </a>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                </>
-                                                            }
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </section>
+    const renderStatus = () => {
+        if (isLoading) {
+            return (
+                <Card className="border-0 shadow-sm">
+                    <CardContent className="flex flex-col items-center gap-4 py-12 text-center">
+                        <Clock className="h-16 w-16 text-amber-500" />
+                        <div className="space-y-2">
+                            <CardTitle className="text-2xl">Đang Xử Lý...</CardTitle>
+                            <p className="text-sm text-muted-foreground">
+                                Chúng tôi đang xác minh thanh toán của bạn, vui lòng đợi trong giây lát.
+                            </p>
                         </div>
-                    </main>
-                    <div
-                        className="modal fade"
-                        id="exampleModal"
-                        tabIndex={-1}
-                        aria-labelledby="exampleModalLabel"
-                        aria-hidden="true"
-                    >
-                        <div className="modal-dialog">
-                            <div className="modal-content">
-                                <div className="modal-header">
-                                    <h5 className="modal-title" id="exampleModalLabel">
-                                        Order Summary
-                                    </h5>
-                                    <button
-                                        type="button"
-                                        className="btn-close"
-                                        data-bs-dismiss="modal"
-                                        aria-label="Close"
-                                    />
-                                </div>
-                                <div className="modal-body">
-                                    <div className="modal-body text-start text-black p-4">
-                                        <h5
-                                            className="modal-title text-uppercase "
-                                            id="exampleModalLabel"
-                                        >
-                                            {order.full_name}
-                                        </h5>
-                                        <h6>{order.email}</h6>
-                                        <h6 className="mb-5">{order.address}</h6>
-                                        <p className="mb-0" style={{ color: "#35558a" }}>
-                                            Payment summary
-                                        </p>
-                                        <hr
-                                            className="mt-2 mb-4"
-                                            style={{
-                                                height: 0,
-                                                backgroundColor: "transparent",
-                                                opacity: ".75",
-                                                borderTop: "2px dashed #9e9e9e"
-                                            }}
-                                        />
-                                        <div className="d-flex justify-content-between">
-                                            <p className="fw-bold mb-0">Subtotal</p>
-                                            <p className="text-muted mb-0">${order.sub_total}</p>
-                                        </div>
-                                        <div className="d-flex justify-content-between">
-                                            <p className="small mb-0">Shipping Fee</p>
-                                            <p className="small mb-0">${order.shipping_amount}</p>
-                                        </div>
-                                        <div className="d-flex justify-content-between">
-                                            <p className="small mb-0">Service Fee</p>
-                                            <p className="small mb-0">${order.service_fee}</p>
-                                        </div>
-                                        <div className="d-flex justify-content-between">
-                                            <p className="small mb-0">Tax</p>
-                                            <p className="small mb-0">${order.tax_fee}</p>
-                                        </div>
-                                        <div className="d-flex justify-content-between">
-                                            <p className="small mb-0">Discount</p>
-                                            <p className="small mb-0">-${order.saved}</p>
-                                        </div>
-                                        <div className="d-flex justify-content-between mt-4">
-                                            <p className="fw-bold">Total</p>
-                                            <p className="fw-bold" style={{ color: "#35558a" }}>
-                                                ${order.total}
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
+                    </CardContent>
+                </Card>
+            )
+        }
+
+        if (statusMessage === 'Payment Successfull' || statusMessage === 'Already Paid') {
+            const isFirstPayment = statusMessage === 'Payment Successfull'
+
+            return (
+                <Card className="border-0 shadow-sm">
+                    <CardContent className="space-y-6 py-12 text-center">
+                        <div className="flex flex-col items-center gap-4">
+                            <CheckCircle2 className="h-16 w-16 text-emerald-500" />
+                            <div className="space-y-2">
+                                <CardTitle className="text-2xl">
+                                    {isFirstPayment ? 'Cảm Ơn Bạn!' : 'Đã Thanh Toán'}
+                                </CardTitle>
+                                <p className="text-sm text-muted-foreground">
+                                    {isFirstPayment
+                                        ? 'Thanh toán của bạn thành công. Chúng tôi đã gửi chi tiết đơn hàng đến email của bạn.'
+                                        : 'Bạn đã thanh toán cho đơn hàng này trước đó. Cảm ơn bạn đã tiếp tục đồng hành.'}
+                                </p>
                             </div>
                         </div>
-                    </div>
-                </main>
-            </>
 
+                        <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
+                            <Dialog>
+                                <DialogTrigger asChild>
+                                    <Button className="gap-2" variant="secondary">
+                                        <Eye className="h-4 w-4" />
+                                        Xem Đơn Hàng
+                                    </Button>
+                                </DialogTrigger>
+                                <DialogContent className="sm:max-w-lg">
+                                    <DialogHeader>
+                                        <DialogTitle>Chi tiết đơn hàng</DialogTitle>
+                                    </DialogHeader>
+                                    <div className="space-y-4 text-sm">
+                                        <div className="space-y-1">
+                                            <p className="font-medium text-slate-900">{order?.full_name}</p>
+                                            <p className="text-muted-foreground">{order?.email}</p>
+                                            <p className="text-muted-foreground">{order?.address}</p>
+                                        </div>
+                                        <Separator />
+                                        <p className="text-xs font-medium uppercase tracking-wider text-slate-500">
+                                            Tóm tắt thanh toán
+                                        </p>
+                                        <div className="space-y-2">
+                                            {summaryRows.map((row) => (
+                                                <div key={row.label} className="flex items-start justify-between text-sm">
+                                                    <span className="text-muted-foreground">{row.label}</span>
+                                                    <span className="font-medium text-slate-900">{row.value}</span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                        <Separator />
+                                        <div className="flex items-center justify-between">
+                                            <span className="text-sm font-semibold text-slate-900">Tổng</span>
+                                            <span className="text-lg font-semibold text-primary">{totalValue}</span>
+                                        </div>
+                                    </div>
+                                </DialogContent>
+                            </Dialog>
+
+                            {order?.oid && (
+                                <Button asChild className="gap-2">
+                                    <Link to={`/invoice/${order.oid}/`}>
+                                        <Download className="h-4 w-4" />
+                                        Tải Hóa Đơn
+                                    </Link>
+                                </Button>
+                            )}
+
+                            <Button asChild variant="outline" className="gap-2">
+                                <Link to="/">
+                                    <Home className="h-4 w-4" />
+                                    Về Trang Chủ
+                                </Link>
+                            </Button>
+                        </div>
+                    </CardContent>
+                </Card>
+            )
+        }
+
+        return (
+            <Card className="border-0 shadow-sm">
+                <CardContent className="flex flex-col items-center gap-4 py-12 text-center">
+                    <Clock className="h-16 w-16 text-amber-500" />
+                    <div className="space-y-2">
+                        <CardTitle className="text-2xl">Không thể xác minh thanh toán</CardTitle>
+                        <p className="text-sm text-muted-foreground">Vui lòng thử lại hoặc liên hệ bộ phận hỗ trợ.</p>
+                    </div>
+                    <Button asChild>
+                        <Link to="/">Quay về trang chủ</Link>
+                    </Button>
+                </CardContent>
+            </Card>
+        )
+    }
+
+    return (
+        <div className="min-h-screen bg-slate-50">
+            <ScrollToTop />
+            <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 py-16">
+                <div className="text-center">
+                    <h1 className="text-3xl font-semibold text-slate-900">Trạng thái thanh toán</h1>
+                    <p className="mt-2 text-sm text-muted-foreground">
+                        Mã đơn hàng: <span className="font-medium text-slate-900">{params?.order_oid}</span>
+                    </p>
+                </div>
+                {renderStatus()}
+            </div>
         </div>
     )
 }
