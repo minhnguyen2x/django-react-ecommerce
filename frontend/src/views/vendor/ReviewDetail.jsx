@@ -1,174 +1,186 @@
-import React, { useState, useEffect } from 'react'
-import { Link, useParams } from 'react-router-dom';
+import React, { useEffect, useMemo, useState } from 'react'
+import { ArrowLeft, MessageSquare, Reply, Star } from 'lucide-react'
+import { Link, useParams } from 'react-router-dom'
 
-import apiInstance from '../../utils/axios';
-import UserData from '../plugin/UserData';
-import Sidebar from './Sidebar';
-
-
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import { Textarea } from '@/components/ui/textarea'
+import apiInstance from '../../utils/axios'
+import UserData from '../plugin/UserData'
+import Sidebar from './Sidebar'
 
 function ReviewDetail() {
-    const [review, setReview] = useState([])
-    const [updateReviews, setUpdateReviews] = useState({ reply: "" })
-
-    if (UserData()?.vendor_id === 0) {
-        window.location.href = '/vendor/register/'
-    }
+    const [review, setReview] = useState(null)
+    const [replyData, setReplyData] = useState({ reply: '' })
+    const [isReplyOpen, setIsReplyOpen] = useState(false)
+    const [isSubmitting, setIsSubmitting] = useState(false)
 
     const axios = apiInstance
     const userData = UserData()
     const params = useParams()
 
+    if (userData?.vendor_id === 0) {
+        window.location.href = '/vendor/register/'
+    }
+
     const fetchData = async () => {
         try {
             const response = await axios.get(`vendor-reviews/${userData?.vendor_id}/${params.id}`)
-            setReview(response.data);
+            setReview(response.data)
         } catch (error) {
-            console.error('Error fetching data:', error);
+            console.error('Error fetching data:', error)
         }
-    };
+    }
 
     useEffect(() => {
-        fetchData();
-    }, []);
+        fetchData()
+    }, [])
 
     const handleReplyChange = (event) => {
-        setUpdateReviews({
-            ...updateReviews,
-            [event.target.name]: event.target.value
-        })
+        setReplyData({ reply: event.target.value })
     }
 
-    const handleReplySubmit = async (e) => {
-        e.preventDefault()
+    const handleReplySubmit = async (event) => {
+        event.preventDefault()
+        if (!replyData.reply?.trim()) {
+            return
+        }
+
         const formdata = new FormData()
+        formdata.append('reply', replyData.reply)
 
-        formdata.append('reply', updateReviews.reply)
-
-        await axios.patch(`vendor-reviews/${userData?.vendor_id}/${review.id}/`, formdata).then((res) => {
-            console.log(res.data);
-            fetchData()
-            updateReviews.reply = ""
-        })
-
+        try {
+            setIsSubmitting(true)
+            await axios.patch(`vendor-reviews/${userData?.vendor_id}/${review?.id}/`, formdata)
+            await fetchData()
+            setReplyData({ reply: '' })
+            setIsReplyOpen(false)
+        } catch (error) {
+            console.error('Error submitting reply:', error)
+        } finally {
+            setIsSubmitting(false)
+        }
     }
+
+    const renderStars = useMemo(
+        () => (count) =>
+            Array.from({ length: 5 }).map((_, index) => (
+                <Star
+                    key={index}
+                    className={index < count ? 'h-4 w-4 fill-yellow-400 text-yellow-400' : 'h-4 w-4 text-slate-300'}
+                    strokeWidth={index < count ? 0 : 2}
+                />
+            )),
+        []
+    )
+
+    const ratingValue = Number(review?.rating) || 0
+
     return (
-        <div className="container-fluid" id="main" >
-            <div className="row row-offcanvas row-offcanvas-left h-100">
+        <div className="min-h-screen bg-slate-50">
+            <div className="mx-auto flex w-full max-w-7xl flex-col gap-8 px-4 py-10 lg:flex-row">
                 <Sidebar />
-                <div className="col-md-9 col-lg-10 main mt-4">
-                    <h4 className='mb-4'><i className="fas fa-star" /> Reviews and Rating</h4>
+                <div className="flex-1 space-y-8">
+                    <div className="flex flex-wrap items-center justify-between gap-3">
+                        <div className="space-y-1">
+                            <h1 className="text-2xl font-semibold text-slate-900">Review details</h1>
+                            <p className="text-sm text-muted-foreground">
+                                Inspect customer feedback and send a personalised response.
+                            </p>
+                        </div>
+                        <Button asChild variant="ghost" className="text-slate-600">
+                            <Link to="/vendor/reviews/">
+                                <ArrowLeft className="mr-2 h-4 w-4" /> Back to reviews
+                            </Link>
+                        </Button>
+                    </div>
 
-                    <section
-                        className="p-4 p-md-5 text-center text-lg-start shadow-1-strong rounded"
-                        style={{
-                            backgroundImage:
-                                "url(https://mdbcdn.b-cdn.net/img/Photos/Others/background2.webp)"
-                        }}
-                    >
-                        <div className="row d-flex justify-content-center align-items-center">
-                            <div className="col-md-10">
-                                <div className="card mt-3 mb-3">
-                                    <div className="card-body m-3">
-                                        <div className="row">
-                                            <div className="col-lg-4 d-flex justify-content-center align-items-center mb-4 mb-lg-0">
-                                                <img
-                                                    src={review?.profile?.image}
-                                                    className="rounded-circle img-fluid shadow-1"
-                                                    alt="woman avatar"
-                                                    style={{ width: 200, height: 200, objectFit: "cover" }}
-                                                />
-                                            </div>
-                                            <div className="col-lg-8">
-                                                <p className="text-dark  mb-2">
-                                                    <b>Review: </b>
-                                                    {review?.review}
-                                                </p>
-                                                <p className="text-dark mb-2 d-flex">
-                                                    <b>Reply: {""} </b>
-                                                    {review.reply === null
-                                                        ? <span className='ms-2'> No Response</span>
-                                                        : <span className='ms-2'> {review.reply}</span>
-                                                    }
-                                                </p>
-                                                <p className="text-dark mb-2">
-                                                    <strong>Name</strong>:{review?.profile?.full_name}
-                                                </p>
-                                                <p className=" mb-2">
-                                                    <b>Product</b>: {review?.product?.title}
-                                                </p>
-                                                <p className=" mb-0">
-                                                    Rating:
-                                                    {review.rating == 1 &&
-                                                        <>
-                                                            <span className='me-2 ms-2'>1</span>
-                                                            < i className="fas fa-star" />
-                                                        </>
-                                                    }
+                    <Card className="border-0 shadow-sm">
+                        <CardHeader className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                            <div>
+                                <CardTitle className="text-lg font-semibold text-slate-900">
+                                    {review?.profile?.full_name || 'Customer'}
+                                </CardTitle>
+                                <p className="text-sm text-muted-foreground">{review?.profile?.email || 'No email provided'}</p>
+                            </div>
+                            <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100">
+                                <MessageSquare className="mr-1 h-3.5 w-3.5" />
+                                {review?.product?.title || 'Unknown product'}
+                            </Badge>
+                        </CardHeader>
 
-                                                    {review.rating == 2 &&
-                                                        <>
-                                                            <span className='me-2 ms-2'>2</span>
-                                                            < i className="fas fa-star" />
-                                                            < i className="fas fa-star" />
-                                                        </>
-                                                    }
-
-                                                    {review.rating == 3 &&
-                                                        <>
-                                                            <span className='me-2 ms-2'>3</span>
-                                                            < i className="fas fa-star" />
-                                                            < i className="fas fa-star" />
-                                                            < i className="fas fa-star" />
-                                                        </>
-                                                    }
-
-                                                    {review.rating == 4 &&
-                                                        <>
-                                                            <span className='me-2 ms-2'>4</span>
-                                                            < i className="fas fa-star" />
-                                                            < i className="fas fa-star" />
-                                                            < i className="fas fa-star" />
-                                                            < i className="fas fa-star" />
-                                                        </>
-                                                    }
-
-                                                    {review.rating == 5 &&
-                                                        <>
-                                                            <span className='me-2 ms-2'>5</span>
-                                                            < i className="fas fa-star" />
-                                                            < i className="fas fa-star" />
-                                                            < i className="fas fa-star" />
-                                                            < i className="fas fa-star" />
-                                                            < i className="fas fa-star" />
-                                                        </>
-                                                    }
-                                                </p>
-                                                <div className="= mt-3">
-                                                    <p>
-                                                        <a class="btn btn-primary" data-bs-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
-                                                            <i className='fas fa-reply'></i> Reply
-                                                        </a>
-                                                    </p>
-                                                    <div class="collapse" id="collapseExample">
-                                                        <div class="card card-body">
-                                                            <form onSubmit={handleReplySubmit} method='POST' className='d-flex'>
-                                                                <input onChange={handleReplyChange} type="text" className='form-control' placeholder='Write Reply' name="reply" id="" />
-                                                                <button type='submit' className='btn btn-success ms-2'><i className='fas fa-paper-plane'></i></button>
-                                                            </form>                                                            </div>
-                                                    </div>
-
-                                                </div>
-                                            </div>
-                                        </div>
+                        <CardContent className="space-y-6">
+                            <div className="flex flex-col items-center gap-6 md:flex-row md:items-start">
+                                <div className="flex items-center justify-center md:w-48">
+                                    <div className="h-40 w-40 overflow-hidden rounded-full border border-slate-200 bg-white shadow-sm">
+                                        <img
+                                            src={review?.profile?.image}
+                                            alt={`${review?.profile?.full_name || 'Customer'} avatar`}
+                                            className="h-full w-full object-cover"
+                                        />
                                     </div>
                                 </div>
 
-                            </div>
-                        </div>
-                    </section>
-                </div>
+                                <div className="flex-1 space-y-6">
+                                    <div className="space-y-3">
+                                        <div className="flex items-center gap-2">
+                                            <span className="text-sm font-medium text-slate-700">Rating</span>
+                                            <div className="flex items-center gap-1">{renderStars(ratingValue)}</div>
+                                            <span className="text-xs text-muted-foreground">{ratingValue}/5</span>
+                                        </div>
 
+                                        <div className="space-y-2">
+                                            <p className="text-sm font-medium text-slate-700">Review</p>
+                                            <p className="text-sm leading-relaxed text-slate-600">{review?.review || 'No review text provided.'}</p>
+                                        </div>
+
+                                        <div className="space-y-2">
+                                            <p className="text-sm font-medium text-slate-700">Seller reply</p>
+                                            {review?.reply ? (
+                                                <p className="text-sm leading-relaxed text-slate-600">{review.reply}</p>
+                                            ) : (
+                                                <p className="text-sm text-muted-foreground">No response yet.</p>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </CardContent>
+
+                        <CardFooter className="flex flex-col gap-4 border-t border-slate-100 bg-slate-50 p-6">
+                            <div className="flex flex-wrap items-center justify-between gap-3">
+                                <div className="text-sm text-muted-foreground">
+                                    {review?.reply ? 'Update your response' : 'Post a response to this review'}
+                                </div>
+                                <Button variant="outline" onClick={() => setIsReplyOpen((prev) => !prev)}>
+                                    <Reply className="mr-2 h-4 w-4" />
+                                    {isReplyOpen ? 'Cancel reply' : 'Write a reply'}
+                                </Button>
+                            </div>
+
+                            {isReplyOpen && (
+                                <form onSubmit={handleReplySubmit} className="space-y-4">
+                                    <Textarea
+                                        name="reply"
+                                        value={replyData.reply}
+                                        onChange={handleReplyChange}
+                                        placeholder="Share helpful order updates, apologies, or thanks."
+                                        rows={4}
+                                    />
+                                    <div className="flex flex-wrap items-center gap-3">
+                                        <Button type="submit" disabled={isSubmitting}>
+                                            {isSubmitting ? 'Sending…' : 'Send reply'}
+                                        </Button>
+                                        <Button type="button" variant="ghost" onClick={() => setIsReplyOpen(false)}>
+                                            Cancel
+                                        </Button>
+                                    </div>
+                                </form>
+                            )}
+                        </CardFooter>
+                    </Card>
+                </div>
             </div>
         </div>
     )

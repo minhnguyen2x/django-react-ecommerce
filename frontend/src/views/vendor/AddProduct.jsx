@@ -1,12 +1,16 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
+import { CheckCircle2, Image as ImageIcon, ListChecks, Loader2, Palette, PlusCircle, Tag, Trash2 } from 'lucide-react'
 import Swal from 'sweetalert2'
-import { CKEditor } from '@ckeditor/ckeditor5-react';
-import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 
-import apiInstance from '../../utils/axios';
-import UserData from '../plugin/UserData';
-import Sidebar from './Sidebar';
-import { useNavigate } from 'react-router-dom';
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Textarea } from '@/components/ui/textarea'
+import apiInstance from '../../utils/axios'
+import UserData from '../plugin/UserData'
+import Sidebar from './Sidebar'
 
 
 function AddProduct() {
@@ -36,12 +40,9 @@ function AddProduct() {
     const [category, setCategory] = useState([]);
     const [isLoading, setIsLoading] = useState(false)
     const axios = apiInstance
-    const navigate = useNavigate()
-    const handleAddMore = (setStateFunction) => {
-        setStateFunction((prevState) => [...prevState, {}]);
+    const handleAddMore = (setStateFunction, template) => {
+        setStateFunction((prevState) => [...prevState, template]);
     };
-
-    console.log(product.category);
 
     const handleRemove = (index, setStateFunction) => {
         setStateFunction((prevState) => {
@@ -166,7 +167,6 @@ function AddProduct() {
                     if (key === 'image' && value && value.file && value.file.type.startsWith('image/')) {
                         formData.append(`colors[${index}][${key}]`, value.file, value.file.name);
                     } else {
-                        console.log(String(value));
                         formData.append(`colors[${index}][${key}]`, String(value)); // Convert `value` to a string
                     }
                 });
@@ -186,612 +186,467 @@ function AddProduct() {
                 }
             });
 
-            const response = await apiInstance.post(`vendor-product-create/${userData?.vendor_id}/`, formData, {
+            await axios.post(`vendor-product-create/${userData?.vendor_id}/`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
             });
-
-            // navigate('/vendor/products/')
 
             Swal.fire({
                 icon: 'success',
                 title: 'Product Created Successfully',
                 text: 'This product has been successfully created',
             });
-
-
-
-            const data = await response.json();
         } catch (error) {
             console.error('Error submitting form:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Could not create product',
+                text: 'Please try again in a moment.'
+            })
+        } finally {
             setIsLoading(false)
-
         }
     };
-
-
+    const productImagePreview = product?.image?.preview
 
     return (
-        <div>
-            <div className="container-fluid" id="main">
-                <div className="row row-offcanvas row-offcanvas-left h-100">
-                    <Sidebar />
-                    {/*/col*/}
-                    <div className="col-md-9 col-lg-10 main mt-4">
-                        <div className="container">
-                            <form className="main-body" method='POST' encType="multipart/form-data" onSubmit={handleSubmit}>
-                                <div className="tab-content" id="pills-tabContent">
-                                    <div
-                                        className="tab-pane fade show active"
-                                        id="pills-home"
-                                        role="tabpanel"
-                                        aria-labelledby="pills-home-tab"
-                                    >
-                                        <div className="row gutters-sm shadow p-4 rounded">
-                                            <h4 className="mb-4">Product Details</h4>
-                                            <div className="col-md-4 mb-3">
-                                                <div className="card h-100">
-                                                    <div className="card-body">
-                                                        <div className="d-flex flex-column align-items-center text-center">
-                                                            {product.image && product.image.preview ? (
-                                                                <img
-                                                                    src={product.image.preview}
-                                                                    alt="Product Thumbnail Preview"
-                                                                    style={{ width: '100%', height: '200px', objectFit: 'cover', borderRadius: 10 }}
-                                                                />
-                                                            ) : (
-                                                                <img
-                                                                    src="https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png"
-                                                                    style={{ width: '100%', height: '200px', objectFit: 'cover', borderRadius: 10 }}
-                                                                    alt=""
-                                                                />
-                                                            )}
+        <div className="min-h-screen bg-slate-50">
+            <div className="mx-auto flex w-full max-w-7xl flex-col gap-8 px-4 py-10 lg:flex-row">
+                <Sidebar />
+                <form className="flex-1 space-y-8" method="POST" encType="multipart/form-data" onSubmit={handleSubmit}>
+                    <header className="space-y-2">
+                        <h1 className="text-2xl font-semibold text-slate-900">Create Product</h1>
+                        <p className="text-sm text-muted-foreground">
+                            Upload product information, configure variations, and publish it to your storefront.
+                        </p>
+                    </header>
 
-                                                            <div className="mt-3">
-                                                                {product.title !== "" &&
-                                                                    <h4 className="text-dark">{product.title}</h4>
-                                                                }
-                                                                {product.title === "" &&
-                                                                    <h4 className="text-dark">Product Title</h4>
-                                                                }
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
+                    <div className="grid gap-6 lg:grid-cols-[320px_1fr]">
+                        <Card className="border-0 shadow-sm">
+                            <CardHeader>
+                                <CardTitle className="flex items-center gap-2 text-lg font-semibold text-slate-900">
+                                    <ImageIcon className="h-5 w-5" />
+                                    Product Preview
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent className="space-y-4">
+                                <div className="overflow-hidden rounded-lg border border-dashed border-slate-200 bg-white">
+                                    <img
+                                        src={productImagePreview || 'https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png'}
+                                        alt="Product preview"
+                                        className="h-64 w-full object-cover"
+                                    />
+                                </div>
+                                <div className="space-y-1">
+                                    <p className="text-lg font-medium text-slate-900">
+                                        {product.title || 'Untitled product'}
+                                    </p>
+                                    <p className="text-sm text-muted-foreground">
+                                        {product.description ? product.description.slice(0, 140) : 'Add a compelling description to highlight the main benefits of your product.'}
+                                    </p>
+                                </div>
+                            </CardContent>
+                        </Card>
 
-                                            <div className="col-md-8">
-                                                <div className="card mb-3">
+                        <Card className="border-0 shadow-sm">
+                            <CardHeader>
+                                <CardTitle className="text-lg font-semibold text-slate-900">Product details</CardTitle>
+                            </CardHeader>
+                            <CardContent className="space-y-5">
+                                <div className="space-y-2">
+                                    <Label htmlFor="product-image">Product Thumbnail</Label>
+                                    <Input id="product-image" type="file" name="image" onChange={handleProductFileChange} />
+                                </div>
 
-                                                    <div className="card-body">
+                                <div className="space-y-2">
+                                    <Label htmlFor="product-title">Title</Label>
+                                    <Input
+                                        id="product-title"
+                                        type="text"
+                                        name="title"
+                                        value={product.title || ''}
+                                        onChange={handleProductInputChange}
+                                        placeholder="Premium wireless headphones"
+                                    />
+                                </div>
 
-                                                        <div className="row text-dark">
-                                                            <div className="col-lg-12 mb-2">
-                                                                <label htmlFor="" className="mb-2">
-                                                                    Product Thumbnail
-                                                                </label>
-                                                                <input
-                                                                    type="file"
-                                                                    className="form-control"
-                                                                    name="image"
-                                                                    id=""
-                                                                    onChange={handleProductFileChange}
-                                                                />
-                                                            </div>
-                                                            <div className="col-lg-12 mb-2 ">
-                                                                <label htmlFor="" className="mb-2">
-                                                                    Title
-                                                                </label>
-                                                                <input
-                                                                    type="text"
-                                                                    className="form-control"
-                                                                    id=""
-                                                                    name="title"
-                                                                    value={product.title || ''}
-                                                                    onChange={handleProductInputChange}
-                                                                />
-                                                            </div>
-                                                            <div className="col-lg-12 mb-2">
-                                                                <label htmlFor="" className="mb-2">
-                                                                    Description
-                                                                </label>
-                                                                <textarea
-                                                                    className="form-control"
-                                                                    id=""
-                                                                    cols={30}
-                                                                    rows={10}
-                                                                    defaultValue={""}
-                                                                    name="description"
-                                                                    value={product.description || ''}
-                                                                    onChange={handleProductInputChange}
-                                                                />
-                                                                {/* <CKEditor
-                                                                    editor={ClassicEditor}
-                                                                    data="<p>Hello from CKEditor&nbsp;5!</p>"
-                                                                    onReady={editor => {
-                                                                        // You can store the "editor" and use when it is needed.
-                                                                        console.log('Editor is ready to use!', editor);
-                                                                    }}
-                                                                    onChange={(event) => handleProductInputChange()}
-                                                                    onBlur={(event, editor) => {
-                                                                        console.log('Blur.', editor);
-                                                                    }}
-                                                                    onFocus={(event, editor) => {
-                                                                        console.log('Focus.', editor);
-                                                                    }}
-                                                                /> */}
-                                                            </div>
-                                                            <div className="col-lg-6 mb-2">
-                                                                <label htmlFor="" className="mb-2">
-                                                                    Category
-                                                                </label>
-                                                                <select
-                                                                    className="select form-control"
-                                                                    id=""
-                                                                    name="category"
-                                                                    value={product.category || ''}
-                                                                    onChange={handleProductInputChange}
-                                                                >
-                                                                    <option value="">- Select -</option>
-                                                                    {category.map((c, index) => (
-                                                                        <option key={index} value={c.id}>{c.title}</option>
-                                                                    ))}
-                                                                </select>
-                                                            </div>
-                                                            <div className="col-lg-6 mb-2 ">
-                                                                <label htmlFor="" className="mb-2">
-                                                                    Brand
-                                                                </label>
-                                                                <input
-                                                                    type="text"
-                                                                    className="form-control"
-                                                                    name="brand"
-                                                                    value={product.brand || ''}
-                                                                    onChange={handleProductInputChange}
-                                                                />
-                                                            </div>
-                                                            <div className="col-lg-6 mb-2 ">
-                                                                <label htmlFor="" className="mb-2">
-                                                                    Sale Price
-                                                                </label>
-                                                                <input
-                                                                    type="number"
-                                                                    className="form-control"
-                                                                    name="price"
-                                                                    value={product.price || ''}
-                                                                    onChange={handleProductInputChange}
-                                                                />
-                                                            </div>
-                                                            <div className="col-lg-6 mb-2 ">
-                                                                <label htmlFor="" className="mb-2">
-                                                                    Regular Price
-                                                                </label>
-                                                                <input
-                                                                    type="number"
-                                                                    className="form-control"
-                                                                    name="old_price"
-                                                                    value={product.old_price || ''}
-                                                                    onChange={handleProductInputChange}
-                                                                />
-                                                            </div>
-                                                            <div className="col-lg-6 mb-2 ">
-                                                                <label htmlFor="" className="mb-2">
-                                                                    Shipping Amount
-                                                                </label>
-                                                                <input
-                                                                    type="number"
-                                                                    className="form-control"
-                                                                    name="shipping_amount"
-                                                                    value={product.shipping_amount || ''}
-                                                                    onChange={handleProductInputChange}
-                                                                />
-                                                            </div>
-                                                            <div className="col-lg-6 mb-2 ">
-                                                                <label htmlFor="" className="mb-2">
-                                                                    Stock Qty
-                                                                </label>
-                                                                <input
-                                                                    type="number"
-                                                                    className="form-control"
-                                                                    name="stock_qty"
-                                                                    value={product.stock_qty || ''}
-                                                                    onChange={handleProductInputChange}
-                                                                />
-                                                            </div>
-                                                            <div className="col-lg-12 mb-2 ">
-                                                                <label htmlFor="" className="mb-2">
-                                                                    Tags
-                                                                </label>
-                                                                <br />
-                                                                <input
-                                                                    type="text"
-                                                                    className="form-control"
-                                                                    name="tags"
-                                                                    value={product.tags || ''}
-                                                                    onChange={handleProductInputChange}
-                                                                />
-                                                                <span style={{ fontSize: 12 }} className='text-muted'>NOTE: Seperate tags with comma</span>
+                                <div className="space-y-2">
+                                    <Label htmlFor="product-description">Description</Label>
+                                    <Textarea
+                                        id="product-description"
+                                        name="description"
+                                        value={product.description || ''}
+                                        onChange={handleProductInputChange}
+                                        placeholder="Describe product features, materials, and any guarantees your store provides."
+                                        rows={6}
+                                    />
+                                </div>
 
-                                                            </div>
-                                                        </div>
-
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div
-                                        className="tab-pane fade"
-                                        id="pills-profile"
-                                        role="tabpanel"
-                                        aria-labelledby="pills-profile-tab"
-                                    >
-                                        <div className="row gutters-sm shadow p-4 rounded">
-                                            <h4 className="mb-4">Product Image</h4>
-                                            <div className="col-md-12">
-                                                <div className="card mb-3">
-                                                    <div className="card-body">
-                                                        {gallery.map((item, index) => (
-
-                                                            <div className="row text-dark mb-5">
-                                                                <div className="col-lg-3">
-                                                                    {item.image && (
-                                                                        <img
-                                                                            src={item.image.preview}
-                                                                            alt={`Preview for gallery item ${index + 1}`}
-                                                                            style={{ width: '100%', height: '100px', objectFit: 'cover', borderRadius: 5 }}
-                                                                        />
-                                                                    )}
-
-                                                                    {!item.image && (
-                                                                        <img
-                                                                            src="https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png"
-                                                                            alt={`Preview for gallery item ${index + 1}`}
-                                                                            style={{ width: '100%', height: '100px', objectFit: 'cover', borderRadius: 5 }}
-                                                                        />
-                                                                    )}
-                                                                </div>
-                                                                <div className="col-lg-6 mb-2">
-                                                                    <label htmlFor="" className="mb-2">
-                                                                        Product Image
-                                                                    </label>
-                                                                    <input
-                                                                        type="file"
-                                                                        className="form-control"
-                                                                        name=""
-                                                                        id=""
-                                                                        onChange={(e) => handleImageChange(index, e, setGallery)}
-                                                                    />
-                                                                </div>
-                                                                <div className="col-lg-3 mt-2">
-                                                                    <button onClick={() => handleRemove(index, setGallery)} type='button' className='btn btn-danger mt-4'>Remove</button>
-                                                                </div>
-
-                                                            </div>
-                                                        ))}
-
-                                                        {gallery < 1 &&
-                                                            <h4>No Images Selected</h4>
-                                                        }
-
-                                                        <button type='button' onClick={() => handleAddMore(setGallery)} className="btn btn-primary mt-2">
-                                                            <i className="fas fa-plus" /> Add More Images
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div
-                                        className="tab-pane fade"
-                                        id="pills-contact"
-                                        role="tabpanel"
-                                        aria-labelledby="pills-contact-tab"
-                                    >
-                                        <div className="row gutters-sm shadow p-4 rounded">
-                                            <h4 className="mb-4">Specifications</h4>
-                                            <div className="col-md-12">
-                                                <div className="card mb-3">
-                                                    <div className="card-body">
-
-                                                        {specifications.map((specification, index) => (
-
-                                                            <div className="row text-dark">
-                                                                <div className="col-lg-3 mb-2">
-                                                                    <label htmlFor="" className="mb-2">
-                                                                        Title
-                                                                    </label>
-                                                                    <input
-                                                                        type="text"
-                                                                        className="form-control"
-                                                                        value={specification.title || ''}
-                                                                        onChange={(e) => handleInputChange(index, 'title', e.target.value, setSpecifications)}
-
-                                                                    />
-                                                                </div>
-                                                                <div className="col-lg-6 mb-2">
-                                                                    <label htmlFor="" className="mb-2">
-                                                                        Content
-                                                                    </label>
-                                                                    <input
-                                                                        type="text"
-                                                                        className="form-control"
-                                                                        value={specification.content || ''}
-                                                                        onChange={(e) => handleInputChange(index, 'content', e.target.value, setSpecifications)}
-
-                                                                    />
-                                                                </div>
-                                                                <div className="col-lg-3 mb-2">
-                                                                    <button type='button' onClick={() => handleRemove(index, setSpecifications)} className='btn btn-danger mt-4'>Remove</button>
-                                                                </div>
-                                                            </div>
-                                                        ))}
-
-                                                        {specifications.length < 1 &&
-                                                            <h4>No Specification Form</h4>
-                                                        }
-
-                                                        <button type='button' onClick={() => handleAddMore(setSpecifications)} className="btn btn-primary mt-2">
-                                                            <i className="fas fa-plus" /> Add More Specifications
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div
-                                        className="tab-pane fade"
-                                        id="pills-size"
-                                        role="tabpanel"
-                                        aria-labelledby="pills-size-tab"
-                                    >
-                                        <div className="row gutters-sm shadow p-4 rounded">
-                                            <h4 className="mb-4">Sizes</h4>
-                                            <div className="col-md-12">
-                                                <div className="card mb-3">
-                                                    <div className="card-body">
-                                                        {sizes.map((s, index) => (
-
-                                                            <div className="row text-dark">
-                                                                <div className="col-lg-3 mb-2">
-                                                                    <label htmlFor="" className="mb-2">
-                                                                        Size
-                                                                    </label>
-                                                                    <input
-                                                                        type="text"
-                                                                        className="form-control"
-                                                                        name=""
-                                                                        placeholder="XXL"
-                                                                        id=""
-                                                                        value={s.name || ''}
-                                                                        onChange={(e) => handleInputChange(index, 'name', e.target.value, setSizes)}
-
-                                                                    />
-                                                                </div>
-                                                                <div className="col-lg-6 mb-2">
-                                                                    <label htmlFor="" className="mb-2">
-                                                                        Price
-                                                                    </label>
-                                                                    <input
-                                                                        type="number"
-                                                                        placeholder="$20"
-                                                                        className="form-control"
-                                                                        name=""
-                                                                        id=""
-                                                                        value={s.price || ''}
-                                                                        onChange={(e) => handleInputChange(index, 'price', e.target.value, setSizes)}
-
-                                                                    />
-                                                                </div>
-                                                                <div className="col-lg-3 mt-2">
-                                                                    <button type='button' onClick={() => handleRemove(index, setSizes)} className='btn btn-danger mt-4'>Remove</button>
-                                                                </div>
-                                                            </div>
-                                                        ))}
-                                                        {sizes < 1 &&
-                                                            <h4>No Size Added</h4>
-                                                        }
-                                                        <button type='button' onClick={() => handleAddMore(setSizes)} className="btn btn-primary mt-2">
-                                                            <i className="fas fa-plus" /> Add More Sizes
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div
-                                        className="tab-pane fade"
-                                        id="pills-color"
-                                        role="tabpanel"
-                                        aria-labelledby="pills-color-tab"
-                                    >
-                                        <div className="row gutters-sm shadow p-4 rounded">
-                                            <h4 className="mb-4">Color</h4>
-                                            <div className="col-md-12">
-                                                <div className="card mb-3">
-                                                    <div className="card-body">
-                                                        {colors.map((c, index) => (
-                                                            <div className="row text-dark mb-3">
-                                                                <div className="col-lg-2 mb-2">
-                                                                    <label htmlFor="" className="mb-2">
-                                                                        Name
-                                                                    </label>
-                                                                    <input
-                                                                        type="text"
-                                                                        className="form-control"
-                                                                        name=""
-                                                                        placeholder="Green"
-                                                                        id=""
-                                                                        value={c.name || ''}
-                                                                        onChange={(e) => handleInputChange(index, 'name', e.target.value, setColors)}
-
-                                                                    />
-                                                                </div>
-                                                                <div className="col-lg-2 mb-2">
-                                                                    <label htmlFor="" className="mb-2">
-                                                                        Code
-                                                                    </label>
-                                                                    <input
-                                                                        type="text"
-                                                                        placeholder="#f4f7f6"
-                                                                        className="form-control"
-                                                                        name=""
-                                                                        id=""
-                                                                        value={c.color_code || ''}
-                                                                        onChange={(e) => handleInputChange(index, 'color_code', e.target.value, setColors)}
-
-                                                                    />
-                                                                </div>
-                                                                <div className="col-lg-3 mb-2">
-                                                                    <label htmlFor="" className="mb-2">
-                                                                        Image
-                                                                    </label>
-                                                                    <input
-                                                                        type="file"
-                                                                        className="form-control"
-                                                                        name=""
-                                                                        id=""
-                                                                        onChange={(e) => handleImageChange(index, e, setColors)}
-
-                                                                    />
-                                                                </div>
-
-                                                                <div className="col-lg-3 mt-2">
-                                                                    {c.image && (
-                                                                        <img
-                                                                            src={c.image.preview}
-                                                                            alt={`Preview for gallery item ${index + 1}`}
-                                                                            style={{ width: '100%', height: '100px', objectFit: 'cover', borderRadius: 5 }}
-                                                                        />
-                                                                    )}
-                                                                    {!c.image && (
-                                                                        <img
-                                                                            src="https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png"
-                                                                            alt={`Preview for gallery item ${index + 1}`}
-                                                                            style={{ width: '100%', height: '100px', objectFit: 'cover', borderRadius: 5 }}
-                                                                        />
-                                                                    )}
-                                                                </div>
-
-                                                                <div className="col-lg-2 mt-2">
-                                                                    <button type='button' onClick={() => handleRemove(index, setColors)} className='btn btn-danger mt-4'>Remove</button>
-                                                                </div>
-
-                                                            </div>
-                                                        ))}
-
-                                                        {colors < 1 &&
-                                                            <h4>No Colors Added</h4>
-                                                        }
-
-                                                        <button type='button' onClick={() => handleAddMore(setColors)} className="btn btn-primary mt-2">
-                                                            <i className="fas fa-plus" /> Add More Colors
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <ul
-                                            className="nav nav-pills mb-3 d-flex justify-content-center mt-5"
-                                            id="pills-tab"
-                                            role="tablist"
+                                <div className="grid gap-4 sm:grid-cols-2">
+                                    <div className="space-y-2">
+                                        <Label htmlFor="product-category">Category</Label>
+                                        <Select
+                                            value={product.category ? String(product.category) : undefined}
+                                            onValueChange={(value) =>
+                                                setProduct((prev) => ({
+                                                    ...prev,
+                                                    category: value
+                                                }))
+                                            }
                                         >
-                                            <li className="nav-item" role="presentation">
-                                                <button
-                                                    className="nav-link active"
-                                                    id="pills-home-tab"
-                                                    data-bs-toggle="pill"
-                                                    data-bs-target="#pills-home"
-                                                    type="button"
-                                                    role="tab"
-                                                    aria-controls="pills-home"
-                                                    aria-selected="true"
-                                                >
-                                                    Basic Information
-                                                </button>
-                                            </li>
-                                            <li className="nav-item" role="presentation">
-                                                <button
-                                                    className="nav-link"
-                                                    id="pills-profile-tab"
-                                                    data-bs-toggle="pill"
-                                                    data-bs-target="#pills-profile"
-                                                    type="button"
-                                                    role="tab"
-                                                    aria-controls="pills-profile"
-                                                    aria-selected="false"
-                                                >
-                                                    Gallery
-                                                </button>
-                                            </li>
-                                            <li className="nav-item" role="presentation">
-                                                <button
-                                                    className="nav-link"
-                                                    id="pills-contact-tab"
-                                                    data-bs-toggle="pill"
-                                                    data-bs-target="#pills-contact"
-                                                    type="button"
-                                                    role="tab"
-                                                    aria-controls="pills-contact"
-                                                    aria-selected="false"
-                                                >
-                                                    Specifications
-                                                </button>
-                                            </li>
-                                            <li className="nav-item" role="presentation">
-                                                <button
-                                                    className="nav-link"
-                                                    id="pills-size-tab"
-                                                    data-bs-toggle="pill"
-                                                    data-bs-target="#pills-size"
-                                                    type="button"
-                                                    role="tab"
-                                                    aria-controls="pills-size"
-                                                    aria-selected="false"
-                                                >
-                                                    Size
-                                                </button>
-                                            </li>
-                                            <li className="nav-item" role="presentation">
-                                                <button
-                                                    className="nav-link"
-                                                    id="pills-color-tab"
-                                                    data-bs-toggle="pill"
-                                                    data-bs-target="#pills-color"
-                                                    type="button"
-                                                    role="tab"
-                                                    aria-controls="pills-color"
-                                                    aria-selected="false"
-                                                >
-                                                    Color
-                                                </button>
-                                            </li>
-                                        </ul>
-                                        <div className="d-flex justify-content-center mb-5">
-                                            {isLoading === false &&
-                                                <button type='submit' className="btn btn-success w-50">
-                                                    Create Product <i className="fa fa-check-circle" />{" "}
-                                                </button>
-                                            }
-
-                                            {isLoading === true &&
-                                                <button disabled className="btn btn-success w-50">
-                                                    Creating... <i className="fa fa-spinner fa-spin" />{" "}
-                                                </button>
-                                            }
-                                        </div>
+                                            <SelectTrigger className="w-full">
+                                                <SelectValue placeholder="Select a category" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                {category.map((c) => (
+                                                    <SelectItem key={c.id} value={String(c.id)}>
+                                                        {c.title}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label htmlFor="product-brand">Brand</Label>
+                                        <Input
+                                            id="product-brand"
+                                            type="text"
+                                            name="brand"
+                                            value={product.brand || ''}
+                                            onChange={handleProductInputChange}
+                                            placeholder="Brand name"
+                                        />
                                     </div>
                                 </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
 
+                                <div className="grid gap-4 sm:grid-cols-3">
+                                    <div className="space-y-2">
+                                        <Label htmlFor="product-price">Sale Price</Label>
+                                        <Input
+                                            id="product-price"
+                                            type="number"
+                                            name="price"
+                                            value={product.price ?? ''}
+                                            onChange={handleProductInputChange}
+                                            placeholder="79.99"
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label htmlFor="product-old-price">Regular Price</Label>
+                                        <Input
+                                            id="product-old-price"
+                                            type="number"
+                                            name="old_price"
+                                            value={product.old_price ?? ''}
+                                            onChange={handleProductInputChange}
+                                            placeholder="99.99"
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label htmlFor="product-shipping">Shipping Amount</Label>
+                                        <Input
+                                            id="product-shipping"
+                                            type="number"
+                                            name="shipping_amount"
+                                            value={product.shipping_amount ?? ''}
+                                            onChange={handleProductInputChange}
+                                            placeholder="5.00"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="grid gap-4 sm:grid-cols-2">
+                                    <div className="space-y-2">
+                                        <Label htmlFor="product-stock">Stock Quantity</Label>
+                                        <Input
+                                            id="product-stock"
+                                            type="number"
+                                            name="stock_qty"
+                                            value={product.stock_qty ?? ''}
+                                            onChange={handleProductInputChange}
+                                            placeholder="50"
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label htmlFor="product-tags">Tags</Label>
+                                        <Input
+                                            id="product-tags"
+                                            type="text"
+                                            name="tags"
+                                            value={product.tags || ''}
+                                            onChange={handleProductInputChange}
+                                            placeholder="audio, wireless, premium"
+                                        />
+                                        <p className="text-xs text-muted-foreground">Separate tags with commas for better search visibility.</p>
+                                    </div>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    </div>
+
+                    <Card className="border-0 shadow-sm">
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2 text-lg font-semibold text-slate-900">
+                                <ImageIcon className="h-5 w-5" />
+                                Gallery
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                            <div className="space-y-4">
+                                {gallery.length === 0 && (
+                                    <p className="text-sm text-muted-foreground">No gallery images added yet.</p>
+                                )}
+
+                                {gallery.map((item, index) => (
+                                    <div key={`gallery-${index}`} className="grid gap-4 rounded-lg border border-slate-200 p-4 sm:grid-cols-[160px_1fr_auto]">
+                                        <div className="flex items-center justify-center overflow-hidden rounded-md border border-dashed border-slate-200 bg-white">
+                                            <img
+                                                src={item.image?.preview || 'https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png'}
+                                                alt={`Gallery item ${index + 1}`}
+                                                className="h-28 w-full object-cover"
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label htmlFor={`gallery-${index}`}>Product Image</Label>
+                                            <Input
+                                                id={`gallery-${index}`}
+                                                type="file"
+                                                onChange={(event) => handleImageChange(index, event, setGallery)}
+                                            />
+                                        </div>
+                                        <Button
+                                            type="button"
+                                            variant="destructive"
+                                            className="h-fit"
+                                            onClick={() => handleRemove(index, setGallery)}
+                                        >
+                                            <Trash2 className="h-4 w-4" />
+                                            Remove
+                                        </Button>
+                                    </div>
+                                ))}
+                            </div>
+                            <Button
+                                type="button"
+                                variant="outline"
+                                onClick={() => handleAddMore(setGallery, { image: null })}
+                            >
+                                <PlusCircle className="h-4 w-4" />
+                                Add Gallery Image
+                            </Button>
+                        </CardContent>
+                    </Card>
+
+                    <Card className="border-0 shadow-sm">
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2 text-lg font-semibold text-slate-900">
+                                <ListChecks className="h-5 w-5" />
+                                Specifications
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                            <div className="space-y-4">
+                                {specifications.length === 0 && (
+                                    <p className="text-sm text-muted-foreground">No specification rows added.</p>
+                                )}
+
+                                {specifications.map((specification, index) => (
+                                    <div key={`spec-${index}`} className="grid gap-4 rounded-lg border border-slate-200 p-4 sm:grid-cols-[1fr_1fr_auto]">
+                                        <div className="space-y-2">
+                                            <Label htmlFor={`spec-title-${index}`}>Title</Label>
+                                            <Input
+                                                id={`spec-title-${index}`}
+                                                type="text"
+                                                value={specification.title || ''}
+                                                onChange={(event) => handleInputChange(index, 'title', event.target.value, setSpecifications)}
+                                                placeholder="Material"
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label htmlFor={`spec-content-${index}`}>Content</Label>
+                                            <Input
+                                                id={`spec-content-${index}`}
+                                                type="text"
+                                                value={specification.content || ''}
+                                                onChange={(event) => handleInputChange(index, 'content', event.target.value, setSpecifications)}
+                                                placeholder="100% recycled cotton"
+                                            />
+                                        </div>
+                                        <Button
+                                            type="button"
+                                            variant="destructive"
+                                            className="h-fit"
+                                            onClick={() => handleRemove(index, setSpecifications)}
+                                        >
+                                            <Trash2 className="h-4 w-4" />
+                                            Remove
+                                        </Button>
+                                    </div>
+                                ))}
+                            </div>
+                            <Button
+                                type="button"
+                                variant="outline"
+                                onClick={() => handleAddMore(setSpecifications, { title: '', content: '' })}
+                            >
+                                <PlusCircle className="h-4 w-4" />
+                                Add Specification
+                            </Button>
+                        </CardContent>
+                    </Card>
+
+                    <Card className="border-0 shadow-sm">
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2 text-lg font-semibold text-slate-900">
+                                <Tag className="h-5 w-5" />
+                                Sizes
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                            <div className="space-y-4">
+                                {sizes.length === 0 && (
+                                    <p className="text-sm text-muted-foreground">No sizes configured.</p>
+                                )}
+
+                                {sizes.map((size, index) => (
+                                    <div key={`size-${index}`} className="grid gap-4 rounded-lg border border-slate-200 p-4 sm:grid-cols-[1fr_1fr_auto]">
+                                        <div className="space-y-2">
+                                            <Label htmlFor={`size-name-${index}`}>Size</Label>
+                                            <Input
+                                                id={`size-name-${index}`}
+                                                type="text"
+                                                value={size.name || ''}
+                                                onChange={(event) => handleInputChange(index, 'name', event.target.value, setSizes)}
+                                                placeholder="XL"
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label htmlFor={`size-price-${index}`}>Price Impact</Label>
+                                            <Input
+                                                id={`size-price-${index}`}
+                                                type="number"
+                                                value={size.price ?? ''}
+                                                onChange={(event) => handleInputChange(index, 'price', event.target.value, setSizes)}
+                                                placeholder="5.00"
+                                            />
+                                        </div>
+                                        <Button
+                                            type="button"
+                                            variant="destructive"
+                                            className="h-fit"
+                                            onClick={() => handleRemove(index, setSizes)}
+                                        >
+                                            <Trash2 className="h-4 w-4" />
+                                            Remove
+                                        </Button>
+                                    </div>
+                                ))}
+                            </div>
+                            <Button
+                                type="button"
+                                variant="outline"
+                                onClick={() => handleAddMore(setSizes, { name: '', price: '' })}
+                            >
+                                <PlusCircle className="h-4 w-4" />
+                                Add Size
+                            </Button>
+                        </CardContent>
+                    </Card>
+
+                    <Card className="border-0 shadow-sm">
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2 text-lg font-semibold text-slate-900">
+                                <Palette className="h-5 w-5" />
+                                Colors
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                            <div className="space-y-4">
+                                {colors.length === 0 && (
+                                    <p className="text-sm text-muted-foreground">No color variants added.</p>
+                                )}
+
+                                {colors.map((color, index) => (
+                                    <div key={`color-${index}`} className="grid gap-4 rounded-lg border border-slate-200 p-4 sm:grid-cols-[1fr_1fr_1fr_auto]">
+                                        <div className="space-y-2">
+                                            <Label htmlFor={`color-name-${index}`}>Name</Label>
+                                            <Input
+                                                id={`color-name-${index}`}
+                                                type="text"
+                                                value={color.name || ''}
+                                                onChange={(event) => handleInputChange(index, 'name', event.target.value, setColors)}
+                                                placeholder="Forest green"
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label htmlFor={`color-code-${index}`}>Hex Code</Label>
+                                            <Input
+                                                id={`color-code-${index}`}
+                                                type="text"
+                                                value={color.color_code || ''}
+                                                onChange={(event) => handleInputChange(index, 'color_code', event.target.value, setColors)}
+                                                placeholder="#1f513f"
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label htmlFor={`color-image-${index}`}>Image</Label>
+                                            <Input
+                                                id={`color-image-${index}`}
+                                                type="file"
+                                                onChange={(event) => handleImageChange(index, event, setColors)}
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label>Preview</Label>
+                                            <div className="flex h-20 w-full items-center justify-center rounded-md border border-dashed border-slate-200 bg-white">
+                                                <img
+                                                    src={color.image?.preview || 'https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png'}
+                                                    alt={`Color ${index + 1}`}
+                                                    className="h-full w-full rounded-md object-cover"
+                                                />
+                                            </div>
+                                        </div>
+                                        <Button
+                                            type="button"
+                                            variant="destructive"
+                                            className="h-fit"
+                                            onClick={() => handleRemove(index, setColors)}
+                                        >
+                                            <Trash2 className="h-4 w-4" />
+                                            Remove
+                                        </Button>
+                                    </div>
+                                ))}
+                            </div>
+                            <Button
+                                type="button"
+                                variant="outline"
+                                onClick={() => handleAddMore(setColors, { name: '', color_code: '', image: null })}
+                            >
+                                <PlusCircle className="h-4 w-4" />
+                                Add Color
+                            </Button>
+                        </CardContent>
+                    </Card>
+
+                    <div className="flex justify-end gap-3 pb-8">
+                        <Button type="submit" className="min-w-[180px]" disabled={isLoading}>
+                            {isLoading ? (
+                                <>
+                                    <Loader2 className="h-4 w-4 animate-spin" />
+                                    Creating...
+                                </>
+                            ) : (
+                                <>
+                                    <CheckCircle2 className="h-4 w-4" />
+                                    Create Product
+                                </>
+                            )}
+                        </Button>
+                    </div>
+                </form>
+            </div>
         </div>
     )
 }

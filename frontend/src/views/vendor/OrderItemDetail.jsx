@@ -1,153 +1,201 @@
-import React, { useState, useEffect } from 'react'
-import { Link, useParams } from 'react-router-dom';
+import React, { useEffect, useState } from 'react'
+import { ArrowLeft, PackageSearch, Send, Truck } from 'lucide-react'
+import { Link, useParams } from 'react-router-dom'
 
-import apiInstance from '../../utils/axios';
-import UserData from '../plugin/UserData';
-import Sidebar from './Sidebar';
-import Swal from 'sweetalert2';
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Checkbox } from '@/components/ui/checkbox'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import apiInstance from '../../utils/axios'
+import UserData from '../plugin/UserData'
+import Sidebar from './Sidebar'
+import Swal from 'sweetalert2'
 
 function OrderItemDetail() {
-    const [orderItems, setOrderItems] = useState([])
-    const [order, setOrder] = useState([])
+    const [orderItems, setOrderItems] = useState(null)
+    const [order, setOrder] = useState(null)
     const [courier, setCourier] = useState([])
-    const [trackingData, setTrackingData] = useState({})
+    const [trackingData, setTrackingData] = useState({
+        delivery_couriers: '',
+        tracking_id: '',
+        notify_buyer: false,
+    })
     const [loading, setLoading] = useState(false)
-
-    const handleTrackingDataChange = (event) => {
-        setTrackingData({
-            ...trackingData,
-            [event.target.name]: event.target.type === 'checkbox' ? event.target.checked : event.target.value
-        })
-        console.log(trackingData);
-    }
-
 
     const axios = apiInstance
     const userData = UserData()
     const param = useParams()
 
+    if (userData?.vendor_id === 0) {
+        window.location.href = '/vendor/register/'
+    }
+
     useEffect(() => {
         const fetchData = async () => {
             try {
                 const response = await axios.get(`vendor/order-item-detail/${param.id}/`)
-                setOrder(response.data.order);
-                setOrderItems(response.data);
+                setOrder(response.data?.order || null)
+                setOrderItems(response.data || null)
 
+                const deliveryCourierRaw = response.data?.delivery_couriers
+                const deliveryCourierId =
+                    deliveryCourierRaw && typeof deliveryCourierRaw === 'object'
+                        ? deliveryCourierRaw.id
+                        : deliveryCourierRaw
+
+                setTrackingData({
+                    delivery_couriers: deliveryCourierId ? String(deliveryCourierId) : '',
+                    tracking_id: response.data?.tracking_id || '',
+                    notify_buyer: Boolean(response.data?.notify_buyer),
+                })
             } catch (error) {
-                console.error('Error fetching data:', error);
+                console.error('Error fetching order detail:', error)
             }
-        };
+        }
 
         const fetchCourier = async () => {
             try {
                 const response = await axios.get(`vendor/couriers/`)
-                setCourier(response.data);
-
+                setCourier(response.data || [])
             } catch (error) {
-                console.error('Error fetching data:', error);
+                console.error('Error fetching courier list:', error)
             }
-        };
+        }
 
-        fetchCourier();
-        fetchData();
-    }, []);
+        fetchCourier()
+        fetchData()
+    }, [])
 
-    const handleOnSubmit = async (e) => {
-        e.preventDefault()
+    const updateTrackingData = (name, value) => {
+        setTrackingData((prev) => ({
+            ...prev,
+            [name]: value,
+        }))
+    }
+
+    const handleOnSubmit = async (event) => {
+        event.preventDefault()
         setLoading(true)
+
+        const formdata = new FormData()
+        if (trackingData.tracking_id) {
+            formdata.append('tracking_id', trackingData.tracking_id)
+        }
+        if (trackingData.delivery_couriers) {
+            formdata.append('delivery_couriers', trackingData.delivery_couriers)
+        }
+        formdata.append('notify_buyer', trackingData.notify_buyer)
+
         try {
-            console.log(trackingData.tracking_id);
-            console.log(trackingData.delivery_couriers);
-
-            const formdata = new FormData()
-            formdata.append("tracking_id", trackingData.tracking_id)
-            formdata.append("delivery_couriers", trackingData.delivery_couriers)
-            formdata.append("notify_buyer", trackingData.notify_buyer)
-
-            await axios.patch(`vendor/order-item-detail/${param.id}/`, formdata).then((res) => {
-                console.log(res.data);
-                setLoading(false)
-                Swal.fire({
-                    icon: "success",
-                    title: "Tracking ID Added"
-                })
+            await axios.patch(`vendor/order-item-detail/${param.id}/`, formdata)
+            Swal.fire({
+                icon: 'success',
+                title: 'Tracking details saved',
             })
         } catch (error) {
-            console.log(error);
+            console.error('Error updating tracking info:', error)
+            Swal.fire({
+                icon: 'error',
+                title: 'Unable to update tracking info',
+            })
+        } finally {
             setLoading(false)
         }
     }
 
+    const courierOptions = courier
+        .filter((c) => c?.id != null)
+        .map((c) => ({ id: String(c.id), name: c?.name || 'Unnamed courier' }))
 
     return (
-        <div className="container-fluid" id="main" >
-            <div className="row row-offcanvas row-offcanvas-left h-100">
+        <div className="min-h-screen bg-slate-50">
+            <div className="mx-auto flex w-full max-w-7xl flex-col gap-8 px-4 py-10 lg:flex-row">
                 <Sidebar />
-                <div className="col-md-9 col-lg-10 main">
-                    <div className="mb-3 mt-3" style={{ marginBottom: 300 }}>
-                        <div>
-                            <main className="mb-5">
-                                {/* Container for demo purpose */}
-                                <div className="container px-4">
-                                    {/* Section: Summary */}
-                                    <section className="mb-5">
-                                        <h3 className="mb-3">
-                                            <i className="fas fa-shopping-cart text-primary" /> #{order.oid}
-                                        </h3>
-                                    </section>
-
-                                    <section className="">
-                                        <div className="row rounded shadow p-3">
-                                            <div className="col-lg-12 mb-4 mb-lg-0">
-                                                <form onSubmit={handleOnSubmit}>
-                                                    <div className="mb-3">
-                                                        <label htmlFor="exampleInputEmail1" className="form-label">
-                                                            <i className='fas fa-truck'></i> Choose Delivery Courier
-                                                        </label>
-                                                        <select required onChange={handleTrackingDataChange} name="delivery_couriers" id="" className='form-select'>
-                                                            <option>Select Delivery Courier</option>
-                                                            {courier.map((c, index) => (
-                                                                <option key={index} value={c.id}>{c.name}</option>
-                                                            ))}
-                                                        </select>
-                                                        <div id="emailHelp" className="form-text">
-                                                            <span className="" style={{ color: "gray" }}>
-                                                                <a href="">Contact us</a> if you can't find a shipping couriers
-                                                            </span>
-                                                        </div>
-                                                    </div>
-                                                    <div className="mb-3">
-                                                        <label htmlFor="exampleInputPassword1" className="form-label">
-                                                            <i className='fas fa-link'></i> Tracking ID
-                                                        </label>
-                                                        <input
-                                                            type="text"
-                                                            className="form-control"
-                                                            onChange={handleTrackingDataChange}
-                                                            name="tracking_id"
-                                                            placeholder={`${orderItems.tracking_id || 'Add Tracking ID'}`}
-                                                            defaultValue={orderItems.tracking_id || ''}
-                                                        />
-                                                    </div>
-                                                    <div className="mb-3 form-check">
-                                                        <input onChange={handleTrackingDataChange} name='notify_buyer' type="checkbox" className="form-check-input" id="exampleCheck1" />
-                                                        <label className="form-check-label" htmlFor="exampleCheck1">
-                                                            Notify Buyer
-                                                        </label>
-                                                    </div>
-                                                    <Link to={`/vendor/orders/${order.oid}/`} className="btn btn-outline-secondary me-2"><i className='fas fa-arrow-left'></i> Go Back</Link>
-                                                    {loading === true
-                                                        ? <button type="submit" disabled className="btn btn-primary">Saving Tracking Data <i className='fas fa-spinner fa-spin'></i></button>
-                                                        : <button type="submit" className="btn btn-primary">Save Tracking Info</button>
-                                                    }
-                                                </form>
-                                            </div>
-                                        </div>
-                                    </section>
-                                </div>
-                            </main>
+                <div className="flex-1 space-y-8">
+                    <div className="flex flex-wrap items-center justify-between gap-3">
+                        <div className="space-y-1">
+                            <h1 className="text-2xl font-semibold text-slate-900">Order tracking</h1>
+                            <p className="text-sm text-muted-foreground">Assign courier details and keep your customer informed.</p>
                         </div>
+                        <Button asChild variant="ghost" className="text-slate-600">
+                            <Link to={`/vendor/orders/${order?.oid || ''}/`}>
+                                <ArrowLeft className="mr-2 h-4 w-4" /> Back to order
+                            </Link>
+                        </Button>
                     </div>
+
+                    <Card className="border-0 shadow-sm">
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2 text-lg font-semibold text-slate-900">
+                                <PackageSearch className="h-5 w-5 text-slate-500" /> Order #{order?.oid || '—'}
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <form className="space-y-6" onSubmit={handleOnSubmit}>
+                                <div className="space-y-2">
+                                    <Label htmlFor="delivery_couriers" className="flex items-center gap-2 text-sm font-medium text-slate-700">
+                                        <Truck className="h-4 w-4 text-slate-500" /> Delivery courier
+                                    </Label>
+                                    <Select
+                                        value={trackingData.delivery_couriers?.toString() || ''}
+                                        onValueChange={(value) => updateTrackingData('delivery_couriers', value)}
+                                    >
+                                        <SelectTrigger id="delivery_couriers">
+                                            <SelectValue placeholder="Select delivery courier" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {courierOptions.map((c) => (
+                                                <SelectItem key={c.id} value={c.id}>
+                                                    {c.name}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                    <p className="text-xs text-muted-foreground">
+                                        Can’t find your courier? <a href="mailto:support@example.com" className="font-medium text-primary">Contact us</a> and we’ll help set it up.
+                                    </p>
+                                </div>
+
+                                <div className="space-y-2">
+                                    <Label htmlFor="tracking_id" className="text-sm font-medium text-slate-700">
+                                        Tracking ID
+                                    </Label>
+                                    <Input
+                                        id="tracking_id"
+                                        name="tracking_id"
+                                        value={trackingData.tracking_id}
+                                        onChange={(event) => updateTrackingData(event.target.name, event.target.value)}
+                                        placeholder={orderItems?.tracking_id || 'Add tracking ID'}
+                                    />
+                                </div>
+
+                                <div className="flex items-center gap-2">
+                                    <Checkbox
+                                        id="notify_buyer"
+                                        checked={trackingData.notify_buyer}
+                                        onCheckedChange={(checked) => updateTrackingData('notify_buyer', Boolean(checked))}
+                                    />
+                                    <Label htmlFor="notify_buyer" className="text-sm text-slate-700">
+                                        Notify buyer about tracking updates
+                                    </Label>
+                                </div>
+
+                                <div className="flex flex-wrap items-center gap-3">
+                                    <Button type="submit" disabled={loading}>
+                                        <Send className="mr-2 h-4 w-4" />
+                                        {loading ? 'Saving…' : 'Save tracking info'}
+                                    </Button>
+                                    <Button asChild variant="outline">
+                                        <Link to={`/vendor/orders/${order?.oid || ''}/`}>
+                                            <ArrowLeft className="mr-2 h-4 w-4" /> Cancel
+                                        </Link>
+                                    </Button>
+                                </div>
+                            </form>
+                        </CardContent>
+                    </Card>
                 </div>
             </div>
         </div>

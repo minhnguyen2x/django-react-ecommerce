@@ -1,30 +1,36 @@
-import { useEffect, useState, useContext } from 'react';
-import { FaCheckCircle, FaShoppingCart, FaSpinner } from 'react-icons/fa';
-import { Link, useParams } from 'react-router-dom';
-import '../style/InvoiceStyle.css'
+import { useContext, useEffect, useState } from 'react'
+import { Check, Heart, Loader2, ShoppingCart } from 'lucide-react'
+import { Link, useParams } from 'react-router-dom'
 
-import apiInstance from '../../utils/axios';
-import { CartContext } from '../plugin/Context';
-import { addToWishlist } from '../plugin/addToWishlist';
-import { addToCart } from '../plugin/AddToCart';
-import CartID from '../plugin/cartID';
-import GetCurrentAddress from '../plugin/UserCountry';
-import UserData from '../plugin/UserData';
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
+import { Separator } from '@/components/ui/separator'
+import { cn } from '@/lib/utils'
+import apiInstance from '../../utils/axios'
+import { CartContext } from '../plugin/Context'
+import { addToCart } from '../plugin/AddToCart'
+import { addToWishlist } from '../plugin/addToWishlist'
+import CartID from '../plugin/cartID'
+import GetCurrentAddress from '../plugin/UserCountry'
+import UserData from '../plugin/UserData'
 
 function Shop() {
     const [products, setProduct] = useState([])
     const [vendor, setVendor] = useState([])
-    const [selectedProduct, setSelectedProduct] = useState(null);
-    const [selectedColors, setSelectedColors] = useState({});
-    const [selectedSize, setSelectedSize] = useState({});
-    const [colorImage, setColorImage] = useState("")
-    const [colorValue, setColorValue] = useState("No Color")
-    const [sizeValue, setSizeValue] = useState("No Size")
+    const [selectedProduct, setSelectedProduct] = useState(null)
+    const [selectedColors, setSelectedColors] = useState({})
+    const [selectedSizes, setSelectedSizes] = useState({})
+    const [colorImage, setColorImage] = useState('')
+    const [colorValue, setColorValue] = useState('No Color')
+    const [sizeValue, setSizeValue] = useState('No Size')
     const [qtyValue, setQtyValue] = useState(1)
-    let [cartCount, setCartCount] = useContext(CartContext);
+    const [variationOpen, setVariationOpen] = useState(false)
+    const [loadingStates, setLoadingStates] = useState({})
 
-    let [isAddingToCart, setIsAddingToCart] = useState("Add To Cart");
-    const [loadingStates, setLoadingStates] = useState({});
+    const [cartCount, setCartCount] = useContext(CartContext)
 
     const axios = apiInstance
     const currentAddress = GetCurrentAddress()
@@ -50,34 +56,29 @@ function Shop() {
     }, [param])
 
 
-    const handleColorButtonClick = (event, product_id, colorName, colorImage) => {
-        setColorValue(colorName);
-        setColorImage(colorImage);
-        setSelectedProduct(product_id);
+    const handleColorSelect = (productId, colorName, colorPreview) => {
+        setColorValue(colorName)
+        setColorImage(colorPreview)
+        setSelectedProduct(productId)
+        setSelectedColors((prev) => ({
+            ...prev,
+            [productId]: colorName
+        }))
+    }
 
-        setSelectedColors((prevSelectedColors) => ({
-            ...prevSelectedColors,
-            [product_id]: colorName,
-        }));
+    const handleSizeSelect = (productId, sizeName) => {
+        setSizeValue(sizeName)
+        setSelectedProduct(productId)
+        setSelectedSizes((prev) => ({
+            ...prev,
+            [productId]: sizeName
+        }))
+    }
 
-
-    };
-
-    const handleSizeButtonClick = (event, product_id, sizeName) => {
-        setSizeValue(sizeName);
-        setSelectedProduct(product_id);
-
-        setSelectedSize((prevSelectedSize) => ({
-            ...prevSelectedSize,
-            [product_id]: sizeName,
-        }));
-
-    };
-
-    const handleQtyChange = (event, product_id) => {
-        setQtyValue(event.target.value);
-        setSelectedProduct(product_id);
-    };
+    const handleQtyChange = (value, productId) => {
+        setQtyValue(value)
+        setSelectedProduct(productId)
+    }
 
 
     const handleAddToCart = async (product_id, price, shipping_amount) => {
@@ -88,7 +89,20 @@ function Shop() {
 
 
         try {
-            await addToCart(product_id, userData?.user_id, qtyValue, price, shipping_amount, currentAddress.country, colorValue, sizeValue, cart_id, setIsAddingToCart)
+            const quantity = Number(qtyValue) > 0 ? Number(qtyValue) : 1
+
+            await addToCart(
+                product_id,
+                userData?.user_id,
+                quantity,
+                price,
+                shipping_amount,
+                currentAddress.country,
+                colorValue,
+                sizeValue,
+                cart_id,
+                undefined
+            )
 
             // After a successful operation, set the loading state to false
             setLoadingStates((prevStates) => ({
@@ -100,7 +114,8 @@ function Shop() {
 
             setColorValue("No Color");
             setSizeValue("No Size");
-            setQtyValue(0)
+            setQtyValue(1)
+            setVariationOpen(false)
 
             const url = userData?.user_id ? `cart-list/${cart_id}/${userData?.user_id}/` : `cart-list/${cart_id}/`;
             const response = await axios.get(url);
@@ -132,202 +147,267 @@ function Shop() {
     };
 
 
+    const renderAddToCartLabel = (productId) => {
+        if (loadingStates[productId] === 'Added to Cart') {
+            return (
+                <>
+                    Added to Cart
+                    <Check className="ml-2 h-4 w-4" />
+                </>
+            )
+        }
+
+        if (loadingStates[productId] === 'Adding...') {
+            return (
+                <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Adding to Cart
+                </>
+            )
+        }
+
+        return (
+            <>
+                <ShoppingCart className="mr-2 h-4 w-4" />
+                Add to Cart
+            </>
+        )
+    }
+
+    const formatCurrency = (value) => {
+        if (value === null || value === undefined) {
+            return '$0.00'
+        }
+
+        const numberValue = Number(value)
+        if (Number.isNaN(numberValue)) {
+            return '$0.00'
+        }
+
+        return `$${numberValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+    }
+
     return (
-        <main className="mt-5">
-            <div className="container">
-                <section className="text-center container">
-                    <div className="row py-lg-5">
-                        <div className="col-lg-6 col-md-8 mx-auto">
-                            <img
-                                src={vendor.image}
-                                style={{
-                                    width: 100,
-                                    height: 100,
-                                    objectFit: "cover",
-                                    borderRadius: "50%"
-                                }}
-                                alt=""
-                            />
-                            <h1 className="fw-light">{vendor.name}</h1>
-                            <p className="lead text-muted">
-                                {vendor.description}
-                            </p>
-                        </div>
+        <main className="bg-slate-50 py-12">
+            <div className="mx-auto w-full max-w-6xl px-4">
+                <section className="flex flex-col items-center gap-5 text-center">
+                    <div className="h-28 w-28 overflow-hidden rounded-full border border-slate-200 bg-white shadow-sm">
+                        <img
+                            src={colorImage && selectedProduct ? colorImage : vendor.image}
+                            alt={vendor.name}
+                            className="h-full w-full object-cover"
+                        />
                     </div>
+                    <div className="space-y-2">
+                        <h1 className="text-3xl font-semibold text-slate-900">{vendor.name}</h1>
+                        <p className="max-w-2xl text-sm text-muted-foreground">
+                            {vendor.description}
+                        </p>
+                    </div>
+                    <Badge variant="secondary" className="text-sm font-medium">
+                        {products?.length || 0} Product(s)
+                    </Badge>
                 </section>
-                <section className="text-center">
-                    <h4 className="mb-4">{products?.length} Product(s) </h4>
-                    <div className="row">
-                        {products.map((product, index) => (
-                            <div className="col-lg-4 col-md-12 mb-4" key={index.id}>
-                                <div className="card">
-                                    <div
-                                        className="bg-image hover-zoom ripple"
-                                        data-mdb-ripple-color="light"
-                                    >
-                                        <Link to={`/detail/${product.slug}`}>
+
+                <section className="mt-10">
+                    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                        {products.map((product) => {
+                            const hasVariations = (product?.color && product.color.length > 0) || (product?.size && product.size.length > 0)
+                            const isSelectedProduct = selectedProduct === product.id
+                            const productImage = isSelectedProduct && colorImage ? colorImage : product.image
+
+                            return (
+                                <Card key={product.id} className="flex h-full flex-col border-0 shadow-sm">
+                                    <div className="relative overflow-hidden rounded-t-lg">
+                                        <Link to={`/detail/${product.slug}`} className="block">
                                             <img
-                                                src={(selectedProduct === product.id && colorImage) ? colorImage : product.image}
-                                                className="w-100"
-                                                style={{ width: "100px", height: "300px", objectFit: "cover" }}
+                                                src={productImage}
+                                                alt={product.title}
+                                                className="h-64 w-full object-cover transition-transform duration-300 hover:scale-105"
                                             />
                                         </Link>
-                                        <a href="#!">
-                                            <div className="mask">
-                                                <div className="d-flex justify-content-start align-items-end h-100">
-                                                    <h5>
-                                                        <span className="badge badge-primary ms-2">New</span>
-                                                    </h5>
-                                                </div>
-                                            </div>
-                                            <div className="hover-overlay">
-                                                <div
-                                                    className="mask"
-                                                    style={{ backgroundColor: "rgba(251, 251, 251, 0.15)" }}
-                                                />
-                                            </div>
-                                        </a>
+                                        <Badge className="absolute left-4 top-4 bg-primary text-primary-foreground">
+                                            New
+                                        </Badge>
                                     </div>
-                                    <div className="card-body">
+                                    <CardHeader className="space-y-3">
+                                        <CardTitle className="text-lg font-semibold text-slate-900">
+                                            <Link to={`/detail/${product.slug}`} className="hover:text-primary">
+                                                {product.title?.length > 50
+                                                    ? `${product.title.slice(0, 50)}...`
+                                                    : product.title}
+                                            </Link>
+                                        </CardTitle>
+                                        <p className="text-sm text-muted-foreground">
+                                            <Link to="/" className="transition-colors hover:text-primary">
+                                                {product?.brand?.title}
+                                            </Link>
+                                        </p>
+                                    </CardHeader>
+                                    <CardContent className="flex flex-1 flex-col justify-between space-y-4">
+                                        <div className="flex items-baseline justify-between">
+                                            <span className="text-sm font-medium text-muted-foreground">Price</span>
+                                            <span className="text-lg font-semibold text-primary">
+                                                {formatCurrency(product.price)}
+                                            </span>
+                                        </div>
 
-                                        <Link to={`/detail/${product.slug}`} className="text-reset"><h5 className="card-title mb-3 ">{product.title.slice(0, 30)}...</h5></Link>
-                                        <Link to="/" className="text-reset"><p>{product?.brand.title}</p></Link>
-                                        <h6 className="mb-3">${product.price}</h6>
-
-                                        {((product.color && product.color.length > 0) || (product.size && product.size.length > 0)) ? (
-                                            <div className="btn-group">
-                                                <button className="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuClickable" data-bs-toggle="dropdown" data-bs-auto-close="false" aria-expanded="false">
-                                                    Variation
-                                                </button>
-                                                <ul className="dropdown-menu" style={{ maxWidth: "400px" }} aria-labelledby="dropdownMenuClickable">
-                                                    {/* Quantity */}
-                                                    <div className="d-flex flex-column mb-2 mt-2 p-1">
-                                                        <div className="p-1 mt-0 pt-0 d-flex flex-wrap">
-                                                            <>
-                                                                <li>
-                                                                    <input
-                                                                        type="number"
-                                                                        className='form-control'
-                                                                        placeholder='Quantity'
-                                                                        onChange={(e) => handleQtyChange(e, product.id)}
-                                                                        min={1}
-                                                                        defaultValue={1}
-                                                                    />
-                                                                </li>
-                                                            </>
+                                        {hasVariations ? (
+                                            <Dialog
+                                                open={variationOpen && selectedProduct === product.id}
+                                                onOpenChange={(open) => {
+                                                    setVariationOpen(open)
+                                                    setSelectedProduct(open ? product.id : null)
+                                                    if (open) {
+                                                        setQtyValue(1)
+                                                    }
+                                                }}
+                                            >
+                                                <DialogTrigger asChild>
+                                                    <Button variant="outline" className="w-full justify-center">
+                                                        Choose Options
+                                                    </Button>
+                                                </DialogTrigger>
+                                                <DialogContent className="sm:max-w-lg">
+                                                    <DialogHeader>
+                                                        <DialogTitle>Select variations</DialogTitle>
+                                                    </DialogHeader>
+                                                    <div className="space-y-5">
+                                                        <div className="flex items-center gap-3">
+                                                            <div className="h-16 w-16 overflow-hidden rounded-md border">
+                                                                <img
+                                                                    src={productImage}
+                                                                    alt={product.title}
+                                                                    className="h-full w-full object-cover"
+                                                                />
+                                                            </div>
+                                                            <div className="space-y-1">
+                                                                <p className="text-sm font-medium text-slate-900">{product.title}</p>
+                                                                <p className="text-xs text-muted-foreground">
+                                                                    Shipping: {formatCurrency(product.shipping_amount)}
+                                                                </p>
+                                                            </div>
                                                         </div>
-                                                    </div>
+                                                        <Separator />
 
-                                                    {/* Size */}
-                                                    {product?.size && product?.size.length > 0 && (
-                                                        <div className="d-flex flex-column">
-                                                            <li className="p-1"><b>Size</b>: {selectedSize[product.id] || 'Select a size'}</li>
-                                                            <div className="p-1 mt-0 pt-0 d-flex flex-wrap">
-                                                                {product?.size?.map((size, index) => (
-                                                                    <>
-                                                                        <li key={index}>
-                                                                            <button
-                                                                                className="btn btn-secondary btn-sm me-2 mb-1"
-                                                                                onClick={(e) => handleSizeButtonClick(e, product.id, size.name)}
+                                                        <div className="space-y-2">
+                                                            <label className="text-sm font-medium text-slate-900" htmlFor={`quantity-${product.id}`}>
+                                                                Quantity
+                                                            </label>
+                                                            <Input
+                                                                id={`quantity-${product.id}`}
+                                                                type="number"
+                                                                min={1}
+                                                                value={selectedProduct === product.id ? qtyValue : 1}
+                                                                onChange={(event) => handleQtyChange(Number(event.target.value), product.id)}
+                                                            />
+                                                        </div>
+
+                                                        {product?.size && product.size.length > 0 && (
+                                                            <div className="space-y-3">
+                                                                <p className="text-sm font-medium text-slate-900">
+                                                                    Size: {selectedSizes[product.id] || 'Select a size'}
+                                                                </p>
+                                                                <div className="flex flex-wrap gap-2">
+                                                                    {product.size.map((size) => {
+                                                                        const isActive = selectedSizes[product.id] === size.name
+                                                                        return (
+                                                                            <Button
+                                                                                key={size.id || size.name}
+                                                                                type="button"
+                                                                                variant={isActive ? 'default' : 'outline'}
+                                                                                size="sm"
+                                                                                className={cn('uppercase')}
+                                                                                onClick={() => handleSizeSelect(product.id, size.name)}
                                                                             >
                                                                                 {size.name}
-                                                                            </button>
-                                                                        </li>
-                                                                    </>
-                                                                ))}
+                                                                            </Button>
+                                                                        )
+                                                                    })}
+                                                                </div>
                                                             </div>
-                                                        </div>
-                                                    )}
+                                                        )}
 
-
-                                                    {/* Color */}
-                                                    {product.color && product.color.length > 0 && (
-                                                        <div className="d-flex flex-column mt-3">
-                                                            <li className="p-1 color_name_div"><b>Color</b>: {selectedColors[product.id] || 'Select a color'}</li>
-                                                            <div className="p-1 mt-0 pt-0 d-flex flex-wrap">
-                                                                {product?.color?.map((color, index) => (
-                                                                    <>
-                                                                        <input type="hidden" className={`color_name${color.id}`} name="" id="" />
-                                                                        <li key={index}>
+                                                        {product?.color && product.color.length > 0 && (
+                                                            <div className="space-y-3">
+                                                                <p className="text-sm font-medium text-slate-900">
+                                                                    Color: {selectedColors[product.id] || 'Select a color'}
+                                                                </p>
+                                                                <div className="flex flex-wrap gap-3">
+                                                                    {product.color.map((color) => {
+                                                                        const isActive = selectedColors[product.id] === color.name
+                                                                        return (
                                                                             <button
-                                                                                key={color.id}
-                                                                                className="color-button btn p-3 me-2"
+                                                                                key={color.id || color.name}
+                                                                                type="button"
+                                                                                onClick={() => handleColorSelect(product.id, color.name, color.image)}
+                                                                                className={cn(
+                                                                                    'flex h-10 w-10 items-center justify-center rounded-full border transition-shadow',
+                                                                                    isActive
+                                                                                        ? 'border-primary shadow-[0_0_0_2px_rgba(59,130,246,0.4)]'
+                                                                                        : 'border-slate-200'
+                                                                                )}
                                                                                 style={{ backgroundColor: color.color_code }}
-                                                                                onClick={(e) => handleColorButtonClick(e, product.id, color.name, color.image)}
                                                                             >
+                                                                                <span className="sr-only">{color.name}</span>
                                                                             </button>
-                                                                        </li>
-                                                                    </>
-                                                                ))}
+                                                                        )
+                                                                    })}
+                                                                </div>
                                                             </div>
+                                                        )}
+
+                                                        <div className="flex flex-col gap-3 sm:flex-row">
+                                                            <Button
+                                                                className="w-full"
+                                                                onClick={() => handleAddToCart(product.id, product.price, product.shipping_amount)}
+                                                                disabled={loadingStates[product.id] === 'Adding...'}
+                                                            >
+                                                                {renderAddToCartLabel(product.id)}
+                                                            </Button>
+                                                            <Button
+                                                                type="button"
+                                                                variant="secondary"
+                                                                className="w-full"
+                                                                onClick={() => handleAddToWishlist(product.id)}
+                                                            >
+                                                                <Heart className="mr-2 h-4 w-4" />
+                                                                Add to Wishlist
+                                                            </Button>
                                                         </div>
-                                                    )}
-
-                                                    {/* Add To Cart */}
-                                                    <div className="d-flex mt-3 p-1 w-100">
-                                                        <button
-                                                            onClick={() => handleAddToCart(product.id, product.price, product.shipping_amount)}
-                                                            disabled={loadingStates[product.id] === 'Adding...'}
-                                                            type="button"
-                                                            className="btn btn-primary me-1 mb-1"
-                                                        >
-                                                            {loadingStates[product.id] === 'Added to Cart' ? (
-                                                                <>
-                                                                    Added to Cart <FaCheckCircle />
-                                                                </>
-                                                            ) : loadingStates[product.id] === 'Adding...' ? (
-                                                                <>
-                                                                    Adding to Cart <FaSpinner className='fas fa-spin' />
-                                                                </>
-                                                            ) : (
-                                                                <>
-                                                                    {loadingStates[product.id] || 'Add to Cart'} <FaShoppingCart />
-                                                                </>
-                                                            )}
-                                                        </button>
                                                     </div>
-                                                </ul>
-                                            </div>
+                                                </DialogContent>
+                                            </Dialog>
                                         ) : (
-                                            <button
-                                                onClick={() => handleAddToCart(product.id, product.price, product.shipping_amount)}
-                                                disabled={loadingStates[product.id] === 'Adding...'}
-                                                type="button"
-                                                className="btn btn-primary me-1 mb-1"
-                                            >
-                                                {loadingStates[product.id] === 'Added to Cart' ? (
-                                                    <>
-                                                        Added to Cart <FaCheckCircle />
-                                                    </>
-                                                ) : loadingStates[product.id] === 'Adding...' ? (
-                                                    <>
-                                                        Adding to Cart <FaSpinner className='fas fa-spin' />
-                                                    </>
-                                                ) : (
-                                                    <>
-                                                        {loadingStates[product.id] || 'Add to Cart'} <FaShoppingCart />
-                                                    </>
-                                                )}
-                                            </button>
-
+                                            <div className="flex flex-col gap-3 sm:flex-row">
+                                                <Button
+                                                    className="w-full"
+                                                    onClick={() => handleAddToCart(product.id, product.price, product.shipping_amount)}
+                                                    disabled={loadingStates[product.id] === 'Adding...'}
+                                                >
+                                                    {renderAddToCartLabel(product.id)}
+                                                </Button>
+                                                <Button
+                                                    type="button"
+                                                    variant="secondary"
+                                                    className="w-full sm:w-auto"
+                                                    onClick={() => handleAddToWishlist(product.id)}
+                                                >
+                                                    <Heart className="mr-2 h-4 w-4" />
+                                                    Add to Wishlist
+                                                </Button>
+                                            </div>
                                         )}
-
-                                        {/* Wishlist Button */}
-                                        <button
-                                            onClick={() => handleAddToWishlist(product.id)}
-                                            type="button"
-                                            className="btn btn-danger px-3 ms-2 "
-                                        >
-                                            <i className="fas fa-heart" />
-                                        </button>
-
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
+                                    </CardContent>
+                                    <CardFooter className="flex items-center justify-between text-sm text-muted-foreground">
+                                        <span>Shipping: {formatCurrency(product.shipping_amount)}</span>
+                                        <span>SKU: {product.sku || 'N/A'}</span>
+                                    </CardFooter>
+                                </Card>
+                            )
+                        })}
                     </div>
                 </section>
-                {/*Section: Wishlist*/}
             </div>
         </main>
 

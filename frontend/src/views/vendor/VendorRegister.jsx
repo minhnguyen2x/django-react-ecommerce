@@ -1,10 +1,15 @@
-import React, { useState, useEffect } from 'react'
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useState } from 'react'
+import { Loader2, Store } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 import Swal from 'sweetalert2'
 
-import apiInstance from '../../utils/axios';
-import UserData from '../plugin/UserData';
-import Sidebar from './Sidebar';
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
+import apiInstance from '../../utils/axios'
+import UserData from '../plugin/UserData'
 
 function VendorRegister() {
 
@@ -27,13 +32,12 @@ function VendorRegister() {
             ...vendor,
             [event.target.name]: event.target.value
         })
-        console.log(vendor);
     }
 
     const handleFileChange = (event) => {
         setVendor({
             ...vendor,
-            [event.target.name]: event.target.files[0]
+            [event.target.name]: event.target.files?.[0] || null
         })
     }
 
@@ -70,111 +74,97 @@ function VendorRegister() {
     }
 
     return (
-        <main className="" style={{ marginBottom: 100, marginTop: 50 }}>
-            <div className="container">
-                {/* Section: Login form */}
-                <section className="">
-                    <div className="row d-flex justify-content-center">
-                        <div className="col-xl-5 col-md-8">
-                            <div className="card rounded-5">
-                                <div className="card-body p-4">
-                                    <h3 className="text-center">Register Vendor Account</h3>
-                                    <br />
+        <main className="min-h-[calc(100vh-120px)] bg-slate-50 py-12">
+            <div className="mx-auto w-full max-w-3xl px-4">
+                <Card className="border-0 shadow-sm">
+                    <CardHeader className="space-y-2 text-center">
+                        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary">
+                            <Store className="h-6 w-6" />
+                        </div>
+                        <CardTitle className="text-2xl font-semibold">
+                            Register Vendor Account
+                        </CardTitle>
+                        <p className="text-sm text-muted-foreground">
+                            Create your shop profile so you can start managing products and orders.
+                        </p>
+                    </CardHeader>
+                    <CardContent>
+                        <form onSubmit={handleSubmit} className="space-y-5">
+                            <div className="space-y-2">
+                                <Label htmlFor="vendor-image">Shop Avatar</Label>
+                                <Input
+                                    id="vendor-image"
+                                    type="file"
+                                    onChange={handleFileChange}
+                                    name="image"
+                                    required
+                                />
+                            </div>
 
-                                    <div className="tab-content">
-                                        <div
-                                            className="tab-pane fade show active"
-                                            id="pills-login"
-                                            role="tabpanel"
-                                            aria-labelledby="tab-login"
-                                        >
-                                            <form onSubmit={handleSubmit}>
-                                                <div className="form-outline mb-4">
-                                                    <label className="form-label" htmlFor="Shop Name">
-                                                        Shop Avatar
-                                                    </label>
-                                                    <input
-                                                        type="file"
-                                                        onChange={handleFileChange}
-                                                        name='image'
-                                                        placeholder="Shop Avatar"
-                                                        required
-                                                        className="form-control"
-
-                                                    />
-                                                </div>
-                                                {/* Email input */}
-                                                <div className="form-outline mb-4">
-                                                    <label className="form-label" htmlFor="Shop Name">
-                                                        Shop Name
-                                                    </label>
-                                                    <input
-                                                        type="text"
-                                                        onChange={handleInputChange}
-                                                        name='name'
-                                                        placeholder="Shop Name"
-                                                        required
-                                                        className="form-control"
-
-                                                    />
-                                                </div>
-                                                <div className="form-outline mb-4">
-                                                    <label className="form-label" htmlFor="loginName">
-                                                        Shop Email Address
-                                                    </label>
-                                                    <input
-                                                        type="email"
-                                                        onChange={handleInputChange}
-                                                        name='email'
-                                                        placeholder="Shop Email Address"
-                                                        required
-                                                        className="form-control"
-                                                    />
-                                                </div>
-
-                                                <div className="form-outline mb-4">
-                                                    <label className="form-label" htmlFor="loginName">
-                                                        Shop Contact Number
-                                                    </label>
-                                                    <input
-                                                        type="text"
-                                                        onChange={handleInputChange}
-                                                        name='mobile'
-                                                        placeholder="Mobile Number"
-                                                        required
-                                                        className="form-control"
-                                                    />
-                                                </div>
-
-                                                <div className="form-outline mb-4">
-                                                    <label className="form-label" htmlFor="loginName">
-                                                        Shop Description
-                                                    </label>
-                                                    <textarea className='form-control' onChange={handleInputChange} name="description" id="" cols="30" rows="10"></textarea>
-                                                </div>
-
-
-                                                <button className='btn btn-primary w-100' type="submit" disabled={isLoading}>
-                                                    {isLoading ? (
-                                                        <>
-                                                            <span className="mr-2 ">Processing...</span>
-                                                            <i className="fas fa-spinner fa-spin" />
-                                                        </>
-                                                    ) : (
-                                                        <>
-                                                            <span className="mr-2 me-3">Create Shop</span>
-                                                            <i className="fas fa-shop" />
-                                                        </>
-                                                    )}
-                                                </button>
-                                            </form>
-                                        </div>
-                                    </div>
+                            <div className="grid gap-5 sm:grid-cols-2">
+                                <div className="space-y-2">
+                                    <Label htmlFor="vendor-name">Shop Name</Label>
+                                    <Input
+                                        id="vendor-name"
+                                        type="text"
+                                        onChange={handleInputChange}
+                                        name="name"
+                                        placeholder="Awesome Store"
+                                        required
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="vendor-email">Shop Email Address</Label>
+                                    <Input
+                                        id="vendor-email"
+                                        type="email"
+                                        onChange={handleInputChange}
+                                        name="email"
+                                        placeholder="shop@email.com"
+                                        required
+                                    />
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                </section>
+
+                            <div className="space-y-2">
+                                <Label htmlFor="vendor-phone">Shop Contact Number</Label>
+                                <Input
+                                    id="vendor-phone"
+                                    type="tel"
+                                    onChange={handleInputChange}
+                                    name="mobile"
+                                    placeholder="+84 123 456 789"
+                                    required
+                                />
+                            </div>
+
+                            <div className="space-y-2">
+                                <Label htmlFor="vendor-description">Shop Description</Label>
+                                <Textarea
+                                    id="vendor-description"
+                                    onChange={handleInputChange}
+                                    name="description"
+                                    placeholder="Tell customers about your brand, products, and service guarantees."
+                                    rows={5}
+                                />
+                            </div>
+
+                            <Button className="w-full" type="submit" disabled={isLoading}>
+                                {isLoading ? (
+                                    <>
+                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                        Processing...
+                                    </>
+                                ) : (
+                                    <>
+                                        <Store className="mr-2 h-4 w-4" />
+                                        Create Shop
+                                    </>
+                                )}
+                            </Button>
+                        </form>
+                    </CardContent>
+                </Card>
             </div>
         </main>
     )
