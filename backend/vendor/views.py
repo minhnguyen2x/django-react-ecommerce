@@ -181,8 +181,12 @@ class ProductCreateView(generics.CreateAPIView):
                 color_code = self.request.data.get(color_code_key)
                 image_key = f'colors[{index}][image]'
                 image = self.request.data.get(image_key)
-                colors_data.append(
-                    {'name': name, 'color_code': color_code, 'image': image})
+                
+                # Only include image if it's an actual file
+                color_entry = {'name': name, 'color_code': color_code}
+                if image and hasattr(image, 'read'):  # Check if it's a file-like object
+                    color_entry['image'] = image
+                colors_data.append(color_entry)
 
             # Example key: sizes[0][name]
             elif key.startswith('sizes') and '[name]' in key:
@@ -274,8 +278,12 @@ class ProductUpdateAPIView(generics.RetrieveUpdateAPIView):
                 color_code = self.request.data.get(color_code_key)
                 image_key = f'colors[{index}][image]'
                 image = self.request.data.get(image_key)
-                colors_data.append(
-                    {'name': name, 'color_code': color_code, 'image': image})
+                
+                # Only include image if it's an actual file
+                color_entry = {'name': name, 'color_code': color_code}
+                if image and hasattr(image, 'read'):  # Check if it's a file-like object
+                    color_entry['image'] = image
+                colors_data.append(color_entry)
 
             # Example key: sizes[0][name]
             elif key.startswith('sizes') and '[name]' in key:

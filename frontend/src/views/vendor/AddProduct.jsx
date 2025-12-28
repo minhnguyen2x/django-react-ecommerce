@@ -164,10 +164,14 @@ function AddProduct() {
 
             colors.forEach((color, index) => {
                 Object.entries(color).forEach(([key, value]) => {
-                    if (key === 'image' && value && value.file && value.file.type.startsWith('image/')) {
-                        formData.append(`colors[${index}][${key}]`, value.file, value.file.name);
+                    if (key === 'image') {
+                        // Only append image if it's a valid file
+                        if (value && value.file && value.file.type.startsWith('image/')) {
+                            formData.append(`colors[${index}][${key}]`, value.file, value.file.name);
+                        }
+                        // Skip appending if image is null or empty
                     } else {
-                        formData.append(`colors[${index}][${key}]`, String(value)); // Convert `value` to a string
+                        formData.append(`colors[${index}][${key}]`, value || '');
                     }
                 });
             });
