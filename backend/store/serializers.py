@@ -2,7 +2,7 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
-from store.models import CancelledOrder, Cart, CartOrderItem, Notification, CouponUsers, Product, Tag ,Category, DeliveryCouriers, CartOrder, Gallery, Brand, ProductFaq, Review,  Specification, Coupon, Color, Size, Address, Wishlist, Vendor
+from store.models import CancelledOrder, Cart, CartOrderItem, Notification, CouponUsers, Product, Tag ,Category, DeliveryCouriers, CartOrder, Gallery, Brand, ProductFaq, Review,  Specification, Coupon, Color, Size, Address, Vendor
 from addon.models import ConfigSettings
 from store.models import Gallery
 from userauths.serializer import ProfileSerializer, UserSerializer
@@ -249,26 +249,6 @@ class ReviewSerializer(serializers.ModelSerializer):
         request = self.context.get('request')
         if request and request.method == 'POST':
             # When creating a new review, set serialization depth to 0.
-            self.Meta.depth = 0
-        else:
-            # For other methods, set serialization depth to 3.
-            self.Meta.depth = 3
-
-# Define a serializer for the Wishlist model
-class WishlistSerializer(serializers.ModelSerializer):
-    # Serialize the related Product model
-    product = ProductSerializer()
-
-    class Meta:
-        model = Wishlist
-        fields = '__all__'
-
-    def __init__(self, *args, **kwargs):
-        super(WishlistSerializer, self).__init__(*args, **kwargs)
-        # Customize serialization depth based on the request method.
-        request = self.context.get('request')
-        if request and request.method == 'POST':
-            # When creating a new wishlist item, set serialization depth to 0.
             self.Meta.depth = 0
         else:
             # For other methods, set serialization depth to 3.

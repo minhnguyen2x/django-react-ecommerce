@@ -309,7 +309,6 @@ JAZZMIN_SETTINGS = {
         "store.DeliveryCouriers": "fas fa-truck",
         "store.Address": "fas fa-location-arrow",
         "store.Tag": "fas fa-tag",
-        "store.Wishlist": "fas fa-heart",
         "store.Notification": "fas fa-bell",
 
     },

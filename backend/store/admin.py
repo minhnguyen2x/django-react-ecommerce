@@ -1,5 +1,5 @@
 from django.contrib import admin
-from store.models import CartOrderItem, CouponUsers, Notification, Product, Tag ,Category, Cart, DeliveryCouriers, CartOrder, Gallery, Brand, ProductFaq, Review,  Specification, Coupon, Color, Size, Address, Wishlist
+from store.models import CartOrderItem, CouponUsers, Notification, Product, Tag ,Category, Cart, DeliveryCouriers, CartOrder, Gallery, Brand, ProductFaq, Review,  Specification, Coupon, Color, Size, Address
 from import_export.admin import ImportExportModelAdmin
 from django import forms
 from userauths.models import User
@@ -131,7 +131,6 @@ admin.site.register(Brand, BrandAdmin)
 admin.site.register(ProductFaq, ProductFaqAdmin)
 admin.site.register(Coupon, CouponAdmin)
 admin.site.register(Address, AddressAdmin)
-admin.site.register(Wishlist)
 admin.site.register(Notification, NotificationAdmin)
 admin.site.register(DeliveryCouriers, DeliveryCouriersAdmin)
 # admin.site.register(Size )

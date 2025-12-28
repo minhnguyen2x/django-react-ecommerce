@@ -19,7 +19,6 @@ import Invoice from './views/shop/Invoice';
 import Account from './views/customer/Account';
 import Orders from './views/customer/Orders';
 import OrderDetail from './views/customer/OrderDetail';
-import Wishlist from './views/customer/Wishlist';
 import Notifications from './views/customer/Notifications';
 import Settings from './views/customer/Settings';
 import { CartContext } from './views/plugin/Context';
@@ -99,7 +98,6 @@ function App() { // Define the main 'App' component.
                         <Route path="/customer/account/" element={<PrivateRoute><Account /></PrivateRoute>} />
                         <Route path="/customer/orders/" element={<PrivateRoute><Orders /></PrivateRoute>} />
                         <Route path="/customer/order/detail/:order_oid/" element={<PrivateRoute><OrderDetail /></PrivateRoute>} />
-                        <Route path="/customer/wishlist/" element={<PrivateRoute><Wishlist /></PrivateRoute>} />
                         <Route path="/customer/notifications/" element={<PrivateRoute><Notifications /></PrivateRoute>} />
                         <Route path="/customer/settings/" element={<PrivateRoute><Settings /></PrivateRoute>} />
 

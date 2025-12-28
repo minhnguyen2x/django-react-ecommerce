@@ -50,8 +50,6 @@ urlpatterns = [
     # Customer API Endpoints
     path('customer/orders/<user_id>/', customer_views.OrdersAPIView.as_view(), name='customer-orders'),
     path('customer/order/detail/<user_id>/<order_oid>/', customer_views.OrdersDetailAPIView.as_view(), name='customer-order-detail'),
-    path('customer/wishlist/create/', customer_views.WishlistCreateAPIView.as_view(), name='customer-wishlist-create'),
-    path('customer/wishlist/<user_id>/', customer_views.WishlistAPIView.as_view(), name='customer-wishlist'),
     path('customer/notification/<user_id>/', customer_views.CustomerNotificationView.as_view(), name='customer-notification'),
     path('customer/setting/<int:pk>/', customer_views.CustomerUpdateView.as_view(), name='customer-settings'),
 

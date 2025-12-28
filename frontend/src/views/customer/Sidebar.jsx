@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import UseProfileData from '../plugin/UseProfileData'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { FaUser, FaShoppingCart, FaHeart, FaBell, FaCog, FaSignOutAlt, FaEdit } from 'react-icons/fa'
+import { FaUser, FaShoppingCart, FaBell, FaCog, FaSignOutAlt, FaEdit } from 'react-icons/fa'
 
 
 function Sidebar() {
@@ -65,16 +65,6 @@ function Sidebar() {
                                     <div className="flex items-center gap-3">
                                         <FaShoppingCart className="text-[rgb(37,99,235)] group-hover:scale-110 transition-transform" />
                                         <span className="font-medium text-gray-700 group-hover:text-[rgb(37,99,235)]">Đơn Hàng</span>
-                                    </div>
-                                </Link>
-
-                                <Link 
-                                    to='/customer/wishlist/' 
-                                    className="flex items-center justify-between px-4 py-3 rounded-lg hover:bg-blue-50 transition-colors group"
-                                >
-                                    <div className="flex items-center gap-3">
-                                        <FaHeart className="text-red-500 group-hover:scale-110 transition-transform" />
-                                        <span className="font-medium text-gray-700 group-hover:text-[rgb(37,99,235)]">Yêu Thích</span>
                                     </div>
                                 </Link>
 

@@ -24,11 +24,11 @@ from rest_framework import status
 
 # Serializers
 from userauths.serializer import MyTokenObtainPairSerializer, RegisterSerializer
-from store.serializers import CancelledOrderSerializer, CartSerializer, CartOrderItemSerializer, CouponUsersSerializer, ProductSerializer, TagSerializer ,CategorySerializer, DeliveryCouriersSerializer, CartOrderSerializer, GallerySerializer, BrandSerializer, ProductFaqSerializer, ReviewSerializer,  SpecificationSerializer, CouponSerializer, ColorSerializer, SizeSerializer, AddressSerializer, WishlistSerializer, ConfigSettingsSerializer
+from store.serializers import CancelledOrderSerializer, CartSerializer, CartOrderItemSerializer, CouponUsersSerializer, ProductSerializer, TagSerializer ,CategorySerializer, DeliveryCouriersSerializer, CartOrderSerializer, GallerySerializer, BrandSerializer, ProductFaqSerializer, ReviewSerializer,  SpecificationSerializer, CouponSerializer, ColorSerializer, SizeSerializer, AddressSerializer, ConfigSettingsSerializer
 
 # Models
 from userauths.models import User
-from store.models import CancelledOrder, CartOrderItem, CouponUsers, Cart, Notification, Product, Tag ,Category, DeliveryCouriers, CartOrder, Gallery, Brand, ProductFaq, Review,  Specification, Coupon, Color, Size, Address, Wishlist
+from store.models import CancelledOrder, CartOrderItem, CouponUsers, Cart, Notification, Product, Tag ,Category, DeliveryCouriers, CartOrder, Gallery, Brand, ProductFaq, Review,  Specification, Coupon, Color, Size, Address
 from addon.models import ConfigSettings, Tax
 from vendor.models import Vendor
 
@@ -163,11 +163,13 @@ class CartApiView(generics.ListCreateAPIView):
 
             config_settings = ConfigSettings.objects.first()
 
-            if config_settings.service_fee_charge_type == "percentage":
+            if config_settings and config_settings.service_fee_charge_type == "percentage":
                 service_fee_percentage = config_settings.service_fee_percentage / 100 
                 cart.service_fee = Decimal(service_fee_percentage) * cart.sub_total
-            else:
+            elif config_settings:
                 cart.service_fee = config_settings.service_fee_flat_rate
+            else:
+                cart.service_fee = Decimal(0)
 
             cart.total = cart.sub_total + cart.shipping_amount + cart.service_fee + cart.tax_fee
             cart.save()

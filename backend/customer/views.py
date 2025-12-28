@@ -22,11 +22,11 @@ from rest_framework import status
 
 # Serializers
 from userauths.serializer import MyTokenObtainPairSerializer, ProfileSerializer, RegisterSerializer
-from store.serializers import CancelledOrderSerializer, NotificationSerializer, CartSerializer, CartOrderItemSerializer, CouponUsersSerializer, ProductSerializer, TagSerializer ,CategorySerializer, DeliveryCouriersSerializer, CartOrderSerializer, GallerySerializer, BrandSerializer, ProductFaqSerializer, ReviewSerializer,  SpecificationSerializer, CouponSerializer, ColorSerializer, SizeSerializer, AddressSerializer, WishlistSerializer, ConfigSettingsSerializer
+from store.serializers import CancelledOrderSerializer, NotificationSerializer, CartSerializer, CartOrderItemSerializer, CouponUsersSerializer, ProductSerializer, TagSerializer ,CategorySerializer, DeliveryCouriersSerializer, CartOrderSerializer, GallerySerializer, BrandSerializer, ProductFaqSerializer, ReviewSerializer,  SpecificationSerializer, CouponSerializer, ColorSerializer, SizeSerializer, AddressSerializer, ConfigSettingsSerializer
 
 # Models
 from userauths.models import Profile, User 
-from store.models import CancelledOrder, Notification, CartOrderItem, CouponUsers, Cart, Product, Tag ,Category, DeliveryCouriers, CartOrder, Gallery, Brand, ProductFaq, Review,  Specification, Coupon, Color, Size, Address, Wishlist
+from store.models import CancelledOrder, Notification, CartOrderItem, CouponUsers, Cart, Product, Tag ,Category, DeliveryCouriers, CartOrder, Gallery, Brand, ProductFaq, Review,  Specification, Coupon, Color, Size, Address
 from addon.models import ConfigSettings, Tax
 from vendor.models import Vendor
 
@@ -61,42 +61,6 @@ class OrdersDetailAPIView(generics.RetrieveAPIView):
 
         order = CartOrder.objects.get(buyer=user, payment_status="paid", oid=order_oid)
         return order
-    
-class WishlistCreateAPIView(generics.CreateAPIView):
-    serializer_class = WishlistSerializer
-    permission_classes = (AllowAny, )
-
-    def create(self, request):
-        payload = request.data 
-
-        product_id = payload['product_id']
-        user_id = payload['user_id']
-
-        product = Product.objects.get(id=product_id)
-        user = User.objects.get(id=user_id)
-
-        wishlist = Wishlist.objects.filter(product=product,user=user)
-        if wishlist:
-            wishlist.delete()
-            return Response( {"message": "Removed From Wishlist"}, status=status.HTTP_200_OK)
-        else:
-            wishlist = Wishlist.objects.create(
-                product=product,
-                user=user,
-            )
-            return Response( {"message": "Added To Wishlist"}, status=status.HTTP_201_CREATED)
-
-    
-
-class WishlistAPIView(generics.ListAPIView):
-    serializer_class = WishlistSerializer
-    permission_classes = (AllowAny, )
-
-    def get_queryset(self):
-        user_id = self.kwargs['user_id']
-        user = User.objects.get(id=user_id)
-        wishlist = Wishlist.objects.filter(user=user,)
-        return wishlist
     
 
 class CustomerNotificationView(generics.ListAPIView):

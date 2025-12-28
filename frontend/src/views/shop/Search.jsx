@@ -1,6 +1,6 @@
 import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
-import { FaCheckCircle, FaHeart, FaShoppingCart, FaSpinner } from 'react-icons/fa'
+import { FaCheckCircle, FaShoppingCart, FaSpinner } from 'react-icons/fa'
 import { ChevronDown } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
@@ -17,7 +17,6 @@ import GetCurrentAddress from '../plugin/UserCountry'
 import UserData from '../plugin/UserData'
 import CartID from '../plugin/cartID'
 import { addToCart } from '../plugin/AddToCart'
-import { addToWishlist } from '../plugin/addToWishlist'
 import { CartContext } from '../plugin/Context'
 
 const currencyFormatter = new Intl.NumberFormat('en-US', {
@@ -122,14 +121,6 @@ function Search() {
         }
     }
 
-    const handleAddToWishlist = async (productId) => {
-        try {
-            await addToWishlist(productId, userData?.user_id)
-        } catch (error) {
-            console.error('Error adding to wishlist:', error)
-        }
-    }
-
     const headingText = useMemo(() => {
         const trimmed = query.trim()
         return trimmed ? `Search results for "${trimmed}"` : 'Search results'
@@ -145,15 +136,6 @@ function Search() {
 
                 return (
                     <Card key={product.id} className="relative flex h-full flex-col overflow-hidden">
-                        <Button
-                            onClick={() => handleAddToWishlist(product.id)}
-                            variant="destructive"
-                            size="icon"
-                            className="absolute left-3 top-3 z-10"
-                        >
-                            <FaHeart />
-                        </Button>
-
                         <Link to={`/detail/${product.slug}`} className="group block">
                             <img
                                 src={displayImage}
@@ -298,30 +280,7 @@ function Search() {
                                     </Button>
                                 )}
 
-                                {!variations && (
-                                    <Button
-                                        onClick={() => handleAddToWishlist(product.id)}
-                                        variant="outline"
-                                        size="icon"
-                                        className="border-rose-200 text-rose-500 hover:bg-rose-50"
-                                    >
-                                        <FaHeart className="h-4 w-4" />
-                                    </Button>
-                                )}
                             </div>
-
-                            {variations && (
-                                <div className="mt-4 flex justify-end">
-                                    <Button
-                                        onClick={() => handleAddToWishlist(product.id)}
-                                        variant="outline"
-                                        size="icon"
-                                        className="border-rose-200 text-rose-500 hover:bg-rose-50"
-                                    >
-                                        <FaHeart className="h-4 w-4" />
-                                    </Button>
-                                </div>
-                            )}
                         </CardContent>
                     </Card>
                 )

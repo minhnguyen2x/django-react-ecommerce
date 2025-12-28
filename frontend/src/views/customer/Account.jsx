@@ -2,7 +2,7 @@ import React from 'react'
 import Sidebar from './Sidebar'
 import UseProfileData from '../plugin/UseProfileData'
 import { Link } from 'react-router-dom'
-import { FaUser, FaShoppingCart, FaMapMarkerAlt, FaKey, FaCog, FaHeart } from 'react-icons/fa'
+import { FaUser, FaShoppingCart, FaMapMarkerAlt, FaKey, FaCog } from 'react-icons/fa'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { ScrollToTop } from '@/components/ui/scroll-to-top'
@@ -52,25 +52,6 @@ function Account() {
                               <h3 className="font-semibold text-lg mb-1">Đơn Hàng</h3>
                               <p className="text-sm text-gray-600">
                                 Xem và theo dõi các đơn hàng của bạn
-                              </p>
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    </Link>
-
-                    {/* Wishlist */}
-                    <Link to="/customer/wishlist/">
-                      <Card className="hover:shadow-lg transition-all hover:scale-105 cursor-pointer border-2 hover:border-[rgb(37,99,235)]">
-                        <CardContent className="p-6">
-                          <div className="flex items-start space-x-4">
-                            <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center flex-shrink-0">
-                              <FaHeart className="text-red-500 text-xl" />
-                            </div>
-                            <div>
-                              <h3 className="font-semibold text-lg mb-1">Yêu Thích</h3>
-                              <p className="text-sm text-gray-600">
-                                Quản lý danh sách sản phẩm yêu thích
                               </p>
                             </div>
                           </div>

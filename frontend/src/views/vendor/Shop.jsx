@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from 'react'
-import { Check, Heart, Loader2, ShoppingCart } from 'lucide-react'
+import { Check, Loader2, ShoppingCart } from 'lucide-react'
 import { Link, useParams } from 'react-router-dom'
 
 import { Badge } from '@/components/ui/badge'
@@ -12,7 +12,6 @@ import { cn } from '@/lib/utils'
 import apiInstance from '../../utils/axios'
 import { CartContext } from '../plugin/Context'
 import { addToCart } from '../plugin/AddToCart'
-import { addToWishlist } from '../plugin/addToWishlist'
 import CartID from '../plugin/cartID'
 import GetCurrentAddress from '../plugin/UserCountry'
 import UserData from '../plugin/UserData'
@@ -137,14 +136,6 @@ function Shop() {
 
     };
 
-
-    const handleAddToWishlist = async (product_id) => {
-        try {
-            await addToWishlist(product_id, userData?.user_id)
-        } catch (error) {
-            console.log(error);
-        }
-    };
 
 
     const renderAddToCartLabel = (productId) => {
@@ -365,15 +356,6 @@ function Shop() {
                                                             >
                                                                 {renderAddToCartLabel(product.id)}
                                                             </Button>
-                                                            <Button
-                                                                type="button"
-                                                                variant="secondary"
-                                                                className="w-full"
-                                                                onClick={() => handleAddToWishlist(product.id)}
-                                                            >
-                                                                <Heart className="mr-2 h-4 w-4" />
-                                                                Add to Wishlist
-                                                            </Button>
                                                         </div>
                                                     </div>
                                                 </DialogContent>
@@ -386,15 +368,6 @@ function Shop() {
                                                     disabled={loadingStates[product.id] === 'Adding...'}
                                                 >
                                                     {renderAddToCartLabel(product.id)}
-                                                </Button>
-                                                <Button
-                                                    type="button"
-                                                    variant="secondary"
-                                                    className="w-full sm:w-auto"
-                                                    onClick={() => handleAddToWishlist(product.id)}
-                                                >
-                                                    <Heart className="mr-2 h-4 w-4" />
-                                                    Add to Wishlist
                                                 </Button>
                                             </div>
                                         )}

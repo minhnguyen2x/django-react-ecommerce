@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import moment from 'moment'
 import Swal from 'sweetalert2'
-import { Heart, Loader2, ShoppingCart, Star } from 'lucide-react'
+import { Loader2, ShoppingCart, Star } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -27,7 +27,6 @@ import GetCurrentAddress from '../plugin/UserCountry'
 import UserData from '../plugin/UserData'
 import CartID from '../plugin/cartID'
 import { addToCart } from '../plugin/AddToCart'
-import { addToWishlist } from '../plugin/addToWishlist'
 import { CartContext } from '../plugin/Context'
 
 function ProductDetail() {
@@ -41,7 +40,6 @@ function ProductDetail() {
     const [colorValue, setColorValue] = useState('No Color')
     const [sizeValue, setSizeValue] = useState('No Size')
     const [qtyValue, setQtyValue] = useState(1)
-    const [isWishlistAdded, setIsWishlistAdded] = useState(false)
     const [isAddingToCart, setIsAddingToCart] = useState('Add To Cart')
     const [loading, setLoading] = useState(true)
     const [reviews, setReviews] = useState([])
@@ -86,7 +84,6 @@ function ProductDetail() {
                 setVendor(data.vendor || null)
                 setColorValue('No Color')
                 setSizeValue('No Size')
-                setIsWishlistAdded(false)
             } catch (error) {
                 console.error('Error fetching product:', error)
                 setProduct(null)
@@ -177,26 +174,6 @@ function ProductDetail() {
         setTimeout(() => {
             setIsAddingToCart('Add To Cart')
         }, 2000)
-    }
-
-    const handleAddToWishlist = async () => {
-        if (!product) {
-            return
-        }
-
-        if (!userData?.user_id) {
-            Swal.fire({ icon: 'info', title: 'Vui lòng đăng nhập để lưu sản phẩm' })
-            return
-        }
-
-        try {
-            await addToWishlist(product.id, userData.user_id)
-            setIsWishlistAdded(true)
-            Swal.fire({ icon: 'success', title: 'Đã thêm vào danh sách yêu thích' })
-        } catch (error) {
-            console.error('Error adding to wishlist:', error)
-            Swal.fire({ icon: 'error', title: 'Không thể thêm vào danh sách yêu thích' })
-        }
     }
 
     const handleReviewSubmit = async (event) => {
@@ -407,15 +384,6 @@ function ProductDetail() {
                                 {isAddingToCart === 'Add To Cart' && <ShoppingCart className="h-4 w-4" />}
                                 {isAddingToCart === 'Added To Cart' && <ShoppingCart className="h-4 w-4" />}
                                 {isAddingToCart}
-                            </Button>
-                            <Button
-                                type="button"
-                                variant={isWishlistAdded ? 'destructive' : 'outline'}
-                                className="gap-2"
-                                onClick={handleAddToWishlist}
-                            >
-                                <Heart className="h-4 w-4" />
-                                {isWishlistAdded ? 'Đã lưu' : 'Yêu thích'}
                             </Button>
                         </div>
 

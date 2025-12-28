@@ -15,7 +15,7 @@ import {
     DropdownMenuSeparator
 } from '@/components/ui/dropdown-menu';
 import { 
-    User, ShoppingCart, Heart, Bell, Settings, 
+    User, ShoppingCart, Bell, Settings, 
     Package, Plus, DollarSign, Star, Tag, 
     LayoutDashboard, LogOut, LogIn, UserPlus, 
     Search, ChevronDown, ShoppingBag 
@@ -76,12 +76,6 @@ function StoreHeader() {
                                     <Link to="/customer/orders/" className="flex items-center cursor-pointer">
                                         <ShoppingCart className="mr-2 h-4 w-4" />
                                         Đơn Hàng
-                                    </Link>
-                                </DropdownMenuItem>
-                                <DropdownMenuItem asChild>
-                                    <Link to="/customer/wishlist/" className="flex items-center cursor-pointer">
-                                        <Heart className="mr-2 h-4 w-4" />
-                                        Yêu Thích
                                     </Link>
                                 </DropdownMenuItem>
                                 <DropdownMenuItem asChild>

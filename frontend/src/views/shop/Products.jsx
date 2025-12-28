@@ -1,6 +1,6 @@
 import { useEffect, useState, useContext } from 'react';
 import { Link } from 'react-router-dom';
-import { FaCheckCircle, FaShoppingCart, FaSpinner, FaHeart } from 'react-icons/fa';
+import { FaCheckCircle, FaShoppingCart, FaSpinner } from 'react-icons/fa';
 
 import apiInstance from '../../utils/axios';
 import Addon from '../plugin/Addon';
@@ -8,7 +8,6 @@ import GetCurrentAddress from '../plugin/UserCountry';
 import UserData from '../plugin/UserData';
 import CartID from '../plugin/cartID';
 import { addToCart } from '../plugin/AddToCart';
-import { addToWishlist } from '../plugin/addToWishlist';
 import { CartContext } from '../plugin/Context';
 
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
@@ -206,14 +205,6 @@ function Products() {
     };
 
 
-    const handleAddToWishlist = async (product_id) => {
-        try {
-            await addToWishlist(product_id, userData?.user_id)
-        } catch (error) {
-            console.log(error);
-        }
-    };
-
 
     return (
         <>
@@ -240,16 +231,6 @@ function Products() {
                                 }`}>
                                     {currentItems.map((product, index) => (
                                         <Card key={product.id} className="overflow-hidden hover:shadow-lg transition-shadow relative w-full max-w-[200px]">
-                                            {/* Wishlist Button */}
-                                            <Button
-                                                onClick={() => handleAddToWishlist(product.id)}
-                                                variant="destructive"
-                                                size="icon"
-                                                className="absolute top-2 left-2 z-10"
-                                            >
-                                                <FaHeart />
-                                            </Button>
-                                            
                                             <Link to={`/detail/${product.slug}`} className="block relative group">
                                                 <img
                                                     src={(selectedProduct === product.id && colorImage) ? colorImage : product.image}
@@ -430,7 +411,6 @@ function Products() {
                                     </p>
                                 )}
                             </div>
-                            {/*Section: Wishlist*/}
                         </div>
                     </main>
 
