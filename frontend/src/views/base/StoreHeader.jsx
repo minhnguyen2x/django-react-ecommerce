@@ -78,12 +78,6 @@ function StoreHeader() {
                                         Đơn Hàng
                                     </Link>
                                 </DropdownMenuItem>
-                                <DropdownMenuItem asChild>
-                                    <Link to="/customer/notifications/" className="flex items-center cursor-pointer">
-                                        <Bell className="mr-2 h-4 w-4" />
-                                        Thông Báo
-                                    </Link>
-                                </DropdownMenuItem>
                                 <DropdownMenuSeparator />
                                 <DropdownMenuItem asChild>
                                     <Link to="/customer/settings/" className="flex items-center cursor-pointer">
@@ -134,25 +128,7 @@ function StoreHeader() {
                                         Thu Nhập
                                     </Link>
                                 </DropdownMenuItem>
-                                <DropdownMenuItem asChild>
-                                    <Link to="/vendor/reviews/" className="flex items-center cursor-pointer">
-                                        <Star className="mr-2 h-4 w-4" />
-                                        Đánh Giá
-                                    </Link>
-                                </DropdownMenuItem>
-                                <DropdownMenuItem asChild>
-                                    <Link to="/vendor/coupon/" className="flex items-center cursor-pointer">
-                                        <Tag className="mr-2 h-4 w-4" />
-                                        Phiếu Giảm Giá
-                                    </Link>
-                                </DropdownMenuItem>
                                 <DropdownMenuSeparator />
-                                <DropdownMenuItem asChild>
-                                    <Link to="/vendor/notifications/" className="flex items-center cursor-pointer">
-                                        <Bell className="mr-2 h-4 w-4" />
-                                        Thông Báo
-                                    </Link>
-                                </DropdownMenuItem>
                                 <DropdownMenuItem asChild>
                                     <Link to="/vendor/settings/" className="flex items-center cursor-pointer">
                                         <Settings className="mr-2 h-4 w-4" />
