@@ -147,13 +147,13 @@ function Settings() {
       await fetchProfileData()
       Swal.fire({
         icon: 'success',
-        title: 'Profile updated successfully',
+        title: 'Cập nhật hồ sơ thành công',
       })
     } catch (error) {
       console.error('Error updating profile:', error)
       Swal.fire({
         icon: 'error',
-        title: 'Unable to update profile',
+        title: 'Không thể cập nhật hồ sơ',
       })
     }
   }
@@ -178,13 +178,13 @@ function Settings() {
       await fetchVendorData()
       Swal.fire({
         icon: 'success',
-        title: 'Shop updated successfully',
+        title: 'Cập nhật cửa hàng thành công',
       })
     } catch (error) {
       console.error('Error updating shop:', error)
       Swal.fire({
         icon: 'error',
-        title: 'Unable to update shop',
+        title: 'Không thể cập nhật cửa hàng',
       })
     }
   }
@@ -198,16 +198,16 @@ function Settings() {
         <Sidebar />
         <div className="flex-1 space-y-8">
           <header className="space-y-2">
-            <h1 className="text-2xl font-semibold text-slate-900">Settings</h1>
+            <h1 className="text-2xl font-semibold text-slate-900">Cài Đặt</h1>
             <p className="text-sm text-muted-foreground">
-              Manage your shop appearance and personal profile details.
+              Quản lý giao diện cửa hàng và thông tin hồ sơ cá nhân của bạn.
             </p>
           </header>
 
           <Tabs defaultValue="shop" className="space-y-6">
             <TabsList>
-              <TabsTrigger value="shop">Shop Settings</TabsTrigger>
-              <TabsTrigger value="profile">Profile</TabsTrigger>
+              <TabsTrigger value="shop">Cài Đặt Cửa Hàng</TabsTrigger>
+              <TabsTrigger value="profile">Hồ Sơ</TabsTrigger>
             </TabsList>
 
             <TabsContent value="shop" className="space-y-6">
@@ -215,21 +215,21 @@ function Settings() {
                 <Card className="border-0 shadow-sm">
                   <CardHeader className="text-center">
                     <CardTitle className="text-lg font-semibold text-slate-900">
-                      Shop Overview
+                      Tổng Quan Cửa Hàng
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="flex flex-col items-center gap-4">
                     <div className="h-40 w-40 overflow-hidden rounded-full border border-slate-200 bg-white">
                       <img
                         src={vendorPreview}
-                        alt={`${vendorData.name || 'Shop'} avatar`}
+                        alt={`${vendorData.name || 'Cửa hàng'} avatar`}
                         className="h-full w-full object-cover"
                       />
                     </div>
                     <div className="text-center">
-                      <p className="text-lg font-medium text-slate-900">{vendorData.name || 'Your shop name'}</p>
+                      <p className="text-lg font-medium text-slate-900">{vendorData.name || 'Tên cửa hàng của bạn'}</p>
                       <p className="text-sm text-muted-foreground">
-                        {vendorData.description || 'Add a short description to introduce your shop.'}
+                        {vendorData.description || 'Thêm mô tả ngắn để giới thiệu cửa hàng của bạn.'}
                       </p>
                     </div>
                   </CardContent>
@@ -238,43 +238,43 @@ function Settings() {
                 <Card className="border-0 shadow-sm">
                   <CardHeader>
                     <CardTitle className="text-lg font-semibold text-slate-900">
-                      Update shop information
+                      Cập nhật thông tin cửa hàng
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
                     <form className="space-y-5" onSubmit={handleShopFormSubmit} encType="multipart/form-data">
                       <div className="grid gap-4 sm:grid-cols-2">
                         <div className="space-y-2">
-                          <Label htmlFor="shop-image">Shop Avatar</Label>
+                          <Label htmlFor="shop-image">Ảnh Đại Diện Cửa Hàng</Label>
                           <Input id="shop-image" type="file" name="image" onChange={handleShopFileChange} />
                         </div>
                         <div className="space-y-2">
-                          <Label htmlFor="shop-name">Shop Name</Label>
+                          <Label htmlFor="shop-name">Tên Cửa Hàng</Label>
                           <Input
                             id="shop-name"
                             type="text"
                             name="name"
                             value={vendorData.name}
                             onChange={handleShopInputChange}
-                            placeholder="My Awesome Store"
+                            placeholder="Cửa hàng tuyệt vời của tôi"
                           />
                         </div>
                       </div>
 
                       <div className="space-y-2">
-                        <Label htmlFor="shop-description">Shop Description</Label>
+                        <Label htmlFor="shop-description">Mô Tả Cửa Hàng</Label>
                         <Textarea
                           id="shop-description"
                           name="description"
                           value={vendorData.description}
                           onChange={handleShopInputChange}
-                          placeholder="Describe your product range, guarantees, and service policies."
+                          placeholder="Mô tả dải sản phẩm, bảo hành và chính sách dịch vụ của bạn."
                           rows={4}
                         />
                       </div>
 
                       <div className="space-y-2">
-                        <Label htmlFor="shop-mobile">Mobile</Label>
+                        <Label htmlFor="shop-mobile">Số Điện Thoại</Label>
                         <Input
                           id="shop-mobile"
                           type="text"
@@ -288,13 +288,13 @@ function Settings() {
                       <div className="flex flex-col gap-3 sm:flex-row">
                         <Button type="submit" className="w-full sm:w-auto">
                           <CheckCircle2 className="mr-2 h-4 w-4" />
-                          Update Shop
+                          Cập Nhật Cửa Hàng
                         </Button>
                         {vendorData.slug && (
                           <Button asChild variant="outline" className="w-full sm:w-auto">
                             <Link to={`/vendor/${vendorData.slug}/`}>
                               <Store className="mr-2 h-4 w-4" />
-                              View Shop
+                              Xem Cửa Hàng
                             </Link>
                           </Button>
                         )}
@@ -309,20 +309,20 @@ function Settings() {
               <div className="grid gap-6 lg:grid-cols-[320px_1fr]">
                 <Card className="border-0 shadow-sm">
                   <CardHeader className="text-center">
-                    <CardTitle className="text-lg font-semibold text-slate-900">Profile Overview</CardTitle>
+                    <CardTitle className="text-lg font-semibold text-slate-900">Tổng Quan Hồ Sơ</CardTitle>
                   </CardHeader>
                   <CardContent className="flex flex-col items-center gap-4">
                     <div className="h-40 w-40 overflow-hidden rounded-full border border-slate-200 bg-white">
                       <img
                         src={profilePreview}
-                        alt={`${profileData.full_name || 'Profile'} avatar`}
+                        alt={`${profileData.full_name || 'Hồ sơ'} avatar`}
                         className="h-full w-full object-cover"
                       />
                     </div>
                     <div className="text-center">
-                      <p className="text-lg font-medium text-slate-900">{profileData.full_name || 'Your name'}</p>
+                      <p className="text-lg font-medium text-slate-900">{profileData.full_name || 'Tên của bạn'}</p>
                       <p className="text-sm text-muted-foreground">
-                        {profileData.about || 'Tell customers about yourself and your expertise.'}
+                        {profileData.about || 'Chia sẻ với khách hàng về bản thân và chuyên môn của bạn.'}
                       </p>
                     </div>
                   </CardContent>
@@ -330,87 +330,87 @@ function Settings() {
 
                 <Card className="border-0 shadow-sm">
                   <CardHeader>
-                    <CardTitle className="text-lg font-semibold text-slate-900">Update profile details</CardTitle>
+                    <CardTitle className="text-lg font-semibold text-slate-900">Cập nhật thông tin hồ sơ</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <form className="space-y-5" onSubmit={handleFormSubmit} encType="multipart/form-data">
                       <div className="grid gap-4 sm:grid-cols-2">
                         <div className="space-y-2">
-                          <Label htmlFor="profile-image">Profile Image</Label>
+                          <Label htmlFor="profile-image">Ảnh Hồ Sơ</Label>
                           <Input id="profile-image" type="file" name="p_image" onChange={handleFileChange} />
                         </div>
                         <div className="space-y-2">
-                          <Label htmlFor="profile-name">Full Name</Label>
+                          <Label htmlFor="profile-name">Họ Tên</Label>
                           <Input
                             id="profile-name"
                             type="text"
                             name="full_name"
                             value={profileData.full_name}
                             onChange={handleInputChange}
-                            placeholder="Nguyen Van A"
+                            placeholder="Nguyễn Văn A"
                           />
                         </div>
                       </div>
 
                       <div className="grid gap-4 sm:grid-cols-2">
                         <div className="space-y-2">
-                          <Label htmlFor="profile-about">About</Label>
+                          <Label htmlFor="profile-about">Giới Thiệu</Label>
                           <Textarea
                             id="profile-about"
                             name="about"
                             value={profileData.about}
                             onChange={handleInputChange}
-                            placeholder="Share a short bio about your brand story, mission, and service level."
+                            placeholder="Chia sẻ tiểu sử ngắn về thương hiệu, sứ mệnh và chất lượng dịch vụ."
                             rows={4}
                           />
                         </div>
                         <div className="space-y-2">
-                          <Label htmlFor="profile-country">Country</Label>
+                          <Label htmlFor="profile-country">Quốc Gia</Label>
                           <Input
                             id="profile-country"
                             type="text"
                             name="country"
                             value={profileData.country}
                             onChange={handleInputChange}
-                            placeholder="Vietnam"
+                            placeholder="Việt Nam"
                           />
                         </div>
                       </div>
 
                       <div className="grid gap-4 sm:grid-cols-2">
                         <div className="space-y-2">
-                          <Label htmlFor="profile-city">City</Label>
+                          <Label htmlFor="profile-city">Thành Phố</Label>
                           <Input
                             id="profile-city"
                             type="text"
                             name="city"
                             value={profileData.city}
                             onChange={handleInputChange}
-                            placeholder="Ho Chi Minh City"
+                            placeholder="Thành phố Hồ Chí Minh"
                           />
                         </div>
                         <div className="space-y-2">
-                          <Label htmlFor="profile-state">State / Province</Label>
+                          <Label htmlFor="profile-state">Quận / Huyện</Label>
                           <Input
                             id="profile-state"
                             type="text"
                             name="state"
                             value={profileData.state}
                             onChange={handleInputChange}
-                            placeholder="District 1"
+                            placeholder="Quận 1"
                           />
                         </div>
                       </div>
 
                       <div className="space-y-2">
-                        <Label htmlFor="profile-address">Address</Label>
+                        <Label htmlFor="profile-address">Địa Chỉ</Label>
                         <Input
                           id="profile-address"
                           type="text"
                           name="address"
                           value={profileData.address}
                           onChange={handleInputChange}
-                          placeholder="123 Nguyen Hue, Ben Nghe"
+                          placeholder="123 Nguyễn Huệ, Bến Nghé"
                         />
                       </div>
 
@@ -427,7 +427,7 @@ function Settings() {
 
                       <Button type="submit" className="w-full sm:w-auto">
                         <User className="mr-2 h-4 w-4" />
-                        Update Profile
+                        Cập Nhật Hồ Sơ
                       </Button>
                     </form>
                   </CardContent>

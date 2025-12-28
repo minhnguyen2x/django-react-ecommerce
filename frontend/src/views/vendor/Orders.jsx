@@ -47,15 +47,15 @@ function Orders() {
     }, [axios, vendorId])
 
     return (
-        <VendorLayout title="All Orders" description="Review recent orders and drill into their details.">
+        <VendorLayout title="Tất Cả Đơn Hàng" description="Xem lại các đơn hàng gần đây và xem chi tiết của chúng.">
             <Table>
                 <TableHeader>
                     <TableRow>
                         <TableHead>#ID</TableHead>
-                        <TableHead>Name</TableHead>
-                        <TableHead>Date</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead className="text-right">Action</TableHead>
+                        <TableHead>Tên</TableHead>
+                        <TableHead>Ngày</TableHead>
+                        <TableHead>Trạng Thái</TableHead>
+                        <TableHead className="text-right">Hành Động</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -78,7 +78,7 @@ function Orders() {
                     ) : (
                         <TableRow>
                             <TableCell colSpan={5} className="py-6 text-center text-sm text-slate-500">
-                                No orders yet
+                                Chưa có đơn hàng
                             </TableCell>
                         </TableRow>
                     )}

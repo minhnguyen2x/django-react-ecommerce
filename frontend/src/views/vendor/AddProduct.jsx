@@ -201,8 +201,8 @@ function AddProduct() {
             console.error('Error submitting form:', error);
             Swal.fire({
                 icon: 'error',
-                title: 'Could not create product',
-                text: 'Please try again in a moment.'
+                title: 'Không thể tạo sản phẩm',
+                text: 'Vui lòng thử lại sau.'
             })
         } finally {
             setIsLoading(false)
@@ -216,9 +216,9 @@ function AddProduct() {
                 <Sidebar />
                 <form className="flex-1 space-y-8" method="POST" encType="multipart/form-data" onSubmit={handleSubmit}>
                     <header className="space-y-2">
-                        <h1 className="text-2xl font-semibold text-slate-900">Create Product</h1>
+                        <h1 className="text-2xl font-semibold text-slate-900">Tạo Sản Phẩm</h1>
                         <p className="text-sm text-muted-foreground">
-                            Upload product information, configure variations, and publish it to your storefront.
+                            Tải lên thông tin sản phẩm, cấu hình biến thể và xuất bản lên cửa hàng của bạn.
                         </p>
                     </header>
 
@@ -227,7 +227,7 @@ function AddProduct() {
                             <CardHeader>
                                 <CardTitle className="flex items-center gap-2 text-lg font-semibold text-slate-900">
                                     <ImageIcon className="h-5 w-5" />
-                                    Product Preview
+                                    Xem Trước Sản Phẩm
                                 </CardTitle>
                             </CardHeader>
                             <CardContent className="space-y-4">
@@ -240,10 +240,10 @@ function AddProduct() {
                                 </div>
                                 <div className="space-y-1">
                                     <p className="text-lg font-medium text-slate-900">
-                                        {product.title || 'Untitled product'}
+                                        {product.title || 'Sản phẩm chưa có tên'}
                                     </p>
                                     <p className="text-sm text-muted-foreground">
-                                        {product.description ? product.description.slice(0, 140) : 'Add a compelling description to highlight the main benefits of your product.'}
+                                        {product.description ? product.description.slice(0, 140) : 'Thêm mô tả hấp dẫn để nôi bật những lợi ích chính của sản phẩm.'}
                                     </p>
                                 </div>
                             </CardContent>
@@ -251,41 +251,41 @@ function AddProduct() {
 
                         <Card className="border-0 shadow-sm">
                             <CardHeader>
-                                <CardTitle className="text-lg font-semibold text-slate-900">Product details</CardTitle>
+                                <CardTitle className="text-lg font-semibold text-slate-900">Chi Tiết Sản Phẩm</CardTitle>
                             </CardHeader>
                             <CardContent className="space-y-5">
                                 <div className="space-y-2">
-                                    <Label htmlFor="product-image">Product Thumbnail</Label>
+                                    <Label htmlFor="product-image">Ảnh Thư Viện</Label>
                                     <Input id="product-image" type="file" name="image" onChange={handleProductFileChange} />
                                 </div>
 
                                 <div className="space-y-2">
-                                    <Label htmlFor="product-title">Title</Label>
+                                    <Label htmlFor="product-title">Tiêu Đề</Label>
                                     <Input
                                         id="product-title"
                                         type="text"
                                         name="title"
                                         value={product.title || ''}
                                         onChange={handleProductInputChange}
-                                        placeholder="Premium wireless headphones"
+                                        placeholder="Tai nghe không dây cao cấp"
                                     />
                                 </div>
 
                                 <div className="space-y-2">
-                                    <Label htmlFor="product-description">Description</Label>
+                                    <Label htmlFor="product-description">Mô Tả</Label>
                                     <Textarea
                                         id="product-description"
                                         name="description"
                                         value={product.description || ''}
                                         onChange={handleProductInputChange}
-                                        placeholder="Describe product features, materials, and any guarantees your store provides."
+                                        placeholder="Mô tả đặc điểm sản phẩm, chất liệu và bảo hành của cửa hàng."
                                         rows={6}
                                     />
                                 </div>
 
                                 <div className="grid gap-4 sm:grid-cols-2">
                                     <div className="space-y-2">
-                                        <Label htmlFor="product-category">Category</Label>
+                                        <Label htmlFor="product-category">Danh Mục</Label>
                                         <Select
                                             value={product.category ? String(product.category) : undefined}
                                             onValueChange={(value) =>
@@ -296,7 +296,7 @@ function AddProduct() {
                                             }
                                         >
                                             <SelectTrigger className="w-full">
-                                                <SelectValue placeholder="Select a category" />
+                                                <SelectValue placeholder="Chọn danh mục" />
                                             </SelectTrigger>
                                             <SelectContent>
                                                 {category.map((c) => (
@@ -308,21 +308,21 @@ function AddProduct() {
                                         </Select>
                                     </div>
                                     <div className="space-y-2">
-                                        <Label htmlFor="product-brand">Brand</Label>
+                                        <Label htmlFor="product-brand">Thương Hiệu</Label>
                                         <Input
                                             id="product-brand"
                                             type="text"
                                             name="brand"
                                             value={product.brand || ''}
                                             onChange={handleProductInputChange}
-                                            placeholder="Brand name"
+                                            placeholder="Tên thương hiệu"
                                         />
                                     </div>
                                 </div>
 
                                 <div className="grid gap-4 sm:grid-cols-3">
                                     <div className="space-y-2">
-                                        <Label htmlFor="product-price">Sale Price</Label>
+                                        <Label htmlFor="product-price">Giá Bán</Label>
                                         <Input
                                             id="product-price"
                                             type="number"
@@ -333,7 +333,7 @@ function AddProduct() {
                                         />
                                     </div>
                                     <div className="space-y-2">
-                                        <Label htmlFor="product-old-price">Regular Price</Label>
+                                        <Label htmlFor="product-old-price">Giá Gốc</Label>
                                         <Input
                                             id="product-old-price"
                                             type="number"
@@ -344,7 +344,7 @@ function AddProduct() {
                                         />
                                     </div>
                                     <div className="space-y-2">
-                                        <Label htmlFor="product-shipping">Shipping Amount</Label>
+                                        <Label htmlFor="product-shipping">Phí Vận Chuyển</Label>
                                         <Input
                                             id="product-shipping"
                                             type="number"
@@ -358,7 +358,7 @@ function AddProduct() {
 
                                 <div className="grid gap-4 sm:grid-cols-2">
                                     <div className="space-y-2">
-                                        <Label htmlFor="product-stock">Stock Quantity</Label>
+                                        <Label htmlFor="product-stock">Số Lượng Tồn Kho</Label>
                                         <Input
                                             id="product-stock"
                                             type="number"
@@ -369,16 +369,16 @@ function AddProduct() {
                                         />
                                     </div>
                                     <div className="space-y-2">
-                                        <Label htmlFor="product-tags">Tags</Label>
+                                        <Label htmlFor="product-tags">Thẻ Tags</Label>
                                         <Input
                                             id="product-tags"
                                             type="text"
                                             name="tags"
                                             value={product.tags || ''}
                                             onChange={handleProductInputChange}
-                                            placeholder="audio, wireless, premium"
+                                            placeholder="âm thanh, không dây, cao cấp"
                                         />
-                                        <p className="text-xs text-muted-foreground">Separate tags with commas for better search visibility.</p>
+                                        <p className="text-xs text-muted-foreground">Tách các thẻ bằng dấu phẩy để tăng khả năng tìm kiếm.</p>
                                     </div>
                                 </div>
                             </CardContent>
@@ -389,13 +389,13 @@ function AddProduct() {
                         <CardHeader>
                             <CardTitle className="flex items-center gap-2 text-lg font-semibold text-slate-900">
                                 <ImageIcon className="h-5 w-5" />
-                                Gallery
+                                Bộ Sưu Tập Ảnh
                             </CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-4">
                             <div className="space-y-4">
                                 {gallery.length === 0 && (
-                                    <p className="text-sm text-muted-foreground">No gallery images added yet.</p>
+                                    <p className="text-sm text-muted-foreground">Chưa thêm ảnh vào bộ sưu tập.</p>
                                 )}
 
                                 {gallery.map((item, index) => (
@@ -408,7 +408,7 @@ function AddProduct() {
                                             />
                                         </div>
                                         <div className="space-y-2">
-                                            <Label htmlFor={`gallery-${index}`}>Product Image</Label>
+                                            <Label htmlFor={`gallery-${index}`}>Ảnh Sản Phẩm</Label>
                                             <Input
                                                 id={`gallery-${index}`}
                                                 type="file"
@@ -422,7 +422,7 @@ function AddProduct() {
                                             onClick={() => handleRemove(index, setGallery)}
                                         >
                                             <Trash2 className="h-4 w-4" />
-                                            Remove
+                                            Xóa
                                         </Button>
                                     </div>
                                 ))}
@@ -433,7 +433,7 @@ function AddProduct() {
                                 onClick={() => handleAddMore(setGallery, { image: null })}
                             >
                                 <PlusCircle className="h-4 w-4" />
-                                Add Gallery Image
+                                Thêm Ảnh Vào Bộ Sưu Tập
                             </Button>
                         </CardContent>
                     </Card>
@@ -442,35 +442,35 @@ function AddProduct() {
                         <CardHeader>
                             <CardTitle className="flex items-center gap-2 text-lg font-semibold text-slate-900">
                                 <ListChecks className="h-5 w-5" />
-                                Specifications
+                                Thông Số Kỹ Thuật
                             </CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-4">
                             <div className="space-y-4">
                                 {specifications.length === 0 && (
-                                    <p className="text-sm text-muted-foreground">No specification rows added.</p>
+                                    <p className="text-sm text-muted-foreground">Chưa thêm thông số kỹ thuật.</p>
                                 )}
 
                                 {specifications.map((specification, index) => (
                                     <div key={`spec-${index}`} className="grid gap-4 rounded-lg border border-slate-200 p-4 sm:grid-cols-[1fr_1fr_auto]">
                                         <div className="space-y-2">
-                                            <Label htmlFor={`spec-title-${index}`}>Title</Label>
+                                            <Label htmlFor={`spec-title-${index}`}>Tiêu Đề</Label>
                                             <Input
                                                 id={`spec-title-${index}`}
                                                 type="text"
                                                 value={specification.title || ''}
                                                 onChange={(event) => handleInputChange(index, 'title', event.target.value, setSpecifications)}
-                                                placeholder="Material"
+                                                placeholder="Chất liệu"
                                             />
                                         </div>
                                         <div className="space-y-2">
-                                            <Label htmlFor={`spec-content-${index}`}>Content</Label>
+                                            <Label htmlFor={`spec-content-${index}`}>Nội Dung</Label>
                                             <Input
                                                 id={`spec-content-${index}`}
                                                 type="text"
                                                 value={specification.content || ''}
                                                 onChange={(event) => handleInputChange(index, 'content', event.target.value, setSpecifications)}
-                                                placeholder="100% recycled cotton"
+                                                placeholder="100% vải bông tái chế"
                                             />
                                         </div>
                                         <Button
@@ -480,7 +480,7 @@ function AddProduct() {
                                             onClick={() => handleRemove(index, setSpecifications)}
                                         >
                                             <Trash2 className="h-4 w-4" />
-                                            Remove
+                                            Xóa
                                         </Button>
                                     </div>
                                 ))}
@@ -491,7 +491,7 @@ function AddProduct() {
                                 onClick={() => handleAddMore(setSpecifications, { title: '', content: '' })}
                             >
                                 <PlusCircle className="h-4 w-4" />
-                                Add Specification
+                                Thêm Thông Số
                             </Button>
                         </CardContent>
                     </Card>
@@ -500,19 +500,19 @@ function AddProduct() {
                         <CardHeader>
                             <CardTitle className="flex items-center gap-2 text-lg font-semibold text-slate-900">
                                 <Tag className="h-5 w-5" />
-                                Sizes
+                                Kích Cỡ
                             </CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-4">
                             <div className="space-y-4">
                                 {sizes.length === 0 && (
-                                    <p className="text-sm text-muted-foreground">No sizes configured.</p>
+                                    <p className="text-sm text-muted-foreground">Chưa cấu hình kích cỡ.</p>
                                 )}
 
                                 {sizes.map((size, index) => (
                                     <div key={`size-${index}`} className="grid gap-4 rounded-lg border border-slate-200 p-4 sm:grid-cols-[1fr_1fr_auto]">
                                         <div className="space-y-2">
-                                            <Label htmlFor={`size-name-${index}`}>Size</Label>
+                                            <Label htmlFor={`size-name-${index}`}>Kích Cỡ</Label>
                                             <Input
                                                 id={`size-name-${index}`}
                                                 type="text"
@@ -522,7 +522,7 @@ function AddProduct() {
                                             />
                                         </div>
                                         <div className="space-y-2">
-                                            <Label htmlFor={`size-price-${index}`}>Price Impact</Label>
+                                            <Label htmlFor={`size-price-${index}`}>Ảnh Hưởng Giá</Label>
                                             <Input
                                                 id={`size-price-${index}`}
                                                 type="number"
@@ -538,7 +538,7 @@ function AddProduct() {
                                             onClick={() => handleRemove(index, setSizes)}
                                         >
                                             <Trash2 className="h-4 w-4" />
-                                            Remove
+                                            Xóa
                                         </Button>
                                     </div>
                                 ))}
@@ -549,7 +549,7 @@ function AddProduct() {
                                 onClick={() => handleAddMore(setSizes, { name: '', price: '' })}
                             >
                                 <PlusCircle className="h-4 w-4" />
-                                Add Size
+                                Thêm Kích Cỡ
                             </Button>
                         </CardContent>
                     </Card>
@@ -558,29 +558,29 @@ function AddProduct() {
                         <CardHeader>
                             <CardTitle className="flex items-center gap-2 text-lg font-semibold text-slate-900">
                                 <Palette className="h-5 w-5" />
-                                Colors
+                                Màu Sắc
                             </CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-4">
                             <div className="space-y-4">
                                 {colors.length === 0 && (
-                                    <p className="text-sm text-muted-foreground">No color variants added.</p>
+                                    <p className="text-sm text-muted-foreground">Chưa thêm biến thể màu sắc.</p>
                                 )}
 
                                 {colors.map((color, index) => (
                                     <div key={`color-${index}`} className="grid gap-4 rounded-lg border border-slate-200 p-4 sm:grid-cols-[1fr_1fr_1fr_auto]">
                                         <div className="space-y-2">
-                                            <Label htmlFor={`color-name-${index}`}>Name</Label>
+                                            <Label htmlFor={`color-name-${index}`}>Tên</Label>
                                             <Input
                                                 id={`color-name-${index}`}
                                                 type="text"
                                                 value={color.name || ''}
                                                 onChange={(event) => handleInputChange(index, 'name', event.target.value, setColors)}
-                                                placeholder="Forest green"
+                                                placeholder="Xanh rừng"
                                             />
                                         </div>
                                         <div className="space-y-2">
-                                            <Label htmlFor={`color-code-${index}`}>Hex Code</Label>
+                                            <Label htmlFor={`color-code-${index}`}>Mã Màu</Label>
                                             <Input
                                                 id={`color-code-${index}`}
                                                 type="text"
@@ -590,7 +590,7 @@ function AddProduct() {
                                             />
                                         </div>
                                         <div className="space-y-2">
-                                            <Label htmlFor={`color-image-${index}`}>Image</Label>
+                                            <Label htmlFor={`color-image-${index}`}>Ảnh</Label>
                                             <Input
                                                 id={`color-image-${index}`}
                                                 type="file"
@@ -598,7 +598,7 @@ function AddProduct() {
                                             />
                                         </div>
                                         <div className="space-y-2">
-                                            <Label>Preview</Label>
+                                            <Label>Xem Trước</Label>
                                             <div className="flex h-20 w-full items-center justify-center rounded-md border border-dashed border-slate-200 bg-white">
                                                 <img
                                                     src={color.image?.preview || 'https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png'}
@@ -614,7 +614,7 @@ function AddProduct() {
                                             onClick={() => handleRemove(index, setColors)}
                                         >
                                             <Trash2 className="h-4 w-4" />
-                                            Remove
+                                            Xóa
                                         </Button>
                                     </div>
                                 ))}
@@ -625,7 +625,7 @@ function AddProduct() {
                                 onClick={() => handleAddMore(setColors, { name: '', color_code: '', image: null })}
                             >
                                 <PlusCircle className="h-4 w-4" />
-                                Add Color
+                                Thêm Màu
                             </Button>
                         </CardContent>
                     </Card>
@@ -635,12 +635,12 @@ function AddProduct() {
                             {isLoading ? (
                                 <>
                                     <Loader2 className="h-4 w-4 animate-spin" />
-                                    Creating...
+                                    Đang tạo...
                                 </>
                             ) : (
                                 <>
                                     <CheckCircle2 className="h-4 w-4" />
-                                    Create Product
+                                    Tạo Sản Phẩm
                                 </>
                             )}
                         </Button>

@@ -49,9 +49,9 @@ function Reviews() {
         <Sidebar />
         <div className="flex-1 space-y-8">
           <header className="space-y-2">
-            <h1 className="text-2xl font-semibold text-slate-900">Reviews & Ratings</h1>
+            <h1 className="text-2xl font-semibold text-slate-900">Đánh Giá & Xếp Hạng</h1>
             <p className="text-sm text-muted-foreground">
-              Monitor customer feedback and respond to maintain healthy relationships.
+              Theo dõi phản hồi của khách hàng và phản hồi để duy trì mối quan hệ tốt.
             </p>
           </header>
 
@@ -64,7 +64,7 @@ function Reviews() {
                       <div className="h-32 w-32 overflow-hidden rounded-full border border-slate-200 bg-white shadow-sm">
                         <img
                           src={review?.profile?.image}
-                          alt={`${review?.profile?.full_name || 'Customer'} avatar`}
+                          alt={`${review?.profile?.full_name || 'Khách hàng'} avatar`}
                           className="h-full w-full object-cover"
                         />
                       </div>
@@ -74,19 +74,19 @@ function Reviews() {
                       <div className="flex flex-wrap items-center justify-between gap-3">
                         <div>
                           <p className="text-base font-semibold text-slate-900">
-                            {review?.profile?.full_name || 'Customer'}
+                            {review?.profile?.full_name || 'Khách hàng'}
                           </p>
-                          <p className="text-sm text-muted-foreground">{review?.profile?.email || 'No email provided'}</p>
+                          <p className="text-sm text-muted-foreground">{review?.profile?.email || 'Không có email'}</p>
                         </div>
                         <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100">
                           <MessageSquare className="mr-1 h-3.5 w-3.5" />
-                          {review?.product?.title || 'Unknown product'}
+                          {review?.product?.title || 'Sản phẩm không rõ'}
                         </Badge>
                       </div>
 
                       <div className="space-y-3">
                         <div className="flex items-center gap-2">
-                          <span className="text-sm font-medium text-slate-700">Rating</span>
+                          <span className="text-sm font-medium text-slate-700">Đánh Giá</span>
                           <div className="flex items-center gap-1">
                             {renderStars(Number(review?.rating) || 0)}
                           </div>
@@ -94,16 +94,16 @@ function Reviews() {
                         </div>
 
                         <div className="space-y-1">
-                          <p className="text-sm font-medium text-slate-700">Review</p>
-                          <p className="text-sm leading-relaxed text-slate-600">{review?.review || 'No review text provided.'}</p>
+                          <p className="text-sm font-medium text-slate-700">Nhận Xét</p>
+                          <p className="text-sm leading-relaxed text-slate-600">{review?.review || 'Không có nhận xét.'}</p>
                         </div>
 
                         <div className="space-y-1">
-                          <p className="text-sm font-medium text-slate-700">Seller Reply</p>
+                          <p className="text-sm font-medium text-slate-700">Phản Hồi Của Người Bán</p>
                           {review?.reply ? (
                             <p className="text-sm leading-relaxed text-slate-600">{review.reply}</p>
                           ) : (
-                            <p className="text-sm text-muted-foreground">No response yet.</p>
+                            <p className="text-sm text-muted-foreground">Chưa có phản hồi.</p>
                           )}
                         </div>
                       </div>
@@ -111,7 +111,7 @@ function Reviews() {
                       <div className="flex flex-wrap items-center gap-3">
                         <Button asChild variant="outline">
                           <Link to={`/vendor/reviews/${review.id}/`}>
-                            <Eye className="mr-2 h-4 w-4" /> View review
+                            <Eye className="mr-2 h-4 w-4" /> Xem đánh giá
                           </Link>
                         </Button>
                       </div>
@@ -122,11 +122,11 @@ function Reviews() {
             ) : (
               <Card className="border-0 shadow-sm">
                 <CardHeader>
-                  <CardTitle className="text-lg font-semibold text-slate-900">No reviews yet</CardTitle>
+                  <CardTitle className="text-lg font-semibold text-slate-900">Chưa có đánh giá</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-muted-foreground">
-                    Customer feedback will appear here once shoppers start leaving reviews for your products.
+                    Phản hồi của khách hàng sẽ xuất hiện ở đây khi khách hàng bắt đầu đánh giá sản phẩm của bạn.
                   </p>
                 </CardContent>
               </Card>

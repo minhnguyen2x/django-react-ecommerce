@@ -28,13 +28,13 @@ import VendorLayout from './VendorLayout'
 import { deleteProduct } from '../plugin/DeleteProduct'
 
 const FILTER_OPTIONS = [
-    { value: 'no-filter', label: 'No Filter' },
-    { value: 'published', label: 'Status: Published' },
-    { value: 'draft', label: 'Status: Draft' },
-    { value: 'in-review', label: 'Status: In Review' },
-    { value: 'disabled', label: 'Status: Disabled' },
-    { value: 'latest', label: 'Date: Latest' },
-    { value: 'oldest', label: 'Date: Oldest' }
+    { value: 'no-filter', label: 'Không Lọc' },
+    { value: 'published', label: 'Trạng Thái: Đã Đăng' },
+    { value: 'draft', label: 'Trạng Thái: Bản Nháp' },
+    { value: 'in-review', label: 'Trạng Thái: Đang Duyệt' },
+    { value: 'disabled', label: 'Trạng Thái: Vô Hiệu' },
+    { value: 'latest', label: 'Ngày: Mới Nhất' },
+    { value: 'oldest', label: 'Ngày: Cũ Nhất' }
 ]
 
 const STATUS_STYLES = {
@@ -124,13 +124,13 @@ function Products() {
     )
 
     const activeFilterLabel = useMemo(() => {
-        return FILTER_OPTIONS.find((option) => option.value === activeFilter)?.label || 'No Filter'
+        return FILTER_OPTIONS.find((option) => option.value === activeFilter)?.label || 'Không Lọc'
     }, [activeFilter])
 
     return (
         <VendorLayout
-            title="Products"
-            description="Filter, inspect, and manage the products in your catalog."
+            title="Sản Phẩm"
+            description="Lọc, kiểm tra và quản lý các sản phẩm trong danh mục của bạn."
             actions={
                 <div className="flex flex-wrap items-center gap-2">
                     <DropdownMenu>
@@ -141,7 +141,7 @@ function Products() {
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-48">
-                            <DropdownMenuLabel>Filter Products</DropdownMenuLabel>
+                            <DropdownMenuLabel>Lọc Sản Phẩm</DropdownMenuLabel>
                             <DropdownMenuSeparator />
                             {FILTER_OPTIONS.map((option) => (
                                 <DropdownMenuItem
@@ -156,7 +156,7 @@ function Products() {
                     <Button asChild size="sm" className="gap-2">
                         <Link to="/vendor/product/new/">
                             <Plus className="h-4 w-4" />
-                            Add Product
+                            Thêm Sản Phẩm
                         </Link>
                     </Button>
                 </div>
@@ -164,19 +164,19 @@ function Products() {
         >
             <Card>
                 <CardHeader>
-                    <CardTitle>Product Overview</CardTitle>
+                    <CardTitle>Tổng Quan Sản Phẩm</CardTitle>
                 </CardHeader>
                 <CardContent>
                     <Table>
                         <TableHeader>
                             <TableRow>
-                                <TableHead className="w-[12%]">SKU</TableHead>
-                                <TableHead>Name</TableHead>
-                                <TableHead className="w-[12%]">Price</TableHead>
-                                <TableHead className="w-[12%]">Quantity</TableHead>
-                                <TableHead className="w-[12%]">Orders</TableHead>
-                                <TableHead className="w-[14%]">Status</TableHead>
-                                <TableHead className="text-right">Action</TableHead>
+                                <TableHead className="w-[12%]">Mã SP</TableHead>
+                                <TableHead>Tên</TableHead>
+                                <TableHead className="w-[12%]">Giá</TableHead>
+                                <TableHead className="w-[12%]">Số Lượng</TableHead>
+                                <TableHead className="w-[12%]">Đơn Hàng</TableHead>
+                                <TableHead className="w-[14%]">Trạng Thái</TableHead>
+                                <TableHead className="text-right">Hành Động</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -196,7 +196,7 @@ function Products() {
                                                     variant="outline"
                                                     className={cn('capitalize', STATUS_STYLES[status] || 'border-transparent bg-slate-200 text-slate-600')}
                                                 >
-                                                    {product?.status || 'Unknown'}
+                                                    {product?.status || 'Không rõ'}
                                                 </Badge>
                                             </TableCell>
                                             <TableCell>
@@ -226,7 +226,7 @@ function Products() {
                             ) : (
                                 <TableRow>
                                     <TableCell colSpan={7} className="py-6 text-center text-sm text-slate-500">
-                                        No products yet
+                                        Chưa có sản phẩm
                                     </TableCell>
                                 </TableRow>
                             )}

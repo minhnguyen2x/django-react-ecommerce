@@ -134,13 +134,13 @@ function Coupon() {
     const statCards = useMemo(
         () => [
             {
-                label: 'Total Coupons',
+                label: 'Tổng Mã Giảm Giá',
                 value: stats.total_coupons || 0,
                 icon: Tag,
                 accent: 'bg-sky-500/10 text-sky-600'
             },
             {
-                label: 'Active Coupons',
+                label: 'Mã Đang Hoạt Động',
                 value: stats.active_coupons || 0,
                 icon: CheckCircle2,
                 accent: 'bg-emerald-500/10 text-emerald-600'
@@ -151,52 +151,52 @@ function Coupon() {
 
     return (
         <VendorLayout
-            title="Coupons"
-            description="Create and manage discount codes for your customers."
+            title="Mã Giảm Giá"
+            description="Tạo và quản lý mã giảm giá cho khách hàng của bạn."
             actions={
                 <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
                     <DialogTrigger asChild>
                         <Button size="sm" className="gap-2">
                             <Plus className="h-4 w-4" />
-                            Create Coupon
+                            Tạo Mã Giảm Giá
                         </Button>
                     </DialogTrigger>
                     <DialogContent>
                         <DialogHeader>
-                            <DialogTitle>Create New Coupon</DialogTitle>
-                            <DialogDescription>Provide a code and discount percentage.</DialogDescription>
+                            <DialogTitle>Tạo Mã Giảm Giá Mới</DialogTitle>
+                            <DialogDescription>Cung cấp mã và phần trăm giảm giá.</DialogDescription>
                         </DialogHeader>
                         <form onSubmit={handleCreateCoupon} className="space-y-4">
                             <div className="space-y-2">
-                                <Label htmlFor="coupon-code">Code</Label>
+                                <Label htmlFor="coupon-code">Mã</Label>
                                 <Input
                                     id="coupon-code"
                                     name="code"
-                                    placeholder="E.g DESTINY2025"
+                                    placeholder="Ví dụ: DESTINY2025"
                                     value={formState.code}
                                     onChange={(event) =>
                                         setFormState((prev) => ({ ...prev, code: event.target.value }))
                                     }
                                     required
                                 />
-                                <p className="text-xs text-muted-foreground">Use unique, easy-to-remember codes.</p>
+                                <p className="text-xs text-muted-foreground">Sử dụng mã dễ nhớ và duy nhất.</p>
                             </div>
                             <div className="space-y-2">
-                                <Label htmlFor="coupon-discount">Discount (%)</Label>
+                                <Label htmlFor="coupon-discount">Giảm Giá (%)</Label>
                                 <Input
                                     id="coupon-discount"
                                     name="discount"
                                     type="number"
                                     min="0"
                                     max="100"
-                                    placeholder="Enter percentage"
+                                    placeholder="Nhập phần trăm"
                                     value={formState.discount}
                                     onChange={(event) =>
                                         setFormState((prev) => ({ ...prev, discount: event.target.value }))
                                     }
                                     required
                                 />
-                                <p className="text-xs text-muted-foreground">Discount is applied as a percentage.</p>
+                                <p className="text-xs text-muted-foreground">Giảm giá được áp dụng theo phần trăm.</p>
                             </div>
                             <div className="flex items-center gap-2">
                                 <Checkbox
@@ -208,12 +208,12 @@ function Coupon() {
                                     }
                                 />
                                 <Label htmlFor="coupon-active" className="text-sm font-medium">
-                                    Activate immediately
+                                    Kích hoạt ngay lập tức
                                 </Label>
                             </div>
                             <DialogFooter>
                                 <Button type="submit" disabled={isSubmitting} className="gap-2">
-                                    {isSubmitting ? 'Creating…' : 'Create Coupon'}
+                                    {isSubmitting ? 'Đang tạo...' : 'Tạo Mã Giảm Giá'}
                                     <BadgeCheck className="h-4 w-4" />
                                 </Button>
                             </DialogFooter>
@@ -241,17 +241,17 @@ function Coupon() {
             <section className="space-y-4">
                 <Card>
                     <CardHeader>
-                        <CardTitle>Coupon List</CardTitle>
+                        <CardTitle>Danh Sách Mã Giảm Giá</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <Table>
                             <TableHeader>
                                 <TableRow>
-                                    <TableHead className="w-[20%]">Code</TableHead>
-                                    <TableHead className="w-[15%]">Type</TableHead>
-                                    <TableHead className="w-[20%]">Discount</TableHead>
-                                    <TableHead className="w-[20%]">Status</TableHead>
-                                    <TableHead className="text-right">Actions</TableHead>
+                                    <TableHead className="w-[20%]">Mã</TableHead>
+                                    <TableHead className="w-[15%]">Loại</TableHead>
+                                    <TableHead className="w-[20%]">Giảm Giá</TableHead>
+                                    <TableHead className="w-[20%]">Trạng Thái</TableHead>
+                                    <TableHead className="text-right">Hành Động</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
@@ -261,7 +261,7 @@ function Coupon() {
                                             <TableCell className="font-medium">{coupon.code}</TableCell>
                                             <TableCell className="flex items-center gap-2">
                                                 <Percent className="h-4 w-4 text-slate-400" />
-                                                Percentage
+                                                Phần Trăm
                                             </TableCell>
                                             <TableCell>{coupon.discount}%</TableCell>
                                             <TableCell>
@@ -274,7 +274,7 @@ function Coupon() {
                                                     )}
                                                 >
                                                     <CheckCircle2 className="h-3.5 w-3.5" />
-                                                    {coupon.active ? 'Active' : 'Inactive'}
+                                                    {coupon.active ? 'Đang hoạt động' : 'Không hoạt động'}
                                                 </span>
                                             </TableCell>
                                             <TableCell className="flex justify-end gap-2">
@@ -292,7 +292,7 @@ function Coupon() {
                                 ) : (
                                     <TableRow>
                                         <TableCell colSpan={5} className="py-6 text-center text-sm text-slate-500">
-                                            No coupons yet
+                                            Chưa có mã giảm giá
                                         </TableCell>
                                     </TableRow>
                                 )}

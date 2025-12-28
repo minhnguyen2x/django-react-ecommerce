@@ -105,7 +105,7 @@ function Dashboard() {
     labels: orderMonths,
     datasets: [
       {
-        label: 'Total Orders',
+        label: 'Tổng Đơn Hàng',
         data: orderCounts,
         fill: true,
         backgroundColor: 'rgba(37, 99, 235, 0.2)',
@@ -118,7 +118,7 @@ function Dashboard() {
     labels: productLabels,
     datasets: [
       {
-        label: 'Total Products',
+        label: 'Tổng Sản Phẩm',
         data: productCounts,
         fill: true,
         backgroundColor: 'rgba(8, 145, 178, 0.2)',
@@ -129,19 +129,19 @@ function Dashboard() {
 
   const statCards = [
     {
-      label: 'Products',
+      label: 'Sản Phẩm',
       value: stats?.products || 0,
       icon: LayoutGrid,
       accent: 'bg-sky-500/10 text-sky-600'
     },
     {
-      label: 'Orders',
+      label: 'Đơn Hàng',
       value: stats?.orders || 0,
       icon: ShoppingCart,
       accent: 'bg-emerald-500/10 text-emerald-600'
     },
     {
-      label: 'Revenue',
+      label: 'Doanh Thu',
       value: `$${stats?.revenue || 0}`,
       icon: DollarSign,
       accent: 'bg-amber-500/10 text-amber-600'
@@ -150,13 +150,13 @@ function Dashboard() {
 
   return (
     <VendorLayout
-      title="Vendor Dashboard"
-      description="Track performance, orders, and manage your catalogue."
+      title="Bảng Điều Khiển Nhà Bán"
+      description="Theo dõi hiệu suất, đơn hàng và quản lý danh mục của bạn."
       actions={
         <div className="flex gap-2">
-          <Button variant="outline">Daily Report</Button>
-          <Button variant="outline">Monthly Report</Button>
-          <Button variant="outline">Yearly Report</Button>
+          <Button variant="outline">Báo Cáo Hàng Ngày</Button>
+          <Button variant="outline">Báo Cáo Hàng Tháng</Button>
+          <Button variant="outline">Báo Cáo Hàng Năm</Button>
         </div>
       }
     >
@@ -179,7 +179,7 @@ function Dashboard() {
       <section className="grid gap-4 lg:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle>Orders Trend</CardTitle>
+            <CardTitle>Xu Hướng Đơn Hàng</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="h-[320px]">
@@ -189,7 +189,7 @@ function Dashboard() {
         </Card>
         <Card>
           <CardHeader>
-            <CardTitle>Products Trend</CardTitle>
+            <CardTitle>Xu Hướng Sản Phẩm</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="h-[320px]">
@@ -201,19 +201,19 @@ function Dashboard() {
 
       <section className="space-y-4">
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-slate-900">Inventory & Orders</h2>
+          <h2 className="text-lg font-semibold text-slate-900">Kho Hàng & Đơn Hàng</h2>
           <div className="flex gap-2">
             <Button
               variant={activeTab === 'products' ? 'default' : 'ghost'}
               onClick={() => setActiveTab('products')}
             >
-              Products
+              Sản Phẩm
             </Button>
             <Button
               variant={activeTab === 'orders' ? 'default' : 'ghost'}
               onClick={() => setActiveTab('orders')}
             >
-              Orders
+              Đơn Hàng
             </Button>
           </div>
         </div>
@@ -221,19 +221,19 @@ function Dashboard() {
         {activeTab === 'products' && (
           <Card>
             <CardHeader>
-              <CardTitle>Products</CardTitle>
+              <CardTitle>Sản Phẩm</CardTitle>
             </CardHeader>
             <CardContent>
               <Table>
                 <TableHeader>
                   <TableRow>
                     <TableHead>#ID</TableHead>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Price</TableHead>
-                    <TableHead>Quantity</TableHead>
-                    <TableHead>Orders</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead className="text-right">Action</TableHead>
+                    <TableHead>Tên</TableHead>
+                    <TableHead>Giá</TableHead>
+                    <TableHead>Số Lượng</TableHead>
+                    <TableHead>Đơn Hàng</TableHead>
+                    <TableHead>Trạng Thái</TableHead>
+                    <TableHead className="text-right">Hành Động</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -264,7 +264,7 @@ function Dashboard() {
                   ) : (
                     <TableRow>
                       <TableCell colSpan={7} className="py-6 text-center text-sm text-slate-500">
-                        No products yet
+                        Chưa có sản phẩm
                       </TableCell>
                     </TableRow>
                   )}
@@ -277,17 +277,17 @@ function Dashboard() {
         {activeTab === 'orders' && (
           <Card>
             <CardHeader>
-              <CardTitle>Orders</CardTitle>
+              <CardTitle>Đơn Hàng</CardTitle>
             </CardHeader>
             <CardContent>
               <Table>
                 <TableHeader>
                   <TableRow>
                     <TableHead>#ID</TableHead>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Date</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead className="text-right">Action</TableHead>
+                    <TableHead>Tên</TableHead>
+                    <TableHead>Ngày</TableHead>
+                    <TableHead>Trạng Thái</TableHead>
+                    <TableHead className="text-right">Hành Động</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -310,7 +310,7 @@ function Dashboard() {
                   ) : (
                     <TableRow>
                       <TableCell colSpan={5} className="py-6 text-center text-sm text-slate-500">
-                        No orders yet
+                        Chưa có đơn hàng
                       </TableCell>
                     </TableRow>
                   )}

@@ -19,18 +19,18 @@ import UserData from '../plugin/UserData'
 import VendorLayout from './VendorLayout'
 
 const MONTH_LABELS = [
-  'January',
-  'February',
-  'March',
-  'April',
-  'May',
-  'June',
-  'July',
-  'August',
-  'September',
-  'October',
-  'November',
-  'December'
+  'Tháng 1',
+  'Tháng 2',
+  'Tháng 3',
+  'Tháng 4',
+  'Tháng 5',
+  'Tháng 6',
+  'Tháng 7',
+  'Tháng 8',
+  'Tháng 9',
+  'Tháng 10',
+  'Tháng 11',
+  'Tháng 12'
 ]
 
 function Earning() {
@@ -74,7 +74,7 @@ function Earning() {
       labels: sorted.map((item) => MONTH_LABELS[(item.month || 1) - 1]),
       datasets: [
         {
-          label: 'Revenue Analytics',
+          label: 'Phân Tích Doanh Thu',
           data: sorted.map((item) => Number(item.total_earning || 0)),
           fill: true,
           backgroundColor: 'rgba(14, 116, 144, 0.15)',
@@ -89,12 +89,12 @@ function Earning() {
   const revenueCards = useMemo(
     () => [
       {
-        label: 'Total Revenue',
+        label: 'Tổng Doanh Thu',
         value: `$${Number(earningStats.total_revenue || 0).toFixed(2)}`,
         accent: 'bg-emerald-500/10 text-emerald-600'
       },
       {
-        label: 'Monthly Revenue',
+        label: 'Doanh Thu Tháng',
         value: `$${Number(earningStats.monthly_revenue || 0).toFixed(2)}`,
         accent: 'bg-sky-500/10 text-sky-600'
       }
@@ -104,12 +104,12 @@ function Earning() {
 
   return (
     <VendorLayout
-      title="Earning & Revenue"
-      description="Track your revenue performance across months."
+      title="Thu Nhập & Doanh Thu"
+      description="Theo dõi hiệu suất doanh thu của bạn theo tháng."
       actions={
         <Button variant="outline" size="sm" className="gap-2" disabled>
           <TrendingUp className="h-4 w-4" />
-          Reports coming soon
+          Báo cáo sắp ra mắt
         </Button>
       }
     >
@@ -132,15 +132,15 @@ function Earning() {
       <section className="grid gap-4 lg:grid-cols-2">
         <Card className="lg:col-span-1">
           <CardHeader>
-            <CardTitle>Revenue Tracker</CardTitle>
+            <CardTitle>Theo Dõi Doanh Thu</CardTitle>
           </CardHeader>
           <CardContent>
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Month</TableHead>
-                  <TableHead>Sales</TableHead>
-                  <TableHead>Revenue</TableHead>
+                  <TableHead>Tháng</TableHead>
+                  <TableHead>Doanh Số</TableHead>
+                  <TableHead>Doanh Thu</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -157,7 +157,7 @@ function Earning() {
                 ) : (
                   <TableRow>
                     <TableCell colSpan={3} className="py-6 text-center text-sm text-slate-500">
-                      No revenue data yet
+                      Chưa có dữ liệu doanh thu
                     </TableCell>
                   </TableRow>
                 )}
@@ -168,7 +168,7 @@ function Earning() {
 
         <Card className="lg:col-span-1">
           <CardHeader>
-            <CardTitle>Revenue Analytics</CardTitle>
+            <CardTitle>Phân Tích Doanh Thu</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="h-[320px]">
