@@ -24,6 +24,7 @@ function PaymentSuccess() {
     const urlParams = useMemo(() => new URLSearchParams(window.location.search), [])
     const sessionId = urlParams.get('session_id')
     const payaplOrderId = urlParams.get('payapl_order_id')
+    const paymentMethod = urlParams.get('payment_method')
 
     useEffect(() => {
         if (!params?.order_oid) {
@@ -52,6 +53,7 @@ function PaymentSuccess() {
             formData.append('order_oid', params.order_oid)
             formData.append('session_id', sessionId)
             formData.append('payapl_order_id', payaplOrderId)
+            formData.append('payment_method', paymentMethod || 'null')
 
             try {
                 setIsLoading(true)

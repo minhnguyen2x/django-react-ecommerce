@@ -126,6 +126,7 @@ PAYMENT_METHOD = (
     ("Paypal", "Paypal"),
     ("Credit/Debit Card", "Credit/Debit Card"),
     ("Wallet Points", "Wallet Points"),
+    ("Pay on Delivery", "Pay on Delivery"),
     
 )
 

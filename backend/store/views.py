@@ -188,7 +188,7 @@ class CartListView(generics.ListAPIView):
         
         if user_id is not None:
             user = User.objects.get(id=user_id)
-            queryset = Cart.objects.filter(Q(user=user, cart_id=cart_id) | Q(user=user))
+            queryset = Cart.objects.filter(cart_id=cart_id, user=user)
         else:
             queryset = Cart.objects.filter(cart_id=cart_id)
         
@@ -507,6 +507,85 @@ class StripeCheckoutView(generics.CreateAPIView):
             return Response( {'error': f'Something went wrong when creating stripe checkout session: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+class PayOnDeliveryView(generics.CreateAPIView):
+    serializer_class = CartOrderSerializer
+
+    def create(self, request, *args, **kwargs):
+        order_oid = self.kwargs['order_oid']
+        order = CartOrder.objects.filter(oid=order_oid).first()
+
+        if not order:
+            return Response({'error': 'Order not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        # For Pay on Delivery, we accept both newly created (initiated) and processing states
+        # Transition initiated -> processing once, otherwise keep processing as idempotent
+        if order.payment_status == "initiated":
+            order.payment_status = "processing"
+            order.save()
+
+            # Send notification to buyer
+            if order.buyer != None:
+                send_notification(user=order.buyer, order=order)
+
+            # Get order items
+            order_items = CartOrderItem.objects.filter(order=order)
+
+            # Send confirmation email to customer
+            merge_data = {
+                'order': order,
+                'order_items': order_items,
+            }
+            subject = "Order Placed Successfully - Pay on Delivery"
+            text_body = render_to_string("email/customer_order_confirmation.txt", merge_data)
+            html_body = render_to_string("email/customer_order_confirmation.html", merge_data)
+
+            msg = EmailMultiAlternatives(
+                subject=subject, from_email=settings.FROM_EMAIL,
+                to=[order.email], body=text_body
+            )
+            msg.attach_alternative(html_body, "text/html")
+            msg.send()
+
+            # Send notification to vendors
+            for o in order_items:
+                send_notification(vendor=o.vendor, order=order, order_item=o)
+
+                merge_data = {
+                    'order': order,
+                    'order_items': order_items,
+                }
+                subject = "New Sale - Pay on Delivery!"
+                text_body = render_to_string("email/vendor_order_sale.txt", merge_data)
+                html_body = render_to_string("email/vendor_order_sale.html", merge_data)
+
+                msg = EmailMultiAlternatives(
+                    subject=subject, from_email=settings.FROM_EMAIL,
+                    to=[o.vendor.email], body=text_body
+                )
+                msg.attach_alternative(html_body, "text/html")
+                msg.send()
+
+            # Return JSON so frontend can navigate within SPA
+            return Response(
+                {
+                    "message": "Pay on Delivery initiated",
+                    "redirect_url": f"{settings.SITE_URL}/payment-success/{order.oid}/?payment_method=cod"
+                },
+                status=status.HTTP_201_CREATED
+            )
+        elif order.payment_status == "processing":
+            # Already in processing, treat as idempotent success without re-sending emails
+            return Response(
+                {
+                    "message": "Pay on Delivery already initiated",
+                    "redirect_url": f"{settings.SITE_URL}/payment-success/{order.oid}/?payment_method=cod"
+                },
+                status=status.HTTP_200_OK
+            )
+        else:
+            return Response({'error': 'Order already processed'}, status=status.HTTP_400_BAD_REQUEST)
+
+
 def get_access_token(client_id, secret_key):
     # Function to get access token from PayPal API
     token_url = 'https://api.sandbox.paypal.com/v1/oauth2/token'
@@ -530,11 +609,27 @@ class PaymentSuccessView(generics.CreateAPIView):
         payload = request.data
         
         order_oid = payload['order_oid']
-        session_id = payload['session_id']
-        payapl_order_id = payload['payapl_order_id']
+        session_id = payload.get('session_id', 'null')
+        payapl_order_id = payload.get('payapl_order_id', 'null')
+        payment_method = payload.get('payment_method', 'null')
 
         order = CartOrder.objects.get(oid=order_oid)
         order_items = CartOrderItem.objects.filter(order=order)
+
+        # Handle Pay on Delivery / Cash on Delivery
+        if payment_method == "cod":
+            if order.payment_status == "processing":
+                # For COD, we keep payment status as processing until payment is verified
+                # It will be updated to paid when order is delivered
+                if order.buyer != None:
+                    send_notification(user=order.buyer, order=order)
+
+                for o in order_items:
+                    send_notification(vendor=o.vendor, order=order, order_item=o)
+
+                return Response({"message": "Payment Successfull"}, status=status.HTTP_201_CREATED)
+            else:
+                return Response({"message": "Already Paid"}, status=status.HTTP_201_CREATED)
 
         if payapl_order_id != "null":
             paypal_api_url = f'https://api-m.sandbox.paypal.com/v2/checkout/orders/{payapl_order_id}'

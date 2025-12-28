@@ -3,7 +3,7 @@ import { Link, useParams, useNavigate } from 'react-router-dom';
 import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
 import Swal from 'sweetalert2'
 import { API_BASE_URL, PAYPAL_CLIENT_ID, SERVER_URL } from '../../utils/constants';
-import { FaUser, FaMapMarkerAlt, FaCheckCircle, FaSpinner, FaCreditCard, FaLock } from 'react-icons/fa';
+import { FaUser, FaMapMarkerAlt, FaCheckCircle, FaSpinner, FaCreditCard, FaLock, FaTruck } from 'react-icons/fa';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -31,6 +31,19 @@ function Checkout() {
   let cart_id = CartID()
   const param = useParams()
   let navigate = useNavigate();
+
+  const computed = (order) => {
+    const items = Array.isArray(order?.orderitem) ? order.orderitem : []
+    const sum = (key) => items.reduce((acc, it) => acc + Number(it?.[key] || 0), 0)
+
+    const sub_total = Number(order?.sub_total ?? 0) || sum('sub_total')
+    const shipping_amount = Number(order?.shipping_amount ?? 0) || sum('shipping_amount')
+    const tax_fee = Number(order?.tax_fee ?? 0) || sum('tax_fee')
+    const service_fee = Number(order?.service_fee ?? 0) || sum('service_fee')
+    const total = Number(order?.total ?? 0) || sum('total')
+
+    return { sub_total, shipping_amount, tax_fee, service_fee, total }
+  }
 
 
 
@@ -108,6 +121,22 @@ function Checkout() {
   const payWithStripe = (event) => {
     setPaymentLoading(true)
     event.target.form.submit();
+  }
+
+  const payOnDelivery = async () => {
+    try {
+      setPaymentLoading(true)
+      await axios.post(`pay-on-delivery/${param?.order_oid}/`)
+      navigate(`/payment-success/${order.oid}/?payment_method=cod`)
+    } catch (error) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Không thể tạo thanh toán khi nhận hàng',
+        text: error?.response?.data?.error || 'Vui lòng thử lại.',
+      })
+    } finally {
+      setPaymentLoading(false)
+    }
   }
 
 
@@ -236,19 +265,19 @@ function Checkout() {
                 <div className="space-y-3">
                   <div className="flex justify-between text-muted-foreground">
                     <span>Tạm Tính</span>
-                    <span className="font-medium">${order.sub_total}</span>
+                    <span className="font-medium">${computed(order).sub_total}</span>
                   </div>
                   <div className="flex justify-between text-muted-foreground">
                     <span>Phí Vận Chuyển</span>
-                    <span className="font-medium">${order.shipping_amount}</span>
+                    <span className="font-medium">${computed(order).shipping_amount}</span>
                   </div>
                   <div className="flex justify-between text-muted-foreground">
                     <span>Thuế</span>
-                    <span className="font-medium">${order.tax_fee}</span>
+                    <span className="font-medium">${computed(order).tax_fee}</span>
                   </div>
                   <div className="flex justify-between text-muted-foreground">
                     <span>Phí Dịch Vụ</span>
-                    <span className="font-medium">${order.service_fee}</span>
+                    <span className="font-medium">${computed(order).service_fee}</span>
                   </div>
                 </div>
                 
@@ -256,7 +285,7 @@ function Checkout() {
                 
                 <div className="flex justify-between text-xl font-bold">
                   <span>Tổng Cộng</span>
-                  <span className="text-primary">${order.total}</span>
+                  <span className="text-primary">${computed(order).total}</span>
                 </div>
 
                 <Separator />
@@ -307,7 +336,7 @@ function Checkout() {
                   </h3>
                   
                   {/* Stripe Payment */}
-                  {paymentLoading === true ? (
+                  {/* {paymentLoading === true ? (
                     <form action={`${API_BASE_URL}stripe-checkout/${param?.order_oid}/`} method='POST'>
                       <Button
                         onClick={payWithStripe}
@@ -332,10 +361,10 @@ function Checkout() {
                         Thanh Toán Qua Stripe
                       </Button>
                     </form>
-                  )}
+                  )} */}
 
                   {/* PayPal Payment */}
-                  <PayPalScriptProvider options={initialOptions}>
+                  {/* <PayPalScriptProvider options={initialOptions}>
                     <PayPalButtons
                         createOrder={(data, actions) => {
                           return actions.order.create({
@@ -363,7 +392,27 @@ function Checkout() {
                           })
                         }}
                     />
-                  </PayPalScriptProvider>
+                  </PayPalScriptProvider> */}
+
+                  {/* Pay on Delivery */}
+                  <Button
+                    onClick={payOnDelivery}
+                    className="w-full py-6 text-lg"
+                    style={{ backgroundColor: "#10b981" }}
+                    disabled={paymentLoading}
+                  >
+                    {paymentLoading ? (
+                      <>
+                        <FaSpinner className="mr-2 animate-spin" />
+                        Đang Xử Lý...
+                      </>
+                    ) : (
+                      <>
+                        <FaTruck className="mr-2" />
+                        Thanh Toán Khi Nhận Hàng
+                      </>
+                    )}
+                  </Button>
                 </div>
               </CardContent>
             </Card>

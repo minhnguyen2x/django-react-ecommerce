@@ -44,7 +44,9 @@ class OrdersAPIView(generics.ListAPIView):
         user_id = self.kwargs['user_id']
         user = User.objects.get(id=user_id)
 
-        orders = CartOrder.objects.filter(buyer=user, payment_status="paid")
+        # Show orders with any successful payment status (paid, processing for COD)
+        # Exclude only failed/cancelled orders
+        orders = CartOrder.objects.filter(buyer=user).exclude(payment_status__in=["cancelled", "failed", "initiated"])
         return orders
     
 
@@ -59,7 +61,9 @@ class OrdersDetailAPIView(generics.RetrieveAPIView):
 
         user = User.objects.get(id=user_id)
 
-        order = CartOrder.objects.get(buyer=user, payment_status="paid", oid=order_oid)
+        # Allow all successful orders (paid, processing for COD, etc.)
+        # Exclude only failed/cancelled orders
+        order = CartOrder.objects.exclude(payment_status__in=["cancelled", "failed", "initiated"]).get(buyer=user, oid=order_oid)
         return order
     
 
