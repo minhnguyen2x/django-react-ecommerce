@@ -1,0 +1,584 @@
+// Django E-commerce Database Schema
+// Generated for use with https://dbml.dbdiagram.io/
+
+Project django_ecommerce {
+  database_type: 'PostgreSQL'
+  Note: 'Django React E-commerce Platform Database Schema'
+}
+
+// ====================================
+// USER AUTHENTICATION TABLES
+// ====================================
+
+Table userauths_user {
+  id integer [pk, increment]
+  password varchar(128) [not null]
+  last_login datetime
+  is_superuser boolean [not null, default: false]
+  first_name varchar(150)
+  last_name varchar(150)
+  is_staff boolean [not null, default: false]
+  is_active boolean [not null, default: true]
+  date_joined datetime [not null]
+  username varchar(500)
+  email varchar(254) [unique, not null]
+  full_name varchar(500)
+  phone varchar(500) [not null]
+  otp varchar(1000)
+  reset_token varchar(1000)
+  
+  Note: 'Custom user model extending Django AbstractUser'
+  Indexes {
+    email [unique]
+  }
+}
+
+Table userauths_profile {
+  id integer [pk, increment]
+  user_id integer [ref: - userauths_user.id, not null, unique]
+  image varchar(100)
+  full_name varchar(1000)
+  about text
+  gender varchar(500)
+  country varchar(1000)
+  city varchar(500)
+  state varchar(500)
+  address varchar(1000)
+  newsletter boolean [default: false]
+  type varchar(500)
+  date datetime
+  pid varchar(20) [unique, not null]
+  
+  Note: 'User profile information with one-to-one relationship to User'
+  Indexes {
+    pid [unique]
+    (user_id) [unique]
+  }
+}
+
+// ====================================
+// VENDOR TABLES
+// ====================================
+
+Table vendor_vendor {
+  id integer [pk, increment]
+  user_id integer [ref: - userauths_user.id]
+  image varchar(100)
+  name varchar(100)
+  email varchar(100)
+  description text
+  mobile varchar(150)
+  verified boolean [default: false]
+  active boolean [default: true]
+  vid varchar(20) [unique, not null]
+  date datetime [not null]
+  slug varchar(50) [unique]
+  
+  Note: 'Vendor/Shop information'
+  Indexes {
+    vid [unique]
+    slug [unique]
+  }
+}
+
+// ====================================
+// PRODUCT CATALOG TABLES
+// ====================================
+
+Table store_category {
+  id integer [pk, increment]
+  title varchar(100) [not null]
+  image varchar(100)
+  active boolean [default: true]
+  slug varchar(50) [unique]
+  
+  Note: 'Product categories'
+  Indexes {
+    slug [unique]
+  }
+}
+
+Table store_tag {
+  id integer [pk, increment]
+  title varchar(30) [not null]
+  category_id integer [ref: > store_category.id, not null]
+  active boolean [default: true]
+  slug varchar(30) [unique, not null]
+  
+  Note: 'Product tags associated with categories'
+  Indexes {
+    slug [unique]
+    category_id
+  }
+}
+
+Table store_brand {
+  id integer [pk, increment]
+  title varchar(100) [not null]
+  image varchar(100)
+  active boolean [default: true]
+  
+  Note: 'Product brands'
+}
+
+Table store_product {
+  id integer [pk, increment]
+  title varchar(100) [not null]
+  image varchar(100)
+  description text
+  category_id integer [ref: > store_category.id]
+  tags varchar(1000)
+  brand varchar(100)
+  price decimal(12,2) [default: 0.00, null]
+  old_price decimal(12,2) [default: 0.00, null]
+  shipping_amount decimal(12,2) [default: 0.00, not null]
+  stock_qty integer [default: 0, not null]
+  in_stock boolean [default: true, not null]
+  status varchar(50) [default: 'published', null]
+  type varchar(50) [default: 'regular', not null]
+  featured boolean [default: false]
+  hot_deal boolean [default: false]
+  special_offer boolean [default: false]
+  digital boolean [default: false]
+  views integer [default: 0, null]
+  orders integer [default: 0, null]
+  saved integer [default: 0, null]
+  rating integer [default: 0, null]
+  vendor_id integer [ref: > vendor_vendor.id]
+  sku varchar(50) [unique, not null]
+  pid varchar(20) [unique, not null]
+  slug varchar(50) [unique, null]
+  date datetime [not null]
+  
+  Note: 'Main product catalog table'
+  Indexes {
+    sku [unique]
+    pid [unique]
+    slug [unique]
+    category_id
+    vendor_id
+    status
+    type
+  }
+}
+
+Table store_gallery {
+  id integer [pk, increment]
+  product_id integer [ref: > store_product.id]
+  image varchar(100) [not null]
+  active boolean [default: true]
+  date datetime [not null]
+  gid varchar(25) [unique, not null]
+  
+  Note: 'Product gallery images'
+  Indexes {
+    gid [unique]
+    product_id
+  }
+}
+
+Table store_specification {
+  id integer [pk, increment]
+  product_id integer [ref: > store_product.id]
+  title varchar(100)
+  content varchar(1000)
+  
+  Note: 'Product specifications'
+  Indexes {
+    product_id
+  }
+}
+
+Table store_size {
+  id integer [pk, increment]
+  product_id integer [ref: > store_product.id]
+  name varchar(100)
+  price decimal(12,2) [default: 0.00, not null]
+  
+  Note: 'Product size variations'
+  Indexes {
+    product_id
+  }
+}
+
+Table store_color {
+  id integer [pk, increment]
+  product_id integer [ref: > store_product.id]
+  name varchar(100)
+  color_code varchar(100)
+  image varchar(100)
+  
+  Note: 'Product color variations'
+  Indexes {
+    product_id
+  }
+}
+
+Table store_productfaq {
+  id integer [pk, increment]
+  user_id integer [ref: > userauths_user.id]
+  pid varchar(20) [unique, not null]
+  product_id integer [ref: > store_product.id]
+  email varchar(254) [not null]
+  question varchar(1000) [not null]
+  answer varchar(10000)
+  active boolean [default: false]
+  date datetime [not null]
+  
+  Note: 'Product FAQs and Q&A'
+  Indexes {
+    pid [unique]
+    product_id
+    user_id
+  }
+}
+
+// ====================================
+// SHOPPING CART & ORDERS
+// ====================================
+
+Table store_cart {
+  id integer [pk, increment]
+  product_id integer [ref: > store_product.id, not null]
+  user_id integer [ref: > userauths_user.id]
+  qty integer [default: 0, null]
+  price decimal(12,2) [default: 0.00, null]
+  sub_total decimal(12,2) [default: 0.00, null]
+  shipping_amount decimal(12,2) [default: 0.00, null]
+  service_fee decimal(12,2) [default: 0.00, null]
+  tax_fee decimal(12,2) [default: 0.00, null]
+  total decimal(12,2) [default: 0.00, null]
+  country varchar(100)
+  size varchar(100)
+  color varchar(100)
+  cart_id varchar(1000)
+  date datetime [not null]
+  
+  Note: 'Shopping cart items'
+  Indexes {
+    product_id
+    user_id
+    cart_id
+  }
+}
+
+Table store_cartorder {
+  id integer [pk, increment]
+  buyer_id integer [ref: > userauths_user.id]
+  sub_total decimal(12,2) [default: 0.00, not null]
+  shipping_amount decimal(12,2) [default: 0.00, not null]
+  tax_fee decimal(12,2) [default: 0.00, not null]
+  service_fee decimal(12,2) [default: 0.00, not null]
+  total decimal(12,2) [default: 0.00, not null]
+  payment_status varchar(100) [default: 'initiated']
+  order_status varchar(100) [default: 'Pending']
+  initial_total decimal(12,2) [default: 0.00, not null]
+  saved decimal(12,2) [default: 0.00]
+  full_name varchar(1000) [not null]
+  email varchar(1000) [not null]
+  mobile varchar(1000) [not null]
+  address varchar(1000)
+  city varchar(1000)
+  state varchar(1000)
+  country varchar(1000)
+  stripe_session_id varchar(200)
+  oid varchar(25) [unique, not null]
+  date datetime [not null]
+  
+  Note: 'Main order table'
+  Indexes {
+    oid [unique]
+    buyer_id
+    payment_status
+    order_status
+  }
+}
+
+Table store_cartorder_vendor {
+  id integer [pk, increment]
+  cartorder_id integer [ref: > store_cartorder.id, not null]
+  vendor_id integer [ref: > vendor_vendor.id, not null]
+  
+  Note: 'Many-to-many relationship between orders and vendors'
+  Indexes {
+    (cartorder_id, vendor_id) [unique]
+  }
+}
+
+Table store_cartorder_coupons {
+  id integer [pk, increment]
+  cartorder_id integer [ref: > store_cartorder.id, not null]
+  coupon_id integer [ref: > store_coupon.id, not null]
+  
+  Note: 'Many-to-many relationship between orders and coupons'
+  Indexes {
+    (cartorder_id, coupon_id) [unique]
+  }
+}
+
+Table store_cartorderitem {
+  id integer [pk, increment]
+  order_id integer [ref: > store_cartorder.id, not null]
+  product_id integer [ref: > store_product.id, not null]
+  vendor_id integer [ref: > vendor_vendor.id]
+  delivery_couriers_id integer [ref: > store_deliverycouriers.id]
+  qty integer [default: 0, not null]
+  color varchar(100)
+  size varchar(100)
+  price decimal(12,2) [default: 0.00, not null]
+  sub_total decimal(12,2) [default: 0.00, not null]
+  shipping_amount decimal(12,2) [default: 0.00, not null]
+  tax_fee decimal(12,2) [default: 0.00, not null]
+  service_fee decimal(12,2) [default: 0.00, not null]
+  total decimal(12,2) [default: 0.00, not null]
+  expected_delivery_date_from date
+  expected_delivery_date_to date
+  initial_total decimal(12,2) [default: 0.00, not null]
+  saved decimal(12,2) [default: 0.00]
+  order_placed boolean [default: false]
+  processing_order boolean [default: false]
+  quality_check boolean [default: false]
+  product_shipped boolean [default: false]
+  product_arrived boolean [default: false]
+  product_delivered boolean [default: false]
+  delivery_status varchar(100) [default: 'On Hold']
+  tracking_id varchar(100000)
+  applied_coupon boolean [default: false]
+  oid varchar(25) [unique, not null]
+  date datetime [not null]
+  
+  Note: 'Individual items in an order'
+  Indexes {
+    oid [unique]
+    order_id
+    product_id
+    vendor_id
+    delivery_status
+  }
+}
+
+Table store_cartorderitem_coupon {
+  id integer [pk, increment]
+  cartorderitem_id integer [ref: > store_cartorderitem.id, not null]
+  coupon_id integer [ref: > store_coupon.id, not null]
+  
+  Note: 'Many-to-many relationship between order items and coupons'
+  Indexes {
+    (cartorderitem_id, coupon_id) [unique]
+  }
+}
+
+Table store_deliverycouriers {
+  id integer [pk, increment]
+  name varchar(1000)
+  tracking_website varchar(200)
+  url_parameter varchar(100)
+  
+  Note: 'Delivery courier companies'
+}
+
+// ====================================
+// REVIEWS & RATINGS
+// ====================================
+
+Table store_review {
+  id integer [pk, increment]
+  user_id integer [ref: > userauths_user.id]
+  product_id integer [ref: > store_product.id]
+  review text [not null]
+  reply varchar(1000)
+  rating integer
+  active boolean [default: false]
+  date datetime [not null]
+  
+  Note: 'Product reviews and ratings'
+  Indexes {
+    user_id
+    product_id
+    rating
+  }
+}
+
+Table store_review_helpful {
+  id integer [pk, increment]
+  review_id integer [ref: > store_review.id, not null]
+  user_id integer [ref: > userauths_user.id, not null]
+  
+  Note: 'Users who marked review as helpful'
+  Indexes {
+    (review_id, user_id) [unique]
+  }
+}
+
+Table store_review_not_helpful {
+  id integer [pk, increment]
+  review_id integer [ref: > store_review.id, not null]
+  user_id integer [ref: > userauths_user.id, not null]
+  
+  Note: 'Users who marked review as not helpful'
+  Indexes {
+    (review_id, user_id) [unique]
+  }
+}
+
+// ====================================
+// WISHLIST
+// ====================================
+
+Table store_wishlist {
+  id integer [pk, increment]
+  user_id integer [ref: > userauths_user.id]
+  product_id integer [ref: > store_product.id, not null]
+  date datetime [not null]
+  
+  Note: 'User wishlist items'
+  Indexes {
+    user_id
+    product_id
+  }
+}
+
+// ====================================
+// NOTIFICATIONS
+// ====================================
+
+Table store_notification {
+  id integer [pk, increment]
+  user_id integer [ref: > userauths_user.id]
+  vendor_id integer [ref: > vendor_vendor.id]
+  order_id integer [ref: > store_cartorder.id]
+  order_item_id integer [ref: > store_cartorderitem.id]
+  seen boolean [default: false]
+  date datetime [not null]
+  
+  Note: 'System notifications for users and vendors'
+  Indexes {
+    user_id
+    vendor_id
+    order_id
+    seen
+  }
+}
+
+// ====================================
+// ADDRESS
+// ====================================
+
+Table store_address {
+  id integer [pk, increment]
+  user_id integer [ref: > userauths_user.id]
+  full_name varchar(200) [not null]
+  mobile varchar(50) [not null]
+  email varchar(100) [not null]
+  country_id integer [ref: > addon_tax.id]
+  state varchar(100) [not null]
+  town_city varchar(100) [not null]
+  address varchar(100) [not null]
+  zip varchar(100) [not null]
+  status boolean [default: false]
+  same_as_billing_address boolean [default: false]
+  
+  Note: 'User saved addresses'
+  Indexes {
+    user_id
+    country_id
+  }
+}
+
+// ====================================
+// COUPONS & DISCOUNTS
+// ====================================
+
+Table store_coupon {
+  id integer [pk, increment]
+  vendor_id integer [ref: > vendor_vendor.id]
+  code varchar(1000) [not null]
+  discount integer [default: 1, not null]
+  date datetime [not null]
+  active boolean [default: true]
+  cid varchar(25) [unique, not null]
+  
+  Note: 'Discount coupons'
+  Indexes {
+    cid [unique]
+    vendor_id
+    active
+  }
+}
+
+Table store_coupon_used_by {
+  id integer [pk, increment]
+  coupon_id integer [ref: > store_coupon.id, not null]
+  user_id integer [ref: > userauths_user.id, not null]
+  
+  Note: 'Track which users have used coupons'
+  Indexes {
+    (coupon_id, user_id) [unique]
+  }
+}
+
+Table store_couponusers {
+  id integer [pk, increment]
+  coupon_id integer [ref: > store_coupon.id, not null]
+  order_id integer [ref: > store_cartorder.id, not null]
+  full_name varchar(1000) [not null]
+  email varchar(1000) [not null]
+  mobile varchar(1000) [not null]
+  
+  Note: 'Coupon usage history'
+  Indexes {
+    coupon_id
+    order_id
+  }
+}
+
+// ====================================
+// CANCELLED ORDERS
+// ====================================
+
+Table store_cancelledorder {
+  id integer [pk, increment]
+  user_id integer [ref: > userauths_user.id]
+  orderitem_id integer [ref: > store_cartorderitem.id]
+  email varchar(100) [not null]
+  refunded boolean [default: false]
+  
+  Note: 'Cancelled order tracking'
+  Indexes {
+    user_id
+    orderitem_id
+  }
+}
+
+// ====================================
+// ADDON / CONFIGURATION TABLES
+// ====================================
+
+Table addon_configsettings {
+  id integer [pk, increment]
+  view_more varchar(10) [default: 'View All']
+  currency_sign varchar(10) [default: '$']
+  currency_abbreviation varchar(10) [default: 'USD']
+  service_fee_percentage integer [default: 5]
+  service_fee_flat_rate decimal(12,2) [default: 0.70]
+  service_fee_charge_type varchar(30) [default: 'percentage']
+  enforce_2fa boolean [default: true]
+  activate_affiliate_system boolean [default: true]
+  send_email_notifications boolean [default: false]
+  
+  Note: 'Global platform configuration settings'
+}
+
+Table addon_tax {
+  id integer [pk, increment]
+  country varchar(500) [not null]
+  rate integer [default: 5]
+  active boolean [default: true]
+  date datetime [not null]
+  
+  Note: 'Tax rates by country'
+  Indexes {
+    country
+    active
+  }
+}
