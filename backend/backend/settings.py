@@ -218,15 +218,16 @@ REST_FRAMEWORK = {
     )
 }
 
-ANYMAIL = {
-    "MAILGUN_API_KEY": os.environ.get("MAILGUN_API_KEY"),
-    "MAILGUN_SENDER_DOMAIN": os.environ.get("MAILGUN_SENDER_DOMAIN"),
-}
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = env("EMAIL_HOST", "smtp.gmail.com")
+EMAIL_PORT = env.int("EMAIL_PORT", 587)
+EMAIL_HOST_USER = env("EMAIL_HOST_USER", "john.nguyen.professional@gmail.com")
+EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD")
+EMAIL_USE_TLS = True
 
-FROM_EMAIL = " desphixs@gmail.com"
-EMAIL_BACKEND = "anymail.backends.mailgun.EmailBackend"
-DEFAULT_FROM_EMAIL = " desphixs@gmail.com"
-SERVER_EMAIL = " desphixs@gmail.com"
+FROM_EMAIL = "john.nguyen.professional@gmail.com"
+DEFAULT_FROM_EMAIL = "john.nguyen.professional@gmail.com"
+SERVER_EMAIL = "john.nguyen.professional@gmail.com"
 
 CORS_ALLOW_ALL_ORIGINS = True
 
