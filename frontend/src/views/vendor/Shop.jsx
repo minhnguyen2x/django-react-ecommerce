@@ -223,13 +223,11 @@ function Shop() {
                                     </div>
                                     <CardHeader className="space-y-3">
                                         <CardTitle className="text-lg font-semibold text-slate-900">
-                                            <Link to={`/detail/${product.slug}`} className="hover:text-primary">
-                                                {product.title?.length > 50
-                                                    ? `${product.title.slice(0, 50)}...`
-                                                    : product.title}
+                                            <Link to={`/detail/${product.slug}`} className="hover:text-primary line-clamp-2 min-h-[3.5rem] block">
+                                                {product.title}
                                             </Link>
                                         </CardTitle>
-                                        <p className="text-sm text-muted-foreground">
+                                        <p className="text-sm text-muted-foreground truncate">
                                             <Link to="/" className="transition-colors hover:text-primary">
                                                 {product?.brand?.title}
                                             </Link>
@@ -243,134 +241,13 @@ function Shop() {
                                             </span>
                                         </div>
 
-                                        {hasVariations ? (
-                                            <Dialog
-                                                open={variationOpen && selectedProduct === product.id}
-                                                onOpenChange={(open) => {
-                                                    setVariationOpen(open)
-                                                    setSelectedProduct(open ? product.id : null)
-                                                    if (open) {
-                                                        setQtyValue(1)
-                                                    }
-                                                }}
-                                            >
-                                                <DialogTrigger asChild>
-                                                    <Button variant="outline" className="w-full justify-center">
-                                                        Choose Options
-                                                    </Button>
-                                                </DialogTrigger>
-                                                <DialogContent className="sm:max-w-lg">
-                                                    <DialogHeader>
-                                                        <DialogTitle>Select variations</DialogTitle>
-                                                    </DialogHeader>
-                                                    <div className="space-y-5">
-                                                        <div className="flex items-center gap-3">
-                                                            <div className="h-16 w-16 overflow-hidden rounded-md border">
-                                                                <img
-                                                                    src={productImage}
-                                                                    alt={product.title}
-                                                                    className="h-full w-full object-cover"
-                                                                />
-                                                            </div>
-                                                            <div className="space-y-1">
-                                                                <p className="text-sm font-medium text-slate-900">{product.title}</p>
-                                                                <p className="text-xs text-muted-foreground">
-                                                                    Shipping: {formatCurrency(product.shipping_amount)}
-                                                                </p>
-                                                            </div>
-                                                        </div>
-                                                        <Separator />
-
-                                                        <div className="space-y-2">
-                                                            <label className="text-sm font-medium text-slate-900" htmlFor={`quantity-${product.id}`}>
-                                                                Quantity
-                                                            </label>
-                                                            <Input
-                                                                id={`quantity-${product.id}`}
-                                                                type="number"
-                                                                min={1}
-                                                                value={selectedProduct === product.id ? qtyValue : 1}
-                                                                onChange={(event) => handleQtyChange(Number(event.target.value), product.id)}
-                                                            />
-                                                        </div>
-
-                                                        {product?.size && product.size.length > 0 && (
-                                                            <div className="space-y-3">
-                                                                <p className="text-sm font-medium text-slate-900">
-                                                                    Size: {selectedSizes[product.id] || 'Select a size'}
-                                                                </p>
-                                                                <div className="flex flex-wrap gap-2">
-                                                                    {product.size.map((size) => {
-                                                                        const isActive = selectedSizes[product.id] === size.name
-                                                                        return (
-                                                                            <Button
-                                                                                key={size.id || size.name}
-                                                                                type="button"
-                                                                                variant={isActive ? 'default' : 'outline'}
-                                                                                size="sm"
-                                                                                className={cn('uppercase')}
-                                                                                onClick={() => handleSizeSelect(product.id, size.name)}
-                                                                            >
-                                                                                {size.name}
-                                                                            </Button>
-                                                                        )
-                                                                    })}
-                                                                </div>
-                                                            </div>
-                                                        )}
-
-                                                        {product?.color && product.color.length > 0 && (
-                                                            <div className="space-y-3">
-                                                                <p className="text-sm font-medium text-slate-900">
-                                                                    Color: {selectedColors[product.id] || 'Select a color'}
-                                                                </p>
-                                                                <div className="flex flex-wrap gap-3">
-                                                                    {product.color.map((color) => {
-                                                                        const isActive = selectedColors[product.id] === color.name
-                                                                        return (
-                                                                            <button
-                                                                                key={color.id || color.name}
-                                                                                type="button"
-                                                                                onClick={() => handleColorSelect(product.id, color.name, color.image)}
-                                                                                className={cn(
-                                                                                    'flex h-10 w-10 items-center justify-center rounded-full border transition-shadow',
-                                                                                    isActive
-                                                                                        ? 'border-primary shadow-[0_0_0_2px_rgba(59,130,246,0.4)]'
-                                                                                        : 'border-slate-200'
-                                                                                )}
-                                                                                style={{ backgroundColor: color.color_code }}
-                                                                            >
-                                                                                <span className="sr-only">{color.name}</span>
-                                                                            </button>
-                                                                        )
-                                                                    })}
-                                                                </div>
-                                                            </div>
-                                                        )}
-
-                                                        <div className="flex flex-col gap-3 sm:flex-row">
-                                                            <Button
-                                                                className="w-full"
-                                                                onClick={() => handleAddToCart(product.id, product.price, product.shipping_amount)}
-                                                                disabled={loadingStates[product.id] === 'Adding...'}
-                                                            >
-                                                                {renderAddToCartLabel(product.id)}
-                                                            </Button>
-                                                        </div>
-                                                    </div>
-                                                </DialogContent>
-                                            </Dialog>
-                                        ) : (
-                                            <div className="flex flex-col gap-3 sm:flex-row">
-                                                <Button
-                                                    className="w-full"
-                                                    onClick={() => handleAddToCart(product.id, product.price, product.shipping_amount)}
-                                                    disabled={loadingStates[product.id] === 'Adding...'}
-                                                >
-                                                    {renderAddToCartLabel(product.id)}
-                                                </Button>
-                                            </div>
-                                        )}
+                                        <Button
+                                            className="w-full"
+                                            onClick={() => handleAddToCart(product.id, product.price, product.shipping_amount)}
+                                            disabled={loadingStates[product.id] === 'Adding...'}
+                                        >
+                                            {renderAddToCartLabel(product.id)}
+                                        </Button>
                                     </CardContent>
                                     <CardFooter className="flex items-center justify-between text-sm text-muted-foreground">
                                         <span>Shipping: {formatCurrency(product.shipping_amount)}</span>

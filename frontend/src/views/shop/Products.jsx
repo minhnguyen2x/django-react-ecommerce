@@ -13,7 +13,6 @@ import { CartContext } from '../plugin/Context';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
 import { ProductCardSkeleton, CategorySkeleton } from '@/components/ui/product-skeleton';
 import { 
   Pagination, 
@@ -43,13 +42,6 @@ function Products() {
     const userData = UserData()
     let cart_id = CartID()
 
-    const [selectedProduct, setSelectedProduct] = useState(null);
-    const [selectedColors, setSelectedColors] = useState({});
-    const [selectedSize, setSelectedSize] = useState({});
-    const [colorImage, setColorImage] = useState("")
-    const [colorValue, setColorValue] = useState("No Color")
-    const [sizeValue, setSizeValue] = useState("No Size")
-    const [qtyValue, setQtyValue] = useState(1)
     let [cartCount, setCartCount] = useContext(CartContext);
 
     // Pagination
@@ -132,36 +124,6 @@ function Products() {
 
 
 
-    const handleColorButtonClick = (event, product_id, colorName, colorImage) => {
-        setColorValue(colorName);
-        setColorImage(colorImage);
-        setSelectedProduct(product_id);
-
-        setSelectedColors((prevSelectedColors) => ({
-            ...prevSelectedColors,
-            [product_id]: colorName,
-        }));
-
-
-    };
-
-    const handleSizeButtonClick = (event, product_id, sizeName) => {
-        setSizeValue(sizeName);
-        setSelectedProduct(product_id);
-
-        setSelectedSize((prevSelectedSize) => ({
-            ...prevSelectedSize,
-            [product_id]: sizeName,
-        }));
-
-    };
-
-    const handleQtyChange = (event, product_id) => {
-        setQtyValue(event.target.value);
-        setSelectedProduct(product_id);
-    };
-
-
     const handleAddToCart = async (product_id, price, shipping_amount) => {
         setLoadingStates((prevStates) => ({
             ...prevStates,
@@ -170,19 +132,13 @@ function Products() {
 
 
         try {
-            await addToCart(product_id, userData?.user_id, qtyValue, price, shipping_amount, currentAddress.country, colorValue, sizeValue, cart_id, setIsAddingToCart)
+            await addToCart(product_id, userData?.user_id, 1, price, shipping_amount, currentAddress.country, "No Color", "No Size", cart_id, setIsAddingToCart)
 
             // After a successful operation, set the loading state to false
             setLoadingStates((prevStates) => ({
                 ...prevStates,
                 [product_id]: 'Đã Thêm Giỏ Hàng',
             }));
-
-
-
-            setColorValue("No Color");
-            setSizeValue("No Size");
-            setQtyValue(0)
 
             const url = userData?.user_id ? `cart-list/${cart_id}/${userData?.user_id}/` : `cart-list/${cart_id}/`;
             const response = await axios.get(url);
@@ -233,7 +189,7 @@ function Products() {
                                         <Card key={product.id} className="overflow-hidden hover:shadow-lg transition-shadow relative w-full max-w-[200px]">
                                             <Link to={`/detail/${product.slug}`} className="block relative group">
                                                 <img
-                                                    src={(selectedProduct === product.id && colorImage) ? colorImage : product.image}
+                                                    src={product.image}
                                                     alt={product.title}
                                                     className="w-full aspect-square object-cover group-hover:scale-105 transition-transform duration-300"
                                                 />
@@ -245,126 +201,39 @@ function Products() {
                                             </Link>
                                             <CardContent className="p-4">
                                                 <div className="space-y-2">
-                                                    <p className="text-sm text-muted-foreground">
+                                                    <p className="text-sm text-muted-foreground truncate">
                                                         By: <Link to={`/vendor/${product?.vendor?.slug}`} className="hover:underline">{product.vendor.name}</Link>
                                                     </p>
                                                     <Link to={`/detail/${product.slug}`} className="block">
-                                                        <h5 className="font-semibold text-lg hover:text-primary transition-colors">
-                                                            {product.title.slice(0, 30)}...
+                                                        <h5 className="font-semibold text-lg hover:text-primary transition-colors line-clamp-2 min-h-[3.5rem]">
+                                                            {product.title}
                                                         </h5>
                                                     </Link>
-                                                    <Badge variant="secondary">{product?.brand.title}</Badge>
+                                                    <Badge variant="secondary" className="truncate max-w-full">{product?.brand.title}</Badge>
                                                     <p className="text-xl font-bold text-primary">${product.price}</p>
                                                 </div>
 
-                                                {((product.color && product.color.length > 0) || (product.size && product.size.length > 0)) ? (
-                                                    <div className="mt-4">
-                                                        <details className="group">
-                                                            <summary className="cursor-pointer list-none">
-                                                                <Button variant="outline" className="w-full">
-                                                                    Biến Thể
-                                                                </Button>
-                                                            </summary>
-                                                            <div className="mt-2 space-y-4 rounded-lg border p-4">
-                                                                <div className="space-y-2">
-                                                                    <label className="text-sm font-medium">Số lượng</label>
-                                                                    <Input
-                                                                        type="number"
-                                                                        placeholder="Số lượng"
-                                                                        onChange={(e) => handleQtyChange(e, product.id)}
-                                                                        min={1}
-                                                                        defaultValue={1}
-                                                                    />
-                                                                </div>
-
-                                                                {product?.size && product?.size.length > 0 && (
-                                                                    <div className="space-y-2">
-                                                                        <p className="text-sm font-medium">
-                                                                            <span className="font-semibold">Kích Cỡ:</span> {selectedSize[product.id] || 'Chọn kích cỡ'}
-                                                                        </p>
-                                                                        <div className="flex flex-wrap gap-2">
-                                                                            {product?.size?.map((size, index) => (
-                                                                                <Button
-                                                                                    key={index}
-                                                                                    variant={selectedSize[product.id] === size.name ? 'default' : 'outline'}
-                                                                                    size="sm"
-                                                                                    onClick={(e) => handleSizeButtonClick(e, product.id, size.name)}
-                                                                                >
-                                                                                    {size.name}
-                                                                                </Button>
-                                                                            ))}
-                                                                        </div>
-                                                                    </div>
-                                                                )}
-
-                                                                {product.color && product.color.length > 0 && (
-                                                                    <div className="space-y-2">
-                                                                        <p className="text-sm font-medium">
-                                                                            <span className="font-semibold">Màu Sắc:</span> {selectedColors[product.id] || 'Chọn màu sắc'}
-                                                                        </p>
-                                                                        <div className="flex flex-wrap gap-2">
-                                                                            {product?.color?.map((color, index) => (
-                                                                                <button
-                                                                                    key={index}
-                                                                                    className={`h-10 w-10 rounded-full border-2 transition-all ${
-                                                                                        selectedColors[product.id] === color.name
-                                                                                            ? 'ring-2 ring-primary ring-offset-2'
-                                                                                            : 'hover:scale-110'
-                                                                                    }`}
-                                                                                    style={{ backgroundColor: color.color_code }}
-                                                                                    onClick={(e) => handleColorButtonClick(e, product.id, color.name, color.image)}
-                                                                                    title={color.name}
-                                                                                />
-                                                                            ))}
-                                                                        </div>
-                                                                    </div>
-                                                                )}
-
-                                                                <Button
-                                                                    onClick={() => handleAddToCart(product.id, product.price, product.shipping_amount)}
-                                                                    disabled={loadingStates[product.id] === 'Đang Thêm...'}
-                                                                    className="w-full"
-                                                                >
-                                                                    {loadingStates[product.id] === 'Đã Thêm Giỏ Hàng' ? (
-                                                                        <>
-                                                                            Đã Thêm <FaCheckCircle className="ml-2" />
-                                                                        </>
-                                                                    ) : loadingStates[product.id] === 'Đang Thêm...' ? (
-                                                                        <>
-                                                                            Đang Thêm <FaSpinner className="ml-2 animate-spin" />
-                                                                        </>
-                                                                    ) : (
-                                                                        <>
-                                                                            {loadingStates[product.id] || 'Thêm Giỏ Hàng'} <FaShoppingCart className="ml-2" />
-                                                                        </>
-                                                                    )}
-                                                                </Button>
-                                                            </div>
-                                                        </details>
-                                                    </div>
-                                                ) : (
-                                                    <div className="mt-4">
-                                                        <Button
-                                                            onClick={() => handleAddToCart(product.id, product.price, product.shipping_amount)}
-                                                            disabled={loadingStates[product.id] === 'Đang Thêm...'}
-                                                            className="w-full"
-                                                        >
-                                                            {loadingStates[product.id] === 'Đã Thêm Giỏ Hàng' ? (
-                                                                <>
-                                                                    Đã Thêm <FaCheckCircle className="ml-2" />
-                                                                </>
-                                                            ) : loadingStates[product.id] === 'Đang Thêm...' ? (
-                                                                <>
-                                                                    Đang Thêm <FaSpinner className='ml-2 animate-spin' />
-                                                                </>
-                                                            ) : (
-                                                                <>
-                                                                    {loadingStates[product.id] || 'Thêm Giỏ Hàng'} <FaShoppingCart className="ml-2" />
-                                                                </>
-                                                            )}
-                                                        </Button>
-                                                    </div>
-                                                )}
+                                                <div className="mt-4">
+                                                    <Button
+                                                        onClick={() => handleAddToCart(product.id, product.price, product.shipping_amount)}
+                                                        disabled={loadingStates[product.id] === 'Đang Thêm...'}
+                                                        className="w-full"
+                                                    >
+                                                        {loadingStates[product.id] === 'Đã Thêm Giỏ Hàng' ? (
+                                                            <>
+                                                                Đã Thêm <FaCheckCircle className="ml-2" />
+                                                            </>
+                                                        ) : loadingStates[product.id] === 'Đang Thêm...' ? (
+                                                            <>
+                                                                Đang Thêm <FaSpinner className="ml-2 animate-spin" />
+                                                            </>
+                                                        ) : (
+                                                            <>
+                                                                {loadingStates[product.id] || 'Thêm Giỏ Hàng'} <FaShoppingCart className="ml-2" />
+                                                            </>
+                                                        )}
+                                                    </Button>
+                                                </div>
                                             </CardContent>
                                         </Card>
                                     ))}
