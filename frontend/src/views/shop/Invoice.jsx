@@ -93,7 +93,7 @@ function Invoice() {
                                 />
                                 <div>
                                     <CardTitle className="text-2xl font-semibold">
-                                        Desphixs<span className="text-primary">.</span>
+                                        Sop Pi<span className="text-primary">.</span>
                                     </CardTitle>
                                     <div className="mt-2 space-y-1 text-sm text-muted-foreground">
                                         <p className="flex items-center gap-2">

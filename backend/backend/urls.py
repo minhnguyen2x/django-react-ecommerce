@@ -29,7 +29,7 @@ schema_view = get_schema_view(
       default_version='v1',
       description="This is the API documentation for e-commerce project APIs",
       terms_of_service="https://www.google.com/policies/terms/",
-      contact=openapi.Contact(email="desphixs@gmail.com"),
+      contact=openapi.Contact(email="john.nguyen.professional@gmail.com"),
       license=openapi.License(name="BSD License"),
    ),
    public=True,

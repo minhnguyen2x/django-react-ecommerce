@@ -257,13 +257,13 @@ SIMPLE_JWT = {
 
 
 JAZZMIN_SETTINGS = {
-    "site_title": "Desphixs",
-    "site_header": "Desphixs",
+    "site_title": "Sop Pi",
+    "site_header": "Sop Pi",
     "site_brand": "Modern Marketplace ",
     "site_icon": "images/favicon.ico",
     "site_logo": "images/logos/logo.jpg",
-    "welcome_sign": "Welcome To Desphixs",
-    "copyright": "All right reserved to Desphixs",
+    "welcome_sign": "Welcome To Sop Pi",
+    "copyright": "All right reserved to Sop Pi",
     "user_avatar": "images/photos/logo.jpg",
     "topmenu_links": [
         {"name": "Dashboard", "url": "home",
