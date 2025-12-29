@@ -123,7 +123,8 @@ function PaymentSuccess() {
                                 </CardTitle>
                                 <p className="text-sm text-muted-foreground">
                                     {isFirstPayment
-                                        ? 'Thanh toán của bạn thành công. Chúng tôi đã gửi chi tiết đơn hàng đến email của bạn.'
+                                        ? 
+                                        'Bạn đã đặt hàng thành công.'
                                         : 'Bạn đã thanh toán cho đơn hàng này trước đó. Cảm ơn bạn đã tiếp tục đồng hành.'}
                                 </p>
                             </div>
@@ -137,7 +138,7 @@ function PaymentSuccess() {
                                         Xem Đơn Hàng
                                     </Button>
                                 </DialogTrigger>
-                                <DialogContent className="sm:max-w-lg">
+                                <DialogContent className="sm:max-w-lg bg-white">
                                     <DialogHeader>
                                         <DialogTitle>Chi tiết đơn hàng</DialogTitle>
                                     </DialogHeader>
@@ -206,7 +207,7 @@ function PaymentSuccess() {
     }
 
     return (
-        <div className="min-h-screen bg-slate-50">
+        <div className="min-h-screen bg-white">
             <ScrollToTop />
             <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 py-16">
                 <div className="text-center">
