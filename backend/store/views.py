@@ -618,9 +618,17 @@ class PaymentSuccessView(generics.CreateAPIView):
 
         # Handle Pay on Delivery / Cash on Delivery
         if payment_method == "cod":
-            if order.payment_status == "processing":
-                # For COD, we keep payment status as processing until payment is verified
-                # It will be updated to paid when order is delivered
+            # Mark COD payments as successful immediately per requirement
+            if order.payment_status in ["initiated", "processing", "pending", "unpaid"]:
+                order.payment_status = "paid"
+                # Update order fulfillment status so it doesn't show as Pending
+                try:
+                    order.order_status = "Fulfilled"
+                except Exception:
+                    # Fallback in case choices differ; ignore silently
+                    pass
+                order.save()
+
                 if order.buyer != None:
                     send_notification(user=order.buyer, order=order)
 
