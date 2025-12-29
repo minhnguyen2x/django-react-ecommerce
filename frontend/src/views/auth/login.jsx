@@ -44,7 +44,7 @@ const Login = () => {
         setIsLoading(false);
     };
     return (
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4">
+        <div className=" bg-gray-50 flex items-center justify-center py-12 px-4">
             <div className="w-full max-w-md">
                 <Card className="shadow-lg">
                     <CardHeader className="space-y-1 text-center">

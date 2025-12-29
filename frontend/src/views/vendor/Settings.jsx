@@ -193,12 +193,12 @@ function Settings() {
   const vendorPreview = vendorImage || 'https://i.gifer.com/origin/34/34338d26023e5515f6cc8969aa027bca.gif'
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <div className="mx-auto flex w-full max-w-7xl flex-col gap-8 px-4 py-10 lg:flex-row">
+    <div className=" bg-slate-50">
+      <div className="mx-auto flex w-full max-w-7xl flex-col gap-8 lg:flex-row">
         <Sidebar />
         <div className="flex-1 space-y-8">
           <header className="space-y-2">
-            <h1 className="text-2xl font-semibold text-slate-900">Cài Đặt</h1>
+            <h1 className="text-2xl font-semibold text-slate-900 py-4">Cài Đặt</h1>
             <p className="text-sm text-muted-foreground">
               Quản lý giao diện cửa hàng và thông tin hồ sơ cá nhân của bạn.
             </p>

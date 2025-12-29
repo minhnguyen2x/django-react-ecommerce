@@ -152,13 +152,6 @@ function Dashboard() {
     <VendorLayout
       title="Bảng Điều Khiển Nhà Bán"
       description="Theo dõi hiệu suất, đơn hàng và quản lý danh mục của bạn."
-      actions={
-        <div className="flex gap-2">
-          <Button variant="outline">Báo Cáo Hàng Ngày</Button>
-          <Button variant="outline">Báo Cáo Hàng Tháng</Button>
-          <Button variant="outline">Báo Cáo Hàng Năm</Button>
-        </div>
-      }
     >
       <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         {statCards.map(({ label, value, icon: Icon, accent }) => (
@@ -174,29 +167,6 @@ function Dashboard() {
             </CardContent>
           </Card>
         ))}
-      </section>
-
-      <section className="grid gap-4 lg:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle>Xu Hướng Đơn Hàng</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="h-[320px]">
-              <Line data={orderData} options={{ maintainAspectRatio: false }} />
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle>Xu Hướng Sản Phẩm</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="h-[320px]">
-              <Line data={productData} options={{ maintainAspectRatio: false }} />
-            </div>
-          </CardContent>
-        </Card>
       </section>
 
       <section className="space-y-4">

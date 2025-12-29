@@ -12,7 +12,7 @@ function Account() {
   const userProfile = UseProfileData()
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className=" bg-gray-50">
       <main className="container mx-auto px-4 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Sidebar */}
@@ -52,44 +52,6 @@ function Account() {
                               <h3 className="font-semibold text-lg mb-1">Đơn Hàng</h3>
                               <p className="text-sm text-gray-600">
                                 Xem và theo dõi các đơn hàng của bạn
-                              </p>
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    </Link>
-
-                    {/* Address */}
-                    <Link to="/customer/settings/">
-                      <Card className="hover:shadow-lg transition-all hover:scale-105 cursor-pointer border-2 hover:border-[rgb(37,99,235)]">
-                        <CardContent className="p-6">
-                          <div className="flex items-start space-x-4">
-                            <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
-                              <FaMapMarkerAlt className="text-green-500 text-xl" />
-                            </div>
-                            <div>
-                              <h3 className="font-semibold text-lg mb-1">Địa Chỉ</h3>
-                              <p className="text-sm text-gray-600">
-                                Quản lý địa chỉ giao hàng
-                              </p>
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    </Link>
-
-                    {/* Change Password */}
-                    <Link to="/customer/settings/">
-                      <Card className="hover:shadow-lg transition-all hover:scale-105 cursor-pointer border-2 hover:border-[rgb(37,99,235)]">
-                        <CardContent className="p-6">
-                          <div className="flex items-start space-x-4">
-                            <div className="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center flex-shrink-0">
-                              <FaKey className="text-yellow-600 text-xl" />
-                            </div>
-                            <div>
-                              <h3 className="font-semibold text-lg mb-1">Đổi Mật Khẩu</h3>
-                              <p className="text-sm text-gray-600">
-                                Thay đổi mật khẩu tài khoản
                               </p>
                             </div>
                           </div>

@@ -203,7 +203,7 @@ function ProductDetail() {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-slate-50">
+            <div className=" bg-slate-50">
                 <ScrollToTop />
                 <div className="mx-auto flex w-full max-w-4xl flex-col items-center justify-center px-4 py-24">
                     <Loader2 className="h-10 w-10 animate-spin text-primary" />
@@ -215,7 +215,7 @@ function ProductDetail() {
 
     if (!product) {
         return (
-            <div className="min-h-screen bg-slate-50">
+            <div className=" bg-slate-50">
                 <ScrollToTop />
                 <div className="mx-auto flex w-full max-w-3xl flex-col items-center justify-center px-4 py-24 text-center">
                     <Card className="shadow-sm">
@@ -230,7 +230,7 @@ function ProductDetail() {
     }
 
     return (
-        <div className="min-h-screen bg-slate-50">
+        <div className=" bg-slate-50">
             <ScrollToTop />
             <div className="mx-auto w-full max-w-6xl px-4 py-10">
                 <div className="grid gap-10 lg:grid-cols-[2fr_3fr]">

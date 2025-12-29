@@ -207,7 +207,7 @@ function PaymentSuccess() {
     }
 
     return (
-        <div className="min-h-screen bg-white">
+        <div className=" bg-white">
             <ScrollToTop />
             <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 py-16">
                 <div className="text-center">

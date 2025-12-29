@@ -33,7 +33,7 @@ function OrderDetail() {
   console.log(order);
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className=" bg-white">
       {loading === false &&
         <main className="container mx-auto px-4 py-8">
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
@@ -224,7 +224,7 @@ function OrderDetail() {
       }
 
       {loading === true &&
-        <div className="flex justify-center items-center min-h-screen bg-white">
+        <div className="flex justify-center items-center  bg-white">
           <div className="text-center">
             <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-[rgb(37,99,235)] mx-auto mb-4"></div>
             <p className="text-gray-600 text-lg">Đang tải...</p>

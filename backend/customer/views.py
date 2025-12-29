@@ -16,13 +16,14 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework import generics
 from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.views import APIView
 from rest_framework import status
 
 # Serializers
 from userauths.serializer import MyTokenObtainPairSerializer, ProfileSerializer, RegisterSerializer
-from store.serializers import CancelledOrderSerializer, NotificationSerializer, CartSerializer, CartOrderItemSerializer, CouponUsersSerializer, ProductSerializer, TagSerializer ,CategorySerializer, DeliveryCouriersSerializer, CartOrderSerializer, GallerySerializer, BrandSerializer, ProductFaqSerializer, ReviewSerializer,  SpecificationSerializer, CouponSerializer, ColorSerializer, SizeSerializer, AddressSerializer, ConfigSettingsSerializer
+from store.serializers import CancelledOrderSerializer, NotificationSerializer, CartSerializer, CartOrderItemSerializer, CouponUsersSerializer, ProductSerializer, TagSerializer ,CategorySerializer, DeliveryCouriersSerializer, CartOrderSerializer, CartOrderListSerializer, GallerySerializer, BrandSerializer, ProductFaqSerializer, ReviewSerializer,  SpecificationSerializer, CouponSerializer, ColorSerializer, SizeSerializer, AddressSerializer, ConfigSettingsSerializer
 
 # Models
 from userauths.models import Profile, User 
@@ -36,18 +37,29 @@ from decimal import Decimal
 import stripe
 import requests
 
+
+class CustomerOrderPagination(PageNumberPagination):
+    page_size = 20
+    page_size_query_param = "page_size"
+    max_page_size = 100
+
+
 class OrdersAPIView(generics.ListAPIView):
-    serializer_class = CartOrderSerializer
+    serializer_class = CartOrderListSerializer
     permission_classes = (AllowAny,)
+    pagination_class = CustomerOrderPagination
 
     def get_queryset(self):
         user_id = self.kwargs['user_id']
-        user = User.objects.get(id=user_id)
+        user = get_object_or_404(User, id=user_id)
 
         # Show orders with any successful payment status (paid, processing for COD)
         # Exclude only failed/cancelled orders
-        orders = CartOrder.objects.filter(buyer=user).exclude(payment_status__in=["cancelled", "failed", "initiated"])
-        return orders
+        qs = CartOrder.objects.filter(buyer=user).exclude(
+            payment_status__in=["cancelled", "failed", "initiated"]
+        ).order_by("-date")
+        
+        return qs
     
 
 class OrdersDetailAPIView(generics.RetrieveAPIView):

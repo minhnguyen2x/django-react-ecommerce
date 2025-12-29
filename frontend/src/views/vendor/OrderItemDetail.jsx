@@ -110,7 +110,7 @@ function OrderItemDetail() {
         .map((c) => ({ id: String(c.id), name: c?.name || 'Unnamed courier' }))
 
     return (
-        <div className="min-h-screen bg-slate-50">
+        <div className=" bg-slate-50">
             <div className="mx-auto flex w-full max-w-7xl flex-col gap-8 px-4 py-10 lg:flex-row">
                 <Sidebar />
                 <div className="flex-1 space-y-8">

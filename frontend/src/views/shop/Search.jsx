@@ -157,7 +157,7 @@ function Search() {
     )
 
     return (
-        <div className="min-h-screen bg-slate-50 pb-16">
+        <div className=" bg-slate-50 pb-16">
             <ScrollToTop />
             <div className="mx-auto w-full max-w-6xl px-4 py-10">
                 <header className="mb-8 space-y-2 text-center">

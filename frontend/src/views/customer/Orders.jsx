@@ -12,21 +12,50 @@ import { ScrollToTop } from '@/components/ui/scroll-to-top'
 
 function Orders() {
     const [orders, setOrders] = useState([])
+    const [page, setPage] = useState(1)
+    const [pageSize, setPageSize] = useState(20)
+    const [total, setTotal] = useState(0)
+    const [loading, setLoading] = useState(false)
 
     const axios = apiInstance
     const userData = UserData()
-    
+
+    const totalPages = Math.max(1, Math.ceil(total / pageSize))
 
     useEffect(() => {
-        axios.get(`customer/orders/${userData?.user_id}/`).then((res) => {
-            setOrders(res.data)
-        })
-    }, [])
+        if (!userData?.user_id) return
 
-    console.log(orders);
+        const fetchData = async () => {
+            setLoading(true)
+            try {
+                const res = await axios.get(
+                    `customer/orders/${userData?.user_id}/?page=${page}&page_size=${pageSize}`
+                )
+
+                // Handle DRF pagination
+                if (res.data?.results) {
+                    setOrders(res.data.results)
+                    setTotal(res.data.count || 0)
+                } else {
+                    // Fallback for non-paginated response
+                    setOrders(res.data || [])
+                    setTotal(Array.isArray(res.data) ? res.data.length : 0)
+                }
+            } catch (error) {
+                console.error('Error fetching orders:', error)
+            } finally {
+                setLoading(false)
+            }
+        }
+
+        fetchData()
+    }, [userData?.user_id, page, pageSize])
+
+    const handlePrev = () => setPage((p) => Math.max(1, p - 1))
+    const handleNext = () => setPage((p) => Math.min(totalPages, p + 1))
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className=" bg-gray-50">
             <main className="container mx-auto px-4 py-8">
                 <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
                     {/* Sidebar */}
@@ -51,7 +80,7 @@ function Orders() {
                                             <div className="flex items-center justify-between">
                                                 <div>
                                                     <p className="text-sm text-gray-600 mb-1">Tổng Đơn Hàng</p>
-                                                    <h2 className="text-3xl font-bold text-gray-800">{orders.length}</h2>
+                                                    <h2 className="text-3xl font-bold text-gray-800">{total}</h2>
                                                 </div>
                                                 <div className="w-14 h-14 bg-teal-600 rounded-full flex items-center justify-center">
                                                     <FaShoppingCart className="text-white text-2xl" />
@@ -108,7 +137,13 @@ function Orders() {
                                                     </tr>
                                                 </thead>
                                                 <tbody className="divide-y divide-gray-200">
-                                                    {orders.length > 0 ? (
+                                                    {loading ? (
+                                                        <tr>
+                                                            <td colSpan={5} className="px-6 py-12 text-center">
+                                                                <p className="text-gray-500">Đang tải...</p>
+                                                            </td>
+                                                        </tr>
+                                                    ) : orders.length > 0 ? (
                                                         orders.map((o, index) => (
                                                             <tr key={index} className="hover:bg-gray-50 transition-colors">
                                                                 <td className="px-6 py-4">
@@ -168,6 +203,40 @@ function Orders() {
                                         </div>
                                     </CardContent>
                                 </Card>
+
+                                {/* Pagination Controls */}
+                                <div className="mt-6 flex items-center justify-between">
+                                    <div className="text-sm text-gray-600">
+                                        Trang {page} / {totalPages} • Tổng {total} đơn
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <select
+                                            className="rounded-md border px-2 py-1 text-sm"
+                                            value={pageSize}
+                                            onChange={(e) => {
+                                                setPageSize(Number(e.target.value))
+                                                setPage(1)
+                                            }}
+                                        >
+                                            {[10, 20, 50, 100].map((size) => (
+                                                <option key={size} value={size}>
+                                                    {size} / trang
+                                                </option>
+                                            ))}
+                                        </select>
+                                        <Button variant="outline" size="sm" onClick={handlePrev} disabled={page === 1}>
+                                            Trước
+                                        </Button>
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={handleNext}
+                                            disabled={page >= totalPages}
+                                        >
+                                            Sau
+                                        </Button>
+                                    </div>
+                                </div>
                             </CardContent>
                         </Card>
                     </div>

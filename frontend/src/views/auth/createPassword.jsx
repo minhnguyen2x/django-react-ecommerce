@@ -53,7 +53,7 @@ function CreatePassword() {
     }
 
     return (
-        <div className="min-h-screen bg-slate-50">
+        <div className=" bg-slate-50">
             <ScrollToTop />
             <div className="mx-auto flex w-full max-w-md flex-col justify-center px-4 py-16">
                 <Card className="shadow-sm">

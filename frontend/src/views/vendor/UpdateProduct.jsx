@@ -353,7 +353,7 @@ function UpdateProduct() {
   const productImagePreview = resolvePreview(product.image) || placeholderImage
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className=" bg-slate-50">
       <div className="mx-auto flex w-full max-w-7xl flex-col gap-8 px-4 py-10 lg:flex-row">
         <Sidebar />
         <form className="flex-1 space-y-8" method="POST" encType="multipart/form-data" onSubmit={handleSubmit}>

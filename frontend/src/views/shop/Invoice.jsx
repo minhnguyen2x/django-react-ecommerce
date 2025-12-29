@@ -66,7 +66,7 @@ function Invoice() {
     }), [order])
 
     return (
-        <div className="min-h-screen bg-slate-50">
+        <div className=" bg-slate-50">
             <ScrollToTop />
             <div className="mx-auto w-full max-w-4xl px-4 py-10">
                 {loading ? (
