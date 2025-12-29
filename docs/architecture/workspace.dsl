@@ -15,7 +15,7 @@ workspace "Django-React Multi-Vendor E-commerce Platform" "Architecture document
         paypalSystem = softwareSystem "PayPal Payment Gateway" "Processes PayPal payments and manages transactions" {
             tags "External System"
         }
-        mailgunSystem = softwareSystem "Mailgun Email Service" "Sends transactional emails (order confirmations, password resets, notifications)" {
+        smtpSystem = softwareSystem "SMTP Email Service" "Sends transactional emails via SMTP (order confirmations, password resets, notifications)" {
             tags "External System"
         }
         
@@ -44,7 +44,7 @@ workspace "Django-React Multi-Vendor E-commerce Platform" "Architecture document
                 # Vendor Components
                 vendorModule = component "Vendor Module" "Vendor dashboard, products, orders, analytics" "React Components"
                 vendorDashboard = component "Vendor Dashboard" "Analytics and revenue charts" "React Component + Chart.js"
-                productManagement = component "Product Management" "Add/edit products with CKEditor" "React Component + CKEditor"
+                productManagement = component "Product Management" "Add/edit products" "React Component"
                 vendorOrders = component "Vendor Orders" "Manage orders and fulfillment" "React Component"
                 
                 # State Management
@@ -84,7 +84,6 @@ workspace "Django-React Multi-Vendor E-commerce Platform" "Architecture document
                 orderModel = component "CartOrder Model" "Order header with payment/order status" "Django Model"
                 orderItemModel = component "CartOrderItem Model" "Order line items with delivery tracking" "Django Model"
                 reviewModel = component "Review Model" "Product reviews with 1-5 star ratings" "Django Model"
-                wishlistModel = component "Wishlist Model" "User wishlists" "Django Model"
                 addressModel = component "Address Model" "User shipping addresses" "Django Model"
                 couponModel = component "Coupon Model" "Percentage-based discount coupons" "Django Model"
                 couponUsersModel = component "CouponUsers Model" "Tracks coupon usage" "Django Model"
@@ -109,19 +108,19 @@ workspace "Django-React Multi-Vendor E-commerce Platform" "Architecture document
                 taxModel = component "Tax Model" "Country-based tax rates" "Django Model"
                 
                 # Notification System
-                notificationComponent = component "Notification System" "Automatic notifications for order events" "Django Signals"
+                notificationComponent = component "Notification System" "Automatic notifications for order events" "View Helpers"
                 
                 # Payment Processing
                 paymentProcessor = component "Payment Processor" "Stripe and PayPal integration" "Django Views"
             }
             
             # Database Container
-            database = container "SQLite Database" "Stores user accounts, products, orders, reviews, etc." "SQLite 3" {
+            database = container "PostgreSQL Database" "Stores user accounts, products, orders, reviews, etc." "PostgreSQL" {
                 tags "Database"
             }
             
             # File Storage Container
-            mediaStorage = container "Media Storage" "Stores uploaded images and files" "Filesystem" {
+            mediaStorage = container "Media Storage" "Stores uploaded images and files" "AWS S3" {
                 tags "Storage"
             }
         }
@@ -134,19 +133,19 @@ workspace "Django-React Multi-Vendor E-commerce Platform" "Architecture document
         # Relationships - System to External Systems
         ecommerceSystem -> stripeSystem "Processes credit card payments"
         ecommerceSystem -> paypalSystem "Processes PayPal payments"
-        ecommerceSystem -> mailgunSystem "Sends transactional emails"
+        ecommerceSystem -> smtpSystem "Sends transactional emails"
         
         # Relationships - Frontend to Backend
         ecommerceSystem.reactApp -> ecommerceSystem.djangoAPI "Makes API calls to" "HTTPS/REST"
         
         # Relationships - Backend to Database
-        ecommerceSystem.djangoAPI -> ecommerceSystem.database "Reads from and writes to" "SQLite Protocol"
-        ecommerceSystem.djangoAPI -> ecommerceSystem.mediaStorage "Stores and retrieves files from" "Filesystem"
+        ecommerceSystem.djangoAPI -> ecommerceSystem.database "Reads from and writes to" "PostgreSQL Protocol"
+        ecommerceSystem.djangoAPI -> ecommerceSystem.mediaStorage "Stores and retrieves files from" "S3"
         
         # Relationships - Backend to External Systems
         ecommerceSystem.djangoAPI -> stripeSystem "Creates payment sessions" "HTTPS/Stripe API"
-        ecommerceSystem.djangoAPI -> paypalSystem "Processes PayPal transactions" "HTTPS/PayPal SDK"
-        ecommerceSystem.djangoAPI -> mailgunSystem "Sends emails via" "HTTPS/Mailgun API"
+        ecommerceSystem.djangoAPI -> paypalSystem "Processes PayPal transactions" "HTTPS/PayPal REST API"
+        ecommerceSystem.djangoAPI -> smtpSystem "Sends emails via" "SMTP"
         
         # Component-level Relationships - React App
         ecommerceSystem.reactApp.shopModule -> ecommerceSystem.reactApp.apiClient "Uses"
@@ -190,7 +189,6 @@ workspace "Django-React Multi-Vendor E-commerce Platform" "Architecture document
         ecommerceSystem.djangoAPI.storeViews -> ecommerceSystem.djangoAPI.orderModel "Queries"
         ecommerceSystem.djangoAPI.storeViews -> ecommerceSystem.djangoAPI.orderItemModel "Queries"
         ecommerceSystem.djangoAPI.storeViews -> ecommerceSystem.djangoAPI.reviewModel "Queries"
-        ecommerceSystem.djangoAPI.storeViews -> ecommerceSystem.djangoAPI.wishlistModel "Queries"
         ecommerceSystem.djangoAPI.storeViews -> ecommerceSystem.djangoAPI.couponModel "Queries"
         
         ecommerceSystem.djangoAPI.vendorViews -> ecommerceSystem.djangoAPI.vendorModel "Queries"
@@ -202,7 +200,6 @@ workspace "Django-React Multi-Vendor E-commerce Platform" "Architecture document
         ecommerceSystem.djangoAPI.vendorViews -> ecommerceSystem.djangoAPI.deliveryCouriersModel "Queries"
         
         ecommerceSystem.djangoAPI.customerViews -> ecommerceSystem.djangoAPI.orderModel "Queries"
-        ecommerceSystem.djangoAPI.customerViews -> ecommerceSystem.djangoAPI.wishlistModel "Queries"
         ecommerceSystem.djangoAPI.customerViews -> ecommerceSystem.djangoAPI.notificationModel "Queries"
         ecommerceSystem.djangoAPI.customerViews -> ecommerceSystem.djangoAPI.addressModel "Queries"
         
@@ -257,7 +254,7 @@ workspace "Django-React Multi-Vendor E-commerce Platform" "Architecture document
         # dynamic ecommerceSystem "OrderFlow" "Order processing flow from cart to payment" {
         #     customer -> ecommerceSystem "1. Browses and shops"
         #     ecommerceSystem -> stripeSystem "2. Processes payment"
-        #     ecommerceSystem -> mailgunSystem "3. Sends confirmation"
+        #     ecommerceSystem -> smtpSystem "3. Sends confirmation"
         #     autoLayout lr
         # }
         
