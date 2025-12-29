@@ -21,64 +21,51 @@ Structurizr is a tool for visualizing software architecture using the C4 model (
 
 1. **Start Structurizr Lite**:
    ```bash
-   docker run -it --rm -p 8080:8080 \
-     -v /Volumes/m2-havas-pronto/personal/uit/python/django-react-ecommerce/docs/architecture:/usr/local/structurizr \
-     structurizr/lite
-   ```
-
 2. **Open in Browser**:
    Navigate to [http://localhost:8080](http://localhost:8080)
+   ### System Components
+
+   - **Frontend**: React 18.2 SPA with Vite, Zustand state management
+   - **Backend**: Django 4.2.7 REST API with Django REST Framework
+   - **Database**: PostgreSQL (default) / SQLite optional for local development
+   - **Storage**: AWS S3 (active; filesystem optional for local)
+   - **External Services**: 
+      - Stripe & PayPal for payments
+      - SMTP email (Gmail)
 
 3. **Stop Structurizr**:
-   Press `Ctrl+C` in the terminal where Docker is running
-
-### Edit Architecture
-
+   - PostgreSQL Database
+   - Media Storage (AWS S3)
 1. Edit the `workspace.dsl` file in this directory
 2. Save your changes
-3. Refresh the browser to see updates (Structurizr auto-reloads every 5 seconds)
-
-## Architecture Overview
-
-This project is a full-stack multi-vendor e-commerce platform with the following architecture:
-
+    Customer Module (orders, notifications)
 ### System Components
 
-- **Frontend**: React 18.2 SPA with Vite, Zustand state management
-- **Backend**: Django 4.2.7 REST API with Django REST Framework
-- **Database**: SQLite (development) / PostgreSQL (production ready)
-- **Storage**: Local filesystem / AWS S3 (configurable)
-- **External Services**: 
-  - Stripe & PayPal for payments
-  - Mailgun for transactional emails
-
+   -- **Store App**: models including Product, Category, Tag, Brand, Gallery (one-to-many), Specification, Size, Color, Cart, CartOrder, CartOrderItem, Review, Address, Coupon, CouponUsers, Notification, CancelledOrder, DeliveryCouriers + Store Views (40+ endpoints) + Serializers
+   -- **Customer App**: Customer Views (orders, notifications, settings)
+   -- **Payment Processor**: Stripe and PayPal (REST API) integration
+   -- **Notification System**: Helper invoked from views for order events
 ### Key Features
-
+   -- **`store`**: Complete e-commerce logic with models (products, categories, brands, cart, orders, reviews, coupons, delivery tracking)
 - **Multi-tenancy**: Supports multiple vendors with isolated shops
-- **Product Management**: Categories, brands, variants (colors, sizes), galleries
-- **Shopping Cart**: Session-based for anonymous users, persistent for logged-in users
+   -- **Gallery**: Product images (one-to-many relationship with products)
 - **Order Management**: Full order lifecycle with delivery tracking
-- **Payment Processing**: Integrated Stripe and PayPal checkout
-- **Review System**: Product reviews with ratings and helpful votes
-- **Vendor Dashboard**: Analytics, revenue charts, order fulfillment
-- **Customer Portal**: Order history, wishlist, notifications
-- **Coupon System**: Discount codes with usage tracking
+   **Customer (endpoints):**
 - **Email Notifications**: Automated emails for order events
-
+   - **Customer Routes**: `/customer/*` - Dashboard, orders, notifications
 ## Available Diagrams
-
-The `workspace.dsl` file generates the following views:
-
-### 1. System Context Diagram (`SystemContext`)
+   - **Chart.js**: Vendor analytics dashboards
+   - **SweetAlert2**: User notifications
+   - **PayPal REST API (via requests)**: Payment integration
 Shows the big picture: users (Customer, Vendor, Admin), the e-commerce system, and external dependencies (Stripe, PayPal, Mailgun).
-
-**Use for**: Understanding system boundaries and external integrations
-
+   - Pillow (image processing)
+   - stripe (payments), PayPal via REST (requests)
+   - SMTP email backend
 ### 2. Container Diagram (`Containers`)
-Shows the major applications and data stores:
-- React SPA (frontend)
+   - PostgreSQL (primary)
+   - SQLite optional (local/dev)
 - Django REST API (backend)
-- SQLite Database
+   - AWS S3 active (via django-storages)
 - Media Storage
 
 **Use for**: Understanding the high-level technical architecture
