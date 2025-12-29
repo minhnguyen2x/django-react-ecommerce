@@ -69,16 +69,6 @@ function Sidebar() {
                                 </Link>
 
                                 <Link 
-                                    to='/customer/notifications/' 
-                                    className="flex items-center justify-between px-4 py-3 rounded-lg hover:bg-blue-50 transition-colors group"
-                                >
-                                    <div className="flex items-center gap-3">
-                                        <FaBell className="text-yellow-500 group-hover:scale-110 transition-transform" />
-                                        <span className="font-medium text-gray-700 group-hover:text-[rgb(37,99,235)]">Thông Báo</span>
-                                    </div>
-                                </Link>
-
-                                <Link 
                                     to='/customer/settings/' 
                                     className="flex items-center justify-between px-4 py-3 rounded-lg hover:bg-blue-50 transition-colors group"
                                 >

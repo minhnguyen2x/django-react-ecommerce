@@ -170,10 +170,8 @@ function Products() {
                         <div className="mx-auto max-w-6xl px-4">
                             <section className="text-center">
                                 <div className="mx-auto mb-6 mt-4 max-w-2xl space-y-2">
-                                    <h1 className="text-3xl font-semibold text-slate-900">Sản Phẩm Nổi Bật 📍</h1>
-                                    <p className="text-base text-muted-foreground">
-                                        Sản phẩm tiêu biểu mà người dùng yêu thích gần đây.
-                                    </p>
+                                    <h1 className="text-3xl font-semibold text-slate-900">Sản Phẩm</h1>
+                                   
                                 </div>
                             </section>
                             <section className="text-center">
@@ -280,30 +278,6 @@ function Products() {
                                     </p>
                                 )}
                             </div>
-                        </div>
-                    </main>
-
-                    <main className="mt-12">
-                        <section className="text-center container">
-                            <div className="max-w-2xl mx-auto mb-8">
-                                <h1 className="text-3xl font-light mb-3">Danh mục</h1>
-                            </div>
-                        </section>
-                        <div className="flex justify-center gap-4 flex-wrap">
-                            {category.map((c, index) => (
-                                <Link 
-                                    key={index}
-                                    to={`/category/${c.slug}`}
-                                    className="flex flex-col items-center bg-gray-100 hover:bg-gray-200 transition-colors rounded-xl p-8 min-w-[120px]"
-                                >
-                                    <img 
-                                        src={c.image}
-                                        alt={c.title}
-                                        className="w-20 h-20 object-cover rounded-full"
-                                    />
-                                    <p className="text-gray-800 mt-2 font-medium">{c.title}</p>
-                                </Link>
-                            ))}
                         </div>
                     </main>
                 </div>

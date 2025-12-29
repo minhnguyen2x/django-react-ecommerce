@@ -65,7 +65,7 @@ function StoreHeader() {
                                     <ChevronDown className="ml-2 h-4 w-4" />
                                 </Button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="w-56">
+                            <DropdownMenuContent align="end" className="w-56 bg-white">
                                 <DropdownMenuItem asChild>
                                     <Link to="/customer/account/" className="flex items-center cursor-pointer">
                                         <User className="mr-2 h-4 w-4" />
@@ -97,7 +97,7 @@ function StoreHeader() {
                                     <ChevronDown className="ml-2 h-4 w-4" />
                                 </Button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="w-56">
+                            <DropdownMenuContent align="end" className="w-56 bg-white">
                                 <DropdownMenuItem asChild>
                                     <Link to="/vendor/dashboard/" className="flex items-center cursor-pointer">
                                         <LayoutDashboard className="mr-2 h-4 w-4" />
@@ -158,12 +158,6 @@ function StoreHeader() {
                     <div className="flex items-center gap-2">
                         {isLoggedIn() ? (
                             <>
-                                <Button asChild variant="ghost" className="hidden sm:flex text-white hover:bg-[rgb(37,99,235)]">
-                                    <Link to="/customer/account/">
-                                        <User className="mr-2 h-4 w-4" />
-                                        Tài Khoản
-                                    </Link>
-                                </Button>
                                 <Button asChild variant="ghost" className="text-white hover:bg-[rgb(37,99,235)]">
                                     <Link to="/logout">
                                         <LogOut className="mr-2 h-4 w-4" />

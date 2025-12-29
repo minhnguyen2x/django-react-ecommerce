@@ -10,10 +10,7 @@ const navItems = [
   { href: '/vendor/products/', label: 'Sản Phẩm', icon: Package },
   { href: '/vendor/orders/', label: 'Đơn Hàng', icon: ShoppingCart },
   { href: '/vendor/earning/', label: 'Thu Nhập', icon: DollarSign },
-  { href: '/vendor/reviews/', label: 'Đánh Giá', icon: Star },
   { href: '/vendor/product/new/', label: 'Thêm Sản Phẩm', icon: PlusCircle },
-  { href: '/vendor/coupon/', label: 'Mã Giảm Giá', icon: Tag },
-  { href: '/vendor/notifications/', label: 'Thông Báo', icon: Bell },
   { href: '/vendor/settings/', label: 'Cài Đặt', icon: Settings },
 ]
 

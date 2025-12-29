@@ -18,7 +18,7 @@ function StoreFooter() {
               <span className="text-2xl font-bold text-white">Sộp Pi</span>
             </div>
             <p className="text-sm leading-relaxed">
-              Nền tảng mua sắm trực tuyến hàng đầu Việt Nam. Mang đến trải nghiệm mua sắm tuyệt vời với hàng triệu sản phẩm chất lượng.
+              Nền tảng mua sắm trực tuyến hàng đầu Việt Nam.
             </p>
             <div className="flex gap-2">
               <Button size="icon" variant="ghost" className="hover:bg-blue-600 hover:text-white transition-colors" asChild>
@@ -84,7 +84,7 @@ function StoreFooter() {
             <ul className="space-y-3 mb-6">
               <li className="flex items-start gap-2">
                 <MapPin className="h-5 w-5 text-blue-500 flex-shrink-0 mt-0.5" />
-                <span className="text-sm">123 Nguyễn Văn Linh, Quận 7, TP.HCM</span>
+                <span className="text-sm">TP.HCM</span>
               </li>
               <li className="flex items-center gap-2">
                 <Phone className="h-5 w-5 text-blue-500 flex-shrink-0" />
@@ -92,7 +92,7 @@ function StoreFooter() {
               </li>
               <li className="flex items-center gap-2">
                 <Mail className="h-5 w-5 text-blue-500 flex-shrink-0" />
-                <span className="text-sm">support@ecom.vn</span>
+                <span className="text-sm">support@soppi.vn</span>
               </li>
             </ul>
             
