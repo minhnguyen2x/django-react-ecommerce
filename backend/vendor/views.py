@@ -18,6 +18,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework import generics
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.views import APIView
@@ -26,7 +27,7 @@ from rest_framework.parsers import MultiPartParser, FormParser
 
 # Serializers
 from userauths.serializer import MyTokenObtainPairSerializer, ProfileSerializer, RegisterSerializer
-from store.serializers import CancelledOrderSerializer, CouponSummarySerializer, EarningSummarySerializer, NotificationSerializer, CartSerializer, NotificationSummarySerializer, SummarySerializer, CartOrderItemSerializer, CouponUsersSerializer,  ProductSerializer, TagSerializer, CategorySerializer, DeliveryCouriersSerializer, CartOrderSerializer, GallerySerializer, BrandSerializer, ProductFaqSerializer, ReviewSerializer,  SpecificationSerializer, CouponSerializer, ColorSerializer, SizeSerializer, AddressSerializer, ConfigSettingsSerializer, VendorSerializer
+from store.serializers import CancelledOrderSerializer, CouponSummarySerializer, EarningSummarySerializer, NotificationSerializer, CartSerializer, NotificationSummarySerializer, SummarySerializer, CartOrderItemSerializer, CouponUsersSerializer,  ProductSerializer, TagSerializer, CategorySerializer, DeliveryCouriersSerializer, CartOrderSerializer, CartOrderListSerializer, GallerySerializer, BrandSerializer, ProductFaqSerializer, ReviewSerializer,  SpecificationSerializer, CouponSerializer, ColorSerializer, SizeSerializer, AddressSerializer, ConfigSettingsSerializer, VendorSerializer
 
 # Models
 from userauths.models import Profile, User
@@ -86,15 +87,33 @@ class ProductsAPIView(generics.ListAPIView):
         return products
 
 
+class VendorOrderPagination(PageNumberPagination):
+    page_size = 20
+    page_size_query_param = "page_size"
+    max_page_size = 100
+
+
 class OrdersAPIView(generics.ListAPIView):
-    serializer_class = CartOrderSerializer
+    serializer_class = CartOrderListSerializer
     permission_classes = (AllowAny,)
+    pagination_class = VendorOrderPagination
 
     def get_queryset(self):
         vendor_id = self.kwargs['vendor_id']
-        vendor = Vendor.objects.get(id=vendor_id)
-        orders = CartOrder.objects.filter(vendor=vendor, payment_status="paid")
-        return orders
+        vendor = get_object_or_404(Vendor, id=vendor_id)
+
+        # Use the M2M lookup correctly
+        qs = CartOrder.objects.filter(vendor__id=vendor_id).order_by("-date")
+
+        payment_status = self.request.GET.get("payment_status")
+        if payment_status:
+            qs = qs.filter(payment_status=payment_status)
+
+        order_status = self.request.GET.get("order_status")
+        if order_status:
+            qs = qs.filter(order_status=order_status)
+
+        return qs
 
 
 class RevenueAPIView(generics.ListAPIView):
@@ -376,8 +395,8 @@ class OrderDetailAPIView(generics.RetrieveAPIView):
         order_oid = self.kwargs['order_oid']
 
         vendor = Vendor.objects.get(id=vendor_id)
-        order = CartOrder.objects.get(
-            vendor=vendor, payment_status="paid", oid=order_oid)
+        # Allow vendors to view order details for any payment status
+        order = CartOrder.objects.get(vendor=vendor, oid=order_oid)
         return order
 
 

@@ -214,6 +214,18 @@ class CartOrderSerializer(serializers.ModelSerializer):
             self.Meta.depth = 3
 
 
+class CartOrderListSerializer(serializers.ModelSerializer):
+    """Ultra-lightweight serializer for listing orders - no nested items to avoid N+1 queries."""
+
+    class Meta:
+        model = CartOrder
+        fields = [
+            'id', 'oid', 'full_name', 'email', 'mobile',
+            'payment_status', 'order_status', 'total', 'date'
+        ]
+        depth = 0
+
+
 class VendorSerializer(serializers.ModelSerializer):
     # Serialize related CartOrderItem models
     user = UserSerializer(read_only=True)
